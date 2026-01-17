@@ -1,108 +1,64 @@
-:root {
-  --bg: #0b0b0d;
-  --panel: #151518;
-  --accent: #ff5600;
-  --text: #eaeaea;
-  --muted: #a0a0a0;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OV Legend</title>
 
-* {
-  box-sizing: border-box;
-}
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
-body {
-  margin: 0;
-  font-family: 'Montserrat', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
 
-/* NAV */
-.nav {
-  background: #000;
-  border-bottom: 1px solid #222;
-}
+<body>
 
-.nav-inner {
-  max-width: 1100px;
-  margin: auto;
-  padding: 14px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="logo">OV <span>Legend</span></div>
 
-.logo {
-  font-weight: 800;
-  font-size: 20px;
-}
+      <nav>
+        <a href="/">Home</a>
+        <a href="/rlol/">RLOL</a>
+        <a href="/stats/">Stats</a>
+        <a href="/leaderboards/">Leaderboards</a>
+        <a href="/builds/">Builds</a>
+      </nav>
+    </div>
+  </header>
 
-.logo span {
-  color: var(--accent);
-}
+  <!-- HERO -->
+  <section class="hero">
+    <h1>OV Legend</h1>
+    <div class="tagline">⚡ Site rebuild in progress</div>
+    <div class="sub">RLOL • Clips • Builds • Stats • Community</div>
+  </section>
 
-nav a {
-  color: var(--text);
-  margin-left: 18px;
-  text-decoration: none;
-  font-weight: 600;
-}
+  <!-- CONTENT -->
+  <main class="container">
+    <div class="card">
+      <h2>What’s coming</h2>
+      <ul>
+        <li><strong>RLOL Hub</strong>: standings, schedule, teams</li>
+        <li><strong>Stats</strong>: player season stats + leaderboards</li>
+        <li><strong>Builds</strong>: AlphaConsole presets & downloads</li>
+        <li><strong>Clips</strong>: weekly winners + content pipeline</li>
+      </ul>
+    </div>
+  </main>
 
-nav a:hover {
-  color: var(--accent);
-}
+  <!-- FOOTER -->
+  <footer class="footer">
+    © <span id="year"></span> OV Legend • Built on Cloudflare Pages
+  </footer>
 
-/* HERO */
-.hero {
-  text-align: center;
-  padding: 80px 20px 60px;
-}
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 
-.hero h1 {
-  font-size: 56px;
-  margin-bottom: 10px;
-}
-
-.tagline {
-  font-size: 18px;
-  color: var(--accent);
-  margin-bottom: 8px;
-}
-
-.sub {
-  color: var(--muted);
-}
-
-/* CONTENT */
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-}
-
-.card {
-  background: var(--panel);
-  border-radius: 12px;
-  padding: 24px;
-}
-
-.card h2 {
-  margin-top: 0;
-}
-
-.card ul {
-  padding-left: 18px;
-}
-
-.card li {
-  margin-bottom: 8px;
-}
-
-/* FOOTER */
-.footer {
-  text-align: center;
-  padding: 20px;
-  font-size: 14px;
-  color: var(--muted);
-  border-top: 1px solid #222;
-}
+</body>
+</html>
