@@ -1189,3 +1189,70 @@ body.rlol-hub .hub-grid .panel *::-webkit-scrollbar-track{
 .rlol-hub .stats-preview__footer{
   margin-top: 12px;
 }
+
+/* =========================
+   RLOL HUB — Next Match panel: fit column + scroll
+   ========================= */
+body.rlol-hub .panel{
+  overflow: hidden;
+}
+
+body.rlol-hub .panel .match-list,
+body.rlol-hub #nextMatches{
+  overflow: auto;
+  padding-right: 6px;
+}
+
+/* Each match card */
+body.rlol-hub .match{
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Logo column */
+body.rlol-hub .match .logo{
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(255,138,0,0.35), 0 0 14px rgba(255,138,0,0.12);
+}
+
+/* Text column */
+body.rlol-hub .match .meta{
+  min-width: 0; /* critical for wrapping inside grid */
+}
+
+/* Team rows */
+body.rlol-hub .match .team{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Team name wraps instead of overflowing */
+body.rlol-hub .match .team .name{
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+/* “vs” line tighter */
+body.rlol-hub .match .vs{
+  opacity: .7;
+  font-size: 12px;
+  margin: 2px 0;
+}
+
+/* Optional: shrink “scheduled” label */
+body.rlol-hub .match .status{
+  opacity: .65;
+  font-size: 12px;
+  margin-top: 6px;
+}
