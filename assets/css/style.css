@@ -1067,3 +1067,47 @@ body.rlol-hub a:hover{
   color: var(--accent);
   border-bottom-color: rgba(255,138,0,0.65);
 }
+
+/* =========================
+   RLOL HUB — fix panel overflow + keep columns clean
+   ========================= */
+
+body.rlol-hub .hub-grid{
+  align-items: stretch;
+}
+
+/* Ensure all 3 panels behave like cards with internal scroll areas */
+body.rlol-hub .hub-grid .panel{
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;            /* tweak if you want taller/shorter */
+  overflow: hidden;
+}
+
+/* Let the inside content scroll instead of blowing out the layout */
+body.rlol-hub .hub-grid .panel .panel-body,
+body.rlol-hub .hub-grid .panel .content,
+body.rlol-hub .hub-grid .panel .inner,
+body.rlol-hub .hub-grid .panel .matches,
+body.rlol-hub .hub-grid .panel #nextMatches{
+  overflow: auto;
+  padding-right: 6px;
+}
+
+/* If your Next Match content is just dumped directly in the panel,
+   this catches it and prevents “infinite height” */
+body.rlol-hub .hub-grid .panel > :last-child{
+  overflow: auto;
+}
+
+/* Optional: nicer scrollbar */
+body.rlol-hub .hub-grid .panel *::-webkit-scrollbar{
+  width: 10px;
+}
+body.rlol-hub .hub-grid .panel *::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+}
+body.rlol-hub .hub-grid .panel *::-webkit-scrollbar-track{
+  background: rgba(0,0,0,0.25);
+}
