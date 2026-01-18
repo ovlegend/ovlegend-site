@@ -300,3 +300,164 @@
 
   main();
 })();
+
+// /assets/js/rlol-hub-stats-preview.js
+(function () {
+  const $ = (sel) => document.querySelector(sel);
+
+  function parseCSV(text) {
+    const rows = [];
+    let row = [];
+    let cur = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      const next = text[i + 1];
+
+      if (c === '"' && inQuotes && next === '"') { cur += '"'; i++; continue; }
+      if (c === '"') { inQuotes = !inQuotes; continue; }
+      if (c === "," && !inQuotes) { row.push(cur); cur = ""; continue; }
+
+      if ((c === "\n" || c === "\r") && !inQuotes) {
+        if (c === "\r" && next === "\n") i++;
+        row.push(cur); cur = "";
+        if (row.some(x => String(x).trim() !== "")) rows.push(row);
+        row = [];
+        continue;
+      }
+      cur += c;
+    }
+    row.push(cur);
+    if (row.some(x => String(x).trim() !== "")) rows.push(row);
+
+    const header = rows[0] || [];
+    const data = [];
+    for (let r = 1; r < rows.length; r++) {
+      const obj = {};
+      for (let c = 0; c < header.length; c++) {
+        obj[String(header[c] || "").trim()] = (rows[r][c] ?? "").trim();
+      }
+      data.push(obj);
+    }
+    return data;
+  }
+
+  function num(v, fallback = 0) {
+    const s = String(v ?? "").trim();
+    if (!s) return fallback;
+    const n = Number(s.replace(/[^\d.-]/g, ""));
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function pick(row, keys, fb = "") {
+    for (const k of keys) {
+      const val = row[k];
+      if (val !== undefined && val !== null && String(val).trim() !== "") return String(val).trim();
+    }
+    return fb;
+  }
+
+  async function fetchCsv(url) {
+    if (!url) throw new Error("Stats CSV missing (OV_CONFIG.rlol.playerSeasonStatsCsv)");
+    const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+    const res = await fetch(busted, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status} fetching stats CSV`);
+    return parseCSV(await res.text());
+  }
+
+  function bestBy(rows, valueKeyCandidates) {
+    let best = null;
+    let bestVal = -Infinity;
+    for (const r of rows) {
+      const v = num(pick(r, valueKeyCandidates, "0"), 0);
+      if (v > bestVal) { bestVal = v; best = r; }
+    }
+    return { row: best, val: bestVal };
+  }
+
+  function renderRow(label, whoName, teamName, value, avatarUrl) {
+    const img = avatarUrl ? `<img src="${avatarUrl}" alt="" loading="lazy" />` : `<img src="" alt="" style="display:none" />`;
+    const team = teamName ? `<span class="team">• ${teamName}</span>` : "";
+    return `
+      <div class="stat-row">
+        <div>
+          <div class="label">${label}</div>
+          <div class="who">
+            ${avatarUrl ? img : ""}
+            <div class="name">${whoName || "—"}${team}</div>
+          </div>
+        </div>
+        <div class="value">${Number.isFinite(value) ? value : "—"}</div>
+      </div>
+    `;
+  }
+
+  async function init() {
+    const mount = $("#statsPreview");
+    if (!mount) return;
+
+    try {
+      const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
+      const rows = await fetchCsv(cfg && cfg.playerSeasonStatsCsv);
+
+      // These column guesses cover most sheets:
+      const nameKey = ["player", "Player", "player_name", "Player Name", "name", "Name"];
+      const teamKey = ["team", "Team", "team_name", "Team Name"];
+      const avatarKey = ["avatar", "avatar_url", "pfp", "photo", "image", "img"];
+
+      const topScore = bestBy(rows, ["score", "Score", "pts", "PTS", "points", "Points"]);
+      const topGoals = bestBy(rows, ["g", "G", "goals", "Goals"]);
+      const topAssists = bestBy(rows, ["a", "A", "assists", "Assists"]);
+      const topSaves = bestBy(rows, ["saves", "Saves", "sv", "SV"]);
+
+      mount.innerHTML = [
+        (() => {
+          const r = topScore.row || {};
+          return renderRow(
+            "Top Score",
+            pick(r, nameKey, ""),
+            pick(r, teamKey, ""),
+            topScore.val,
+            pick(r, avatarKey, "")
+          );
+        })(),
+        (() => {
+          const r = topGoals.row || {};
+          return renderRow(
+            "Goals Leader",
+            pick(r, nameKey, ""),
+            pick(r, teamKey, ""),
+            topGoals.val,
+            pick(r, avatarKey, "")
+          );
+        })(),
+        (() => {
+          const r = topAssists.row || {};
+          return renderRow(
+            "Assists Leader",
+            pick(r, nameKey, ""),
+            pick(r, teamKey, ""),
+            topAssists.val,
+            pick(r, avatarKey, "")
+          );
+        })(),
+        (() => {
+          const r = topSaves.row || {};
+          return renderRow(
+            "Saves Leader",
+            pick(r, nameKey, ""),
+            pick(r, teamKey, ""),
+            topSaves.val,
+            pick(r, avatarKey, "")
+          );
+        })(),
+      ].join("");
+    } catch (err) {
+      console.error(err);
+      mount.innerHTML = `<div class="stats-preview__loading">Stats preview failed: ${String(err.message || err)}</div>`;
+    }
+  }
+
+  init();
+})();
