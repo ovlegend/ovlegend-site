@@ -1,7 +1,8 @@
-:root{
+:root {
   --bg:#0b0b0d;
   --panel:#151518;
-  --accent:#ff5600;
+  --accent:#ff5600;      /* OV Orange */
+  --rlol-orange:#ff8a00; /* RLOL Orange */
   --text:#eaeaea;
   --muted:#a0a0a0;
 
@@ -1053,25 +1054,30 @@ body.rlol-schedule{
 
 /* PLAYOFF LINE divider */
 .playoffLineRow td {
-  padding: 10px 0;
+  padding: 14px 0 !important;
   text-align: center;
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 86, 0, 0.9),
-      transparent
-    );
+  border-top: 1px solid rgba(255,138,0,0.25);
+  border-bottom: 1px solid rgba(255,138,0,0.25);
+  background: linear-gradient(90deg,
+    rgba(255,138,0,0.08),
+    rgba(255,138,0,0.35),
+    rgba(255,138,0,0.08)
+  );
 }
 
 .playoffLineRow span {
   display: inline-block;
-  padding: 6px 14px;
-  background: #0b0b0d;
-  border: 1px solid #ff5600;
+  padding: 6px 18px;
   border-radius: 999px;
-  color: #ff5600;
   font-weight: 800;
-  letter-spacing: 1.5px;
-  text-shadow: 0 0 10px rgba(255, 86, 0, 0.8);
+  letter-spacing: 0.12em;
+  font-size: 12px;
+  color: #0b0b0d;
+  background: #ff8a00; /* RLOL orange */
+  box-shadow: 0 0 18px rgba(255,138,0,0.35);
+  text-transform: uppercase;
+}
+
+.playoffRow td {
+  background: rgba(255,138,0,0.06);
 }
