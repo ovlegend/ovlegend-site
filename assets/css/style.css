@@ -1880,7 +1880,7 @@ body.rlol-hub #nextMatches .team{
 }
 
 .hero-center .hero-wordmark {
-  max-width: 460px;
+  max-width: 560px;
 }
 
 .hero-center .hero-lede {
@@ -1896,7 +1896,7 @@ body.rlol-hub #nextMatches .team{
 }
 
 .hero-center .hero-mark {
-  max-width: 220px;
-  opacity: 0.92;
-  filter: drop-shadow(0 0 70px rgba(255, 86, 0, 0.35));
+  max-width: 300px;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 90px rgba(255, 86, 0, 0.45));
 }
