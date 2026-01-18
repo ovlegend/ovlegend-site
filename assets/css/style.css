@@ -661,3 +661,71 @@ body.rlol-schedule{
 .rlol-hub .standings-table .col-rank{ width: 34px; }
 .rlol-hub .standings-table .col-logo{ width: 40px; }
 .rlol-hub .standings-table .col-wlgd{ width: 90px; text-align: right; }
+
+/* =========================
+   RLOL HUB – Next Match layout polish
+   ========================= */
+
+.rlol-hub .next-match{
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: grid;
+  gap: 10px;
+}
+
+.rlol-hub .next-match .matchup{
+  display: grid;
+  gap: 6px;
+}
+
+.rlol-hub .next-match .team{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rlol-hub .next-match .team .team-name{
+  font-weight: 900;
+  font-size: var(--fs-h3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rlol-hub .next-match .vs{
+  color: var(--muted);
+  font-weight: 700;
+  font-size: var(--fs-small);
+  margin-left: 38px;
+}
+
+.rlol-hub .next-match .meta{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rlol-hub .next-match .badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.25);
+  color: var(--muted);
+  font-size: var(--fs-micro);
+}
+
+.rlol-hub .next-match .badge.scheduled{
+  color: #dfe7ff;
+  border-color: rgba(120,160,255,.35);
+}
+
+.rlol-hub .next-match .badge.live{
+  color: var(--text);
+  border-color: rgba(255,138,0,.45);
+  box-shadow: 0 0 18px rgba(255,138,0,.12) inset;
+}
