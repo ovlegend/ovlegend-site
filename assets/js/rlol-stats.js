@@ -382,7 +382,6 @@
           ${r.logo ? `<img class="logo" src="${r.logo}" alt="${safeHtml(r.teamName || r.teamId)} logo" loading="lazy" />` : `<div class="logo ph"></div>`}
           <div class="teamText">
             <div class="teamName">${safeHtml(r.teamName || r.teamId || "TBD")}</div>
-            <div class="teamAbbr">${safeHtml(r.teamId || "")}</div>
           </div>
         </td>
       `;
