@@ -149,3 +149,19 @@ nav a:hover {
 .rlol {
   --accent: #ff8a00; /* RLOL Orange */
 }
+
+/* RLOL Cards */
+.rlol .team-card {
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 18px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.rlol .team-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 0 18px rgba(255, 138, 0, 0.35);
+}
