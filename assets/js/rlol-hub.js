@@ -377,24 +377,17 @@
   }
 
 function renderRow(label, whoName, teamName, value, avatarUrl) {
-  const avatar = avatarUrl
+  const img = avatarUrl
     ? `<img class="avatar" src="${avatarUrl}" alt="" loading="lazy" />`
-    : "";
-
-  const team = teamName
-    ? `<span class="team">${teamName}</span>`
     : "";
 
   return `
     <div class="stat-row">
-      <div class="left">
+      <div>
         <div class="label">${label}</div>
         <div class="who">
-          ${avatar}
-          <div class="name">
-            ${whoName || "--"}
-            ${team}
-          </div>
+          ${img}
+          <div class="name">${whoName || teamName || "—"}</div>
         </div>
       </div>
       <div class="value">${Number.isFinite(value) ? value : ""}</div>
