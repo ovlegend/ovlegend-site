@@ -113,6 +113,7 @@ async function buildTeamMap() {
     const teamId = pick(row, ["team_id", "Team ID", "id", "ID"], "");
     const team   = pick(row, ["team_name", "team", "Team", "TEAM", "name", "Name"], teamId);
     const abbr   = pick(row, ["abbr", "Abbr", "ABBR", "abbreviation", "Abbreviation"], "");
+    const rank = num(pick(row, ["rank", "#", "pos", "position", "Position"], ""), 999);
 
 
     const w = num(pick(row, ["w", "W", "wins", "Wins"], "0"));
@@ -127,7 +128,7 @@ async function buildTeamMap() {
 
     const logo = pick(row, ["logo", "Logo", "logo_url", "Logo URL", "logoUrl"], "");
 
-    return { rank, team, abbr, w, l, gp, gd, gf, ga, pts, logo, _raw: row };
+    return { rank, teamId, team, abbr, w, l, gp, gd, gf, ga, pts, logo, _raw: row };
   }
 
   function applyFilters() {
