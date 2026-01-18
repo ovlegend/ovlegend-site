@@ -225,7 +225,7 @@
           <tbody>
             ${rowsToShow.map((r) => `
               <tr>
-                <td class="num">${r.rank === 999 ? "" : r.rank}</td>
+                <td class="num">${r.rank}</td>
                 <td class="teamCell">
                   ${r.logo
                     ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />`
