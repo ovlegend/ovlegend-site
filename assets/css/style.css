@@ -1283,3 +1283,139 @@ body.rlol-hub .match .status{
   font-size: 12px;
   margin-top: 6px;
 }
+
+/* =========================
+   RLOL HUB — Next Match panel
+   ========================= */
+
+body.rlol-hub #nextMatches{
+  display: grid;
+  gap: 12px;
+  max-height: 100%;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* Individual match row (rendered by JS) */
+body.rlol-hub #nextMatches .match{
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Logo */
+body.rlol-hub #nextMatches .match img{
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,0.35),
+    0 0 14px rgba(255,138,0,0.12);
+}
+
+/* Text column — THIS fixes overflow */
+body.rlol-hub #nextMatches .meta{
+  min-width: 0;
+}
+
+/* Team line */
+body.rlol-hub #nextMatches .team{
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Team name wraps instead of pushing column */
+body.rlol-hub #nextMatches .team .name{
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+/* vs line */
+body.rlol-hub #nextMatches .vs{
+  font-size: 12px;
+  opacity: 0.65;
+  margin: 2px 0;
+}
+
+/* scheduled label */
+body.rlol-hub #nextMatches .status{
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 4px;
+}
+
+/* =========================
+   RLOL HUB — Match rows glow
+   ========================= */
+body.rlol-hub #nextMatches .match{
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+  transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+
+body.rlol-hub #nextMatches .match:hover{
+  border-color: rgba(255,138,0,0.75);
+  box-shadow: 0 0 0 1px rgba(255,138,0,0.55), 0 0 18px rgba(255,138,0,0.18);
+  transform: translateY(-1px);
+}
+
+/* =========================
+   RLOL HUB — Standings snapshot row glow
+   ========================= */
+body.rlol-hub #top4 tr{
+  border-radius: 14px;
+  transition: box-shadow .2s ease, transform .15s ease;
+}
+
+/* Make the whole row look like a card */
+body.rlol-hub #top4 tr td{
+  background: rgba(255,255,255,0.02);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Rounded edges per row */
+body.rlol-hub #top4 tr td:first-child{
+  border-left: 1px solid rgba(255,255,255,0.08);
+  border-top-left-radius: 14px;
+  border-bottom-left-radius: 14px;
+}
+body.rlol-hub #top4 tr td:last-child{
+  border-right: 1px solid rgba(255,255,255,0.08);
+  border-top-right-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+/* Hover glow */
+body.rlol-hub #top4 tr:hover td{
+  border-color: rgba(255,138,0,0.55);
+  box-shadow: 0 0 0 1px rgba(255,138,0,0.35), 0 0 18px rgba(255,138,0,0.14);
+}
+body.rlol-hub #top4 tr:hover{
+  transform: translateY(-1px);
+}
+
+/* =========================
+   RLOL HUB — Stats preview row glow
+   ========================= */
+body.rlol-hub .stats-preview .stat-row{
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+  transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+
+body.rlol-hub .stats-preview .stat-row:hover{
+  border-color: rgba(255,138,0,0.75);
+  box-shadow: 0 0 0 1px rgba(255,138,0,0.55), 0 0 18px rgba(255,138,0,0.18);
+  transform: translateY(-1px);
+}
