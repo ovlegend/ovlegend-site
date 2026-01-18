@@ -1,20 +1,23 @@
 async function buildTeamMap() {
-  const teams = await fetchCsv(OV_CONFIG.rlol.teamsCsv);
+  const teams = await fetchCsv(window.OV_CONFIG.rlol.teamsCsv);
   const map = new Map();
 
   teams.forEach(t => {
-    const id = (t.team_id || t.id || t.abbr || "").trim();
+    const id = String(t.team_id || "").trim();
     if (!id) return;
 
     map.set(id, {
       id,
-      name: t.team_name || t.name || id,
-      logo: t.logo || ""
+      // Your sheet uses "Team" (not team_name/abbr)
+      name: String(t.Team || id).trim(),
+      // Your sheet uses "logo_url" (not logo)
+      logo: String(t.logo_url || "").trim()
     });
   });
 
   return map;
 }
+
 // /assets/js/rlol-standings.js
 (function () {
   const $ = (sel) => document.querySelector(sel);
