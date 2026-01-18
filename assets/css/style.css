@@ -922,3 +922,12 @@ body.rlol-schedule{
     0 0 18px rgba(255,138,0,0.3),
     0 10px 30px rgba(0,0,0,0.4);
 }
+
+/* Schedule: week cards glow on hover */
+.rlol-schedule .card:hover{
+  border-color: rgba(255,138,0,0.35);
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,0.30),
+    0 0 18px rgba(255,138,0,0.14),
+    0 10px 30px rgba(0,0,0,0.35);
+}
