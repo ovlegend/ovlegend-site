@@ -51,20 +51,19 @@
   }
 
   // ✅ Adds cache-buster + better errors
-  async function fetchCsv(url) {
-    if (!url) throw new Error("CSV URL missing");
+ async function fetchCsv(url) {
+  if (!url) throw new Error("CSV URL missing");
 
-    // Cache-bust (solves “works then stops”)
-    const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+  const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+  const res = await fetch(busted, { cache: "no-store" });
 
-    const res = await fetch(busted, { cache: "no-store" });
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status} while fetching CSV`);
+  }
 
-    // If this happens again, you'll SEE what it redirected to
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status} while fetching CSV`);
-    }
-
-    const text = await res.text();
+  const text = await res.text();
+  return parseCSV(text);
+}
 
     // If Google sends you to a login page or HTML, catch it immediately (CORS usually blocks before this,
     // but this is a nice safeguard if the URL ever changes).
