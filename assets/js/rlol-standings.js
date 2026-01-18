@@ -1,3 +1,20 @@
+async function buildTeamMap() {
+  const teams = await fetchCsv(OV_CONFIG.rlol.teamsCsv);
+  const map = new Map();
+
+  teams.forEach(t => {
+    const id = (t.team_id || t.id || t.abbr || "").trim();
+    if (!id) return;
+
+    map.set(id, {
+      id,
+      name: t.team_name || t.name || id,
+      logo: t.logo || ""
+    });
+  });
+
+  return map;
+}
 // /assets/js/rlol-standings.js
 (function () {
   const $ = (sel) => document.querySelector(sel);
