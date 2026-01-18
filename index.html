@@ -33,43 +33,55 @@
     </div>
   </header>
 
-  <!-- HERO -->
+  <!-- HERO (Centered, clean, no duplicates) -->
   <section class="hero hero-v2 hero-center">
-  <div class="hero-v2-inner">
+    <div class="hero-v2-inner">
 
-    <div class="hero-left">
-      <img
-        src="/ovlegend-site/assets/img/brand/ov-wordmark.png"
-        alt="What's Up Twitches"
-        class="hero-wordmark"
-      />
+      <div class="hero-left">
+        <img
+          src="/ovlegend-site/assets/img/brand/ov-wordmark.png"
+          alt="What's Up Twitches"
+          class="hero-wordmark"
+        />
 
-      <div class="hero-kicker">Rocket League • Content • Community</div>
+        <div class="hero-kicker">Rocket League • Content • Community</div>
 
-      <p class="hero-lede">
-        Built around high-energy streams, legendary queue nights, custom builds,
-        and a community league that turns matches into events.
-      </p>
+        <p class="hero-lede">
+          Built around high-energy streams, legendary queue nights, custom builds,
+          and a community league that turns matches into events.
+        </p>
 
-<div class="hero-actions">
-  <a class="btn primary" href="/ovlegend-site/builds/">Browse Builds</a>
-  <a class="btn" href="/ovlegend-site/leaderboards/">Legends vs. Bozos</a>
-  <a class="btn ghost" href="/ovlegend-site/rlol/">RLOL Hub</a>
-</div>
+        <!-- Primary site CTAs -->
+        <div class="hero-actions">
+          <a class="btn primary" href="/ovlegend-site/builds/">Browse Builds</a>
+          <a class="btn" href="/ovlegend-site/leaderboards/">Legends vs. Bozos</a>
+          <a class="btn ghost" href="/ovlegend-site/rlol/">RLOL Hub</a>
+        </div>
 
-<div class="hero-socials">
-  <a class="btn ghost" href="https://discord.gg/sGXgUNAtDp" target="_blank" rel="noopener noreferrer">Discord</a>
-  <a class="btn ghost" href="https://twitch.tv/the_ov_legend" target="_blank" rel="noopener noreferrer">Twitch</a>
-  <a class="btn ghost" href="https://www.youtube.com/@OVLegend" target="_blank" rel="noopener noreferrer">YouTube</a>
-</div>
+        <!-- Social links (working) -->
+        <div class="hero-socials">
+          <a class="btn ghost" href="https://discord.gg/sGXgUNAtDp" target="_blank" rel="noopener noreferrer">Discord</a>
+          <a class="btn ghost" href="https://twitch.tv/the_ov_legend" target="_blank" rel="noopener noreferrer">Twitch</a>
+          <a class="btn ghost" href="https://www.youtube.com/@OVLegend" target="_blank" rel="noopener noreferrer">YouTube</a>
+        </div>
 
+        <!-- Brand mark (anchored) -->
+        <div class="hero-mark-wrap hero-mark-bottom">
+          <img
+            src="/ovlegend-site/assets/img/brand/ov-mark.png"
+            alt=""
+            class="hero-mark"
+          />
+        </div>
+      </div>
 
-  </div>
-</section>
+    </div>
+  </section>
 
-  <!-- FEATURES -->
+  <!-- CONTENT -->
   <main class="container home-v2">
 
+    <!-- OV HQ -->
     <section class="section">
       <div class="section-head">
         <h2 class="section-title">OV Headquarters</h2>
@@ -79,7 +91,7 @@
       <div class="feature-grid">
         <a class="feature-card" href="/ovlegend-site/builds/">
           <div class="feature-top">
-            <h3 class="card-title">Builds</h3>
+            <div class="card-title">Builds</div>
             <span class="chip">Downloads</span>
           </div>
           <p class="muted">AlphaConsole presets, car styles, and branded configs.</p>
@@ -88,41 +100,30 @@
 
         <a class="feature-card" href="/ovlegend-site/leaderboards/">
           <div class="feature-top">
-            <h3 class="card-title">Legends vs. Bozos</h3>
-<p class="muted">Wins, losses, streaks, and the ongoing BOZO war</p>
-<div class="feature-link">Enter the debate →</div>
+            <div class="card-title">Legends vs. Bozos</div>
+            <span class="chip">Tracker</span>
+          </div>
+          <p class="muted">Wins, losses, streaks, and the ongoing debate.</p>
+          <div class="feature-link">Enter the debate →</div>
         </a>
 
         <a class="feature-card" href="/ovlegend-site/rlol/">
           <div class="feature-top">
-            <h3 class="card-title">RLOL</h3>
-            <span class="chip">League</span>
+            <div class="card-title">RLOL</div>
+            <span class="chip">League Hub</span>
           </div>
           <p class="muted">Standings, schedule, teams — built like a mini-RLCS.</p>
           <div class="feature-link">Enter RLOL →</div>
         </a>
 
-        <a class="feature-card" href="#">
+        <a class="feature-card" href="/ovlegend-site/stats/">
           <div class="feature-top">
-            <h3 class="card-title">Clips</h3>
-            <span class="chip">Coming Soon</span>
+            <div class="card-title">Stats</div>
+            <span class="chip">Season</span>
           </div>
-          <p class="muted">Clip of the Week, bangers, and the OV content machine.</p>
-          <div class="feature-link">Soon →</div>
+          <p class="muted">Season tracking and performance breakdowns.</p>
+          <div class="feature-link">View stats →</div>
         </a>
-      </div>
-    </section>
-
-    <section class="cta-strip">
-      <div class="cta-left">
-        <h2 class="section-title">Join the Legend</h2>
-        <p class="section-sub">Community first. Content always. Chaos guaranteed.</p>
-      </div>
-      <div class="cta-right">
-        <!-- Replace # with your real links whenever -->
-        <a class="btn ghost" href="#" target="_blank" rel="noreferrer">Discord</a>
-        <a class="btn ghost" href="#" target="_blank" rel="noreferrer">Twitch</a>
-        <a class="btn ghost" href="#" target="_blank" rel="noreferrer">YouTube</a>
       </div>
     </section>
 
@@ -130,7 +131,7 @@
 
   <!-- FOOTER -->
   <footer class="footer">
-    © <span id="year"></span> OV Legend • Built on GitHub Pages
+    © <span id="year"></span> OV Legend
   </footer>
 
   <script>
