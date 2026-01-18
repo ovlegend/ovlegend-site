@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OV Legend • Player Stats</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/ovlegend-site/assets/css/style.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="/ovlegend-site/">
+        <img class="nav-logo" src="/ovlegend-site/assets/img/brand/ov-mark.png" alt="OV Legend" />
+      </a>
+
+      <nav>
+        <a href="/ovlegend-site/">Home</a>
+        <a href="/ovlegend-site/rlol/">RLOL</a>
+        <a class="active" href="/ovlegend-site/stats/">Stats</a>
+        <a href="/ovlegend-site/leaderboards/">Legends vs. Bozos</a>
+        <a href="/ovlegend-site/builds/">Builds</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 28px;">
+    <div class="card" style="padding: 18px;">
+      <h2 style="margin:0 0 8px 0;">OV Legend • Player Stats</h2>
+      <p class="muted" style="margin:0 0 14px 0;">
+        If the embed doesn’t load, RL Tracker blocks embedding. Use the button below.
+      </p>
+
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+        <a class="btn primary"
+           href="https://rocketleague.tracker.network/rocket-league/profile/epic/OV_Legend/overview"
+           target="_blank" rel="noopener noreferrer">
+          Open on RL Tracker
+        </a>
+        <a class="btn ghost" href="/ovlegend-site/">Back Home</a>
+      </div>
+
+      <div class="embed-wrap">
+        <iframe
+          class="embed-frame"
+          src="https://rocketleague.tracker.network/rocket-league/profile/epic/OV_Legend/overview"
+          title="OV Legend RL Tracker"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    © <span id="year"></span> OV Legend
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>
