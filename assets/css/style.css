@@ -144,3 +144,8 @@ nav a:hover {
   font-size: 13px;
   opacity: 0.75;
 }
+
+/* RLOL Theme Overrides */
+.rlol {
+  --accent: #ff8a00; /* RLOL Orange */
+}
