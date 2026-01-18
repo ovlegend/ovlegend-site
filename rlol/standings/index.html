@@ -1,21 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" class="rlol rlol-standings">
 <head>
-  <meta charset="UTF-8" />
-  <title>RLOL Standings | OV Legend</title>
-  <link rel="stylesheet" href="/ovlegend-site/assets/css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RLOL Standings</title>
+  <link rel="stylesheet" href="/ovlegend-site/assets/css/style.css" />
 </head>
-<body class="rlol">
-  <header class="nav">
-    <div class="nav-inner">
-      <div class="logo">OV <span>Legend</span></div>
-    </div>
-  </header>
 
-  <main style="padding: 80px 20px; text-align: center;">
-    <h1>RLOL Standings</h1>
-    <p>Live league standings</p>
-    <p>Data coming next ⚡</p>
+<body class="rlol rlol-standings">
+  <main class="rlol-wrap">
+    <div class="topbar">
+      <div>
+        <h1>RLOL Standings</h1>
+        <div class="sub">Auto-updates from Google Sheets • Click headers to sort</div>
+      </div>
+
+      <div class="nav-btns">
+        <a class="btn" href="/ovlegend-site/rlol/">Hub</a>
+        <a class="btn" href="/ovlegend-site/rlol/schedule/">Schedule</a>
+        <a class="btn" href="/ovlegend-site/rlol/teams/">Teams</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="metaRow">
+        <div class="pill"><span class="dot"></span> <span id="standingsStatus">Loading standings…</span></div>
+
+        <div class="controls">
+          <input id="searchTeam" type="text" placeholder="Search team (e.g., WLW)" />
+          <select id="viewMode" aria-label="View mode">
+            <option value="full">Full standings</option>
+            <option value="snapshot">Snapshot view (Hub)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="standingsRoot"></div>
+
+      <div class="footer">
+        Tip: Sort by Record, Goal Diff, Goals For/Against. Search matches names & abbreviations.
+      </div>
+    </div>
   </main>
+
+  <script src="/ovlegend-site/assets/js/config.js"></script>
+  <script src="/ovlegend-site/assets/js/rlol-standings.js"></script>
 </body>
 </html>
