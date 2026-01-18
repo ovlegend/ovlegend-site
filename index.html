@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
-  <!-- Main CSS -->
+  <!-- Main CSS (GitHub Pages base path) -->
   <link rel="stylesheet" href="/ovlegend-site/assets/css/style.css">
 </head>
 
@@ -20,7 +20,7 @@
   <header class="nav">
     <div class="nav-inner">
       <a class="logo" href="/ovlegend-site/">
-        <img src="/ovlegend-site/assets/img/brand/ov-wordmark.png" alt="OV Legend" />
+        <img class="nav-logo" src="/ovlegend-site/assets/img/brand/ov-mark.png" alt="OV Legend" />
       </a>
 
       <nav>
@@ -34,55 +34,141 @@
   </header>
 
   <!-- HERO -->
-  <section class="hero hero-home">
-    <div class="hero-inner">
+  <section class="hero hero-v2">
+    <div class="hero-v2-inner">
 
-      <!-- LEFT -->
-      <div class="hero-copy">
+      <div class="hero-left">
         <img
           src="/ovlegend-site/assets/img/brand/ov-wordmark.png"
-          alt="OV Legend"
+          alt="What's Up Twitches"
           class="hero-wordmark"
         />
 
-        <div class="hero-tagline">
-          Rocket League • Content • Community
-        </div>
+        <div class="hero-kicker">Rocket League • Content • Community</div>
 
-        <h2 class="section-title">Builds</h2>
-          Competitive play, legendary queue nights, custom builds,
-          league nights, and clips worth rewinding.
-        </div>
+        <p class="hero-lede">
+          Built around high-energy streams, legendary queue nights, custom builds,
+          and a community league that turns matches into events.
+        </p>
 
-        <div class="hero-cta">
+        <div class="hero-actions">
           <a class="btn primary" href="/ovlegend-site/builds/">Browse Builds</a>
-          <a class="btn ghost" href="/ovlegend-site/rlol/">Enter RLOL</a>
+          <a class="btn" href="/ovlegend-site/leaderboards/">Leaderboards</a>
+          <a class="btn ghost" href="/ovlegend-site/rlol/">RLOL Hub</a>
+        </div>
+
+        <div class="hero-metrics">
+          <div class="metric">
+            <div class="metric-title">Weekly Events</div>
+            <div class="metric-value">Queue Nights + RLOL</div>
+          </div>
+          <div class="metric">
+            <div class="metric-title">Brand Style</div>
+            <div class="metric-value">OV Orange ⚡ Dark Premium</div>
+          </div>
+          <div class="metric">
+            <div class="metric-title">Focus</div>
+            <div class="metric-value">Plays • Builds • Clips</div>
+          </div>
         </div>
       </div>
 
-      <!-- RIGHT -->
-      <div class="hero-visual">
-        <img
-          src="/ovlegend-site/assets/img/brand/ov-mark.png"
-          alt=""
-          class="hero-mark"
-        />
+      <div class="hero-right">
+        <div class="hero-mark-wrap">
+          <img
+            src="/ovlegend-site/assets/img/brand/ov-mark.png"
+            alt=""
+            class="hero-mark"
+          />
+        </div>
+
+        <div class="hero-sidecard">
+          <div class="sidecard-title">Quick Links</div>
+          <div class="sidecard-grid">
+            <a class="tile" href="/ovlegend-site/builds/">
+              <div class="tile-title">Builds</div>
+              <div class="tile-sub">AlphaConsole presets</div>
+            </a>
+            <a class="tile" href="/ovlegend-site/leaderboards/">
+              <div class="tile-title">Leaderboards</div>
+              <div class="tile-sub">Top performers</div>
+            </a>
+            <a class="tile" href="/ovlegend-site/rlol/">
+              <div class="tile-title">RLOL</div>
+              <div class="tile-sub">League hub</div>
+            </a>
+            <a class="tile" href="/ovlegend-site/stats/">
+              <div class="tile-title">Stats</div>
+              <div class="tile-sub">Season tracking</div>
+            </a>
+          </div>
+        </div>
       </div>
 
     </div>
   </section>
 
-  <!-- CONTENT -->
-  <main class="container">
-    <div class="card">
-      <h2>What’s coming</h2>
-      <ul>
-        <li><strong>RLOL Hub</strong>: standings, schedule, teams</li>
-        <li><strong>Stats</strong>: player season stats + leaderboards</li>
-        <li><strong>Builds</strong>: AlphaConsole presets & downloads</li>
-        <li><strong>Clips</strong>: weekly winners + content pipeline</li>
-      </ul>
-    </div>
+  <!-- FEATURES -->
+  <main class="container home-v2">
+
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">OV Headquarters</h2>
+        <p class="section-sub">Everything you need, organized — no fluff.</p>
+      </div>
+
+      <div class="feature-grid">
+        <a class="feature-card" href="/ovlegend-site/builds/">
+          <div class="feature-top">
+            <h3 class="card-title">Builds</h3>
+            <span class="chip">Downloads</span>
+          </div>
+          <p class="muted">AlphaConsole presets, car styles, and branded configs.</p>
+          <div class="feature-link">Open Builds →</div>
+        </a>
+
+        <a class="feature-card" href="/ovlegend-site/leaderboards/">
+          <div class="feature-top">
+            <h3 class="card-title">Leaderboards</h3>
+            <span class="chip">Rankings</span>
+          </div>
+          <p class="muted">Top stats, weekly heat checks, and all-time grinders.</p>
+          <div class="feature-link">View Leaders →</div>
+        </a>
+
+        <a class="feature-card" href="/ovlegend-site/rlol/">
+          <div class="feature-top">
+            <h3 class="card-title">RLOL</h3>
+            <span class="chip">League</span>
+          </div>
+          <p class="muted">Standings, schedule, teams — built like a mini-RLCS.</p>
+          <div class="feature-link">Enter RLOL →</div>
+        </a>
+
+        <a class="feature-card" href="#">
+          <div class="feature-top">
+            <h3 class="card-title">Clips</h3>
+            <span class="chip">Coming Soon</span>
+          </div>
+          <p class="muted">Clip of the Week, bangers, and the OV content machine.</p>
+          <div class="feature-link">Soon →</div>
+        </a>
+      </div>
+    </section>
+
+    <section class="cta-strip">
+      <div class="cta-left">
+        <h2 class="section-title">Join the Legend</h2>
+        <p class="section-sub">Community first. Content always. Chaos guaranteed.</p>
+      </div>
+      <div class="cta-right">
+        <!-- Replace # with your real links whenever -->
+        <a class="btn ghost" href="#" target="_blank" rel="noreferrer">Discord</a>
+        <a class="btn ghost" href="#" target="_blank" rel="noreferrer">Twitch</a>
+        <a class="btn ghost" href="#" target="_blank" rel="noreferrer">YouTube</a>
+      </div>
+    </section>
+
   </main>
 
   <!-- FOOTER -->
