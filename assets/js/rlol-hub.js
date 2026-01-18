@@ -158,9 +158,7 @@
       var awayId = m.away_team_id || m.away || m.away_team || "";
 
       var home = teamMap.get(homeId) || { name: homeId || "TBD", logo: "" };
-      var away = teamMap.get(awayId) || { name: awayId || "TBD", logo: "" };
-
-      var matchId = m.match_id || "";
+      var away = teamMap.get(awayId) || { name: awayId || "TBD", logo: "" };   
       var series = (m.series_id || m.series || "").trim();
       var status = normalizeStatus(m.status);
 
@@ -179,7 +177,6 @@
         '</div>' +
         '<div class="match-right">' +
           (series ? ('<div class="pill soft">Series ' + series + '</div>') : '') +
-          (matchId ? ('<div class="pill">ID ' + matchId + '</div>') : '') +
           (status ? ('<div class="pill status">' + status + '</div>') : '') +
         '</div>';
 
