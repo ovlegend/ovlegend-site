@@ -1,108 +1,43 @@
-<!-- /rlol/stats/index.html -->
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>RLOL Stats • OV Legend</title>
+  <meta charset="UTF-8" />
+  <title>RLOL Stats</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Main site styles -->
   <link rel="stylesheet" href="/ovlegend-site/assets/css/style.css" />
-  <!-- If your site root is already /ovlegend-site on GitHub Pages, use this instead:
-  <link rel="stylesheet" href="/assets/css/style.css" />
-  -->
-
-  <meta name="color-scheme" content="dark" />
 </head>
-
 <body>
-  <header class="pageHeader">
-    <div class="pageHeaderInner">
-      <h1 class="pageTitle">RLOL Stats</h1>
-      <p class="pageSub">
-        Auto-updates from Google Sheets • Filter by season/week/team • Click headers to sort
-      </p>
 
-      <!-- RLOL sub-nav (matches your other RLOL pages) -->
-      <nav class="rlolNav" aria-label="RLOL Navigation">
-        <a class="pill" href="/ovlegend-site/rlol/">Hub</a>
-        <a class="pill" href="/ovlegend-site/rlol/schedule/">Schedule</a>
-        <a class="pill" href="/ovlegend-site/rlol/standings/">Standings</a>
-        <a class="pill" href="/ovlegend-site/rlol/teams/">Teams</a>
-        <a class="pill active" href="/ovlegend-site/rlol/stats/">Stats</a>
-      </nav>
+  <main class="page">
+    <h1>RLOL Player Stats</h1>
+    <p class="subtext">
+      Auto-updates from Google Sheets · Season & Per-Game Stats
+    </p>
 
-      <!-- If your GitHub Pages base is already /ovlegend-site, keep the links above.
-           If not (if site root is just /), replace /ovlegend-site/ with / everywhere. -->
+    <div class="controls">
+      <select id="viewMode">
+        <option value="season_totals">Season Totals</option>
+        <option value="per_game">Per Game</option>
+      </select>
+
+      <select id="seasonSel"></select>
+      <select id="weekSel"></select>
+      <select id="teamSel"></select>
+
+      <input
+        id="searchPlayer"
+        type="text"
+        placeholder="Search player or team…"
+      />
     </div>
-  </header>
 
-  <main class="pageMain">
-    <section class="panel">
-      <div class="panelTop">
-        <div class="panelTitleRow">
-          <div class="panelTitle">Player Stats</div>
-          <div id="statsStatus" class="panelStatus">Loading…</div>
-        </div>
-
-        <!-- Controls -->
-        <div class="controlsRow">
-          <div class="control">
-            <label for="seasonSel">Season</label>
-            <select id="seasonSel">
-              <option value="all">All</option>
-            </select>
-          </div>
-
-          <div class="control">
-            <label for="weekSel">Week</label>
-            <select id="weekSel">
-              <option value="all">All</option>
-            </select>
-          </div>
-
-          <div class="control">
-            <label for="teamSel">Team</label>
-            <select id="teamSel">
-              <option value="all">All Teams</option>
-            </select>
-          </div>
-
-          <div class="control grow">
-            <label for="searchPlayer">Search</label>
-            <input id="searchPlayer" type="text" placeholder="Search player (e.g., eclipse)" autocomplete="off" />
-          </div>
-
-          <div class="control">
-            <label for="viewMode">View</label>
-            <select id="viewMode">
-              <option value="season_totals" selected>Season totals</option>
-              <option value="per_game">Per-game (raw)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Table Mount -->
-      <div id="statsRoot" class="tableWrap">
-        <!-- JS renders here -->
-      </div>
-
-      <div class="panelFooter">
-        <span class="tip">
-          Tip: Sort by Goals/Assists/Saves/Shots/Score. Filters stack (Season + Week + Team + Search).
-        </span>
-      </div>
-    </section>
+    <div id="statsStatus" class="status">Loading stats…</div>
+    <div id="statsRoot"></div>
   </main>
 
-  <!-- Config (you already have this) -->
   <script src="/ovlegend-site/assets/js/config.js"></script>
-
-  <!-- NEW: Stats logic (we’ll create this next) -->
   <script src="/ovlegend-site/assets/js/rlol-stats.js"></script>
 
-  <!-- If your site root is already /ovlegend-site, keep as-is.
-       If not, replace /ovlegend-site/ with / above. -->
 </body>
 </html>
