@@ -1,245 +1,365 @@
+// /assets/js/rlol/schedule.js
 (function () {
-  function splitCSVLine(line) {
-    var out = [], cur = "", inQ = false;
-    for (var i = 0; i < line.length; i++) {
-      var ch = line[i];
-      if (ch === '"') {
-        if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
-        else inQ = !inQ;
-      } else if (ch === ',' && !inQ) {
-        out.push(cur); cur = "";
-      } else cur += ch;
-    }
-    out.push(cur);
-    return out;
-  }
+  const $ = (sel) => document.querySelector(sel);
 
+  // ---------- CSV parsing (quoted commas safe) ----------
   function parseCSV(text) {
-    text = String(text || "").replace(/\uFEFF/g, "");
-    var lines = text.trim().split(/\r?\n/).filter(function (x) { return x && x.trim(); });
-    if (!lines.length) return [];
-    var headers = splitCSVLine(lines[0]).map(function (h) { return h.trim(); });
+    const rows = [];
+    let row = [];
+    let cur = "";
+    let inQuotes = false;
 
-    var rows = [];
-    for (var i = 1; i < lines.length; i++) {
-      var cols = splitCSVLine(lines[i]);
-      var row = {};
-      for (var j = 0; j < headers.length; j++) row[headers[j]] = (cols[j] || "").trim();
-      rows.push(row);
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      const next = text[i + 1];
+
+      if (c === '"' && inQuotes && next === '"') {
+        cur += '"';
+        i++;
+        continue;
+      }
+      if (c === '"') { inQuotes = !inQuotes; continue; }
+
+      if (c === "," && !inQuotes) { row.push(cur); cur = ""; continue; }
+
+      if ((c === "\n" || c === "\r") && !inQuotes) {
+        if (c === "\r" && next === "\n") i++;
+        row.push(cur);
+        cur = "";
+        if (row.some((x) => x !== "")) rows.push(row);
+        row = [];
+        continue;
+      }
+      cur += c;
     }
-    return rows;
-  }
+    row.push(cur);
+    if (row.some((x) => x !== "")) rows.push(row);
 
-  function fetchCSV(url) {
-    return fetch(url, { cache: "no-store" })
-      .then(function (res) { if (!res.ok) throw new Error("Fetch failed: " + res.status); return res.text(); })
-      .then(parseCSV);
-  }
-
-  function toISODateKey(s) { return (s || "").slice(0, 10); }
-
-  function prettyDate(iso) {
-    if (!iso) return "";
-    var d = new Date(iso + "T00:00:00");
-    return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
-  }
-
-  function buildTeamMap(teamsRows) {
-    var map = new Map();
-    for (var i = 0; i < teamsRows.length; i++) {
-      var r = teamsRows[i];
-      var id = r.team_id;
-      if (!id) continue;
-      var name = r.Team || r.team_name || r.team || id;
-      var logo = r.logo_url || "";
-      map.set(id, { id: id, name: name, logo: logo });
+    const header = rows[0] || [];
+    const data = [];
+    for (let r = 1; r < rows.length; r++) {
+      const obj = {};
+      for (let c = 0; c < header.length; c++) {
+        obj[String(header[c] || "").trim()] = (rows[r][c] ?? "").trim();
+      }
+      data.push(obj);
     }
+    return data;
+  }
+
+  async function fetchCsv(url) {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    return parseCSV(text);
+  }
+
+  // ---------- helpers ----------
+  function pick(row, keys, fallback = "") {
+    for (const k of keys) {
+      if (row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== "") return String(row[k]).trim();
+    }
+    return fallback;
+  }
+
+  function normalizeStatus(s) {
+    const v = String(s || "").toLowerCase().trim();
+    if (!v) return "";
+    if (v.includes("live")) return "live";
+    if (v.includes("played") || v.includes("complete") || v.includes("final")) return "played";
+    if (v.includes("sched")) return "scheduled";
+    return v;
+  }
+
+  function statusBadge(status) {
+    const cls =
+      status === "live" ? "badge live" :
+      status === "played" ? "badge played" :
+      "badge sched";
+    const label = status || "scheduled";
+    return `<span class="${cls}">${escapeHtml(label)}</span>`;
+  }
+
+  function escapeHtml(str) {
+    return String(str || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function buildTeamMap(teamRows) {
+    const map = new Map();
+
+    for (const r of teamRows) {
+      const id = pick(r, ["team_id", "id", "Team ID", "ID", "team", "Team"], "").trim();
+      const name = pick(r, ["name", "team_name", "Team Name", "Team"], id);
+      const abbr = pick(r, ["abbr", "abbreviation", "Abbr", "ABBR"], "");
+      const logo = pick(r, ["logo", "logo_url", "Logo", "Logo URL", "image", "Image"], "");
+
+      // store by id + by name + by abbr (so schedule can match any)
+      const payload = { id: id || name, name, abbr, logo };
+      if (id) map.set(id, payload);
+      if (name) map.set(name, payload);
+      if (abbr) map.set(abbr, payload);
+    }
+
     return map;
   }
 
-  function normalizeStatus(s) { return String(s || "").toLowerCase().trim(); }
-
-  function matchSearchText(m, teamMap) {
-    var home = (teamMap.get(m.home_team_id) || {}).name || m.home_team_id;
-    var away = (teamMap.get(m.away_team_id) || {}).name || m.away_team_id;
-    return (home + " " + away + " " + m.home_team_id + " " + m.away_team_id).toLowerCase();
+  function prettyWeekLabel(raw) {
+    const v = String(raw || "").trim();
+    if (!v) return "Week ?";
+    // If already "Week 1" etc
+    if (/week/i.test(v)) return v.replace(/\s+/g, " ").trim();
+    // If "w2" or "W2"
+    const m = v.match(/^w(\d+)$/i);
+    if (m) return `Week ${m[1]}`;
+    return v;
   }
 
-  function badgeForStatus(status) {
-    if (status === "played") return '<span class="badge played">✅ Played</span>';
-    if (status === "scheduled") return '<span class="badge sched">🗓️ Scheduled</span>';
-    if (status === "postponed") return '<span class="badge">⏸️ Postponed</span>';
-    if (status === "cancelled") return '<span class="badge">🛑 Cancelled</span>';
-    return '<span class="badge">' + (status || "—") + '</span>';
+  function inferWeek(row) {
+    // Try explicit week columns first
+    const wk = pick(row, ["week", "Week", "week_num", "Week #", "week_number"], "");
+    if (wk) return prettyWeekLabel(wk);
+
+    // Try series_id like s2_w2_m01
+    const series = pick(row, ["series_id", "series", "Series", "Series ID"], "");
+    const m1 = series.match(/_w(\d+)_/i);
+    if (m1) return `Week ${m1[1]}`;
+
+    // Try match_id
+    const mid = pick(row, ["match_id", "Match ID", "id"], "");
+    const m2 = mid.match(/_w(\d+)_/i);
+    if (m2) return `Week ${m2[1]}`;
+
+    return "Week ?";
   }
 
-  function isTonight(isoDate) {
-    if (!isoDate) return false;
-    var now = new Date();
-    var d = new Date(isoDate + "T00:00:00");
-    return now.getFullYear() === d.getFullYear() && now.getMonth() === d.getMonth() && now.getDate() === d.getDate();
+  function inferDate(row) {
+    // you can add keys if your sheet uses different names
+    return pick(row, ["date", "Date", "match_date", "Match Date", "day"], "");
   }
 
-  function groupByWeek(scheduleRows) {
-    var weeks = new Map();
-    for (var i = 0; i < scheduleRows.length; i++) {
-      var m = scheduleRows[i];
-      var wk = Number(m.week || 0);
-      if (!weeks.has(wk)) weeks.set(wk, []);
-      weeks.get(wk).push(m);
-    }
-    weeks.forEach(function (arr) {
-      arr.sort(function (a, b) { return String(a.match_id).localeCompare(String(b.match_id)); });
-    });
-    return Array.from(weeks.entries()).sort(function (a, b) { return a[0] - b[0]; });
+  function inferTime(row) {
+    return pick(row, ["time", "Time", "match_time", "Match Time"], "");
   }
 
-  function renderWeeks(teamMap, scheduleRows) {
-    var weeksEl = document.getElementById("weeks");
-    weeksEl.innerHTML = "";
-
-    var byWeek = groupByWeek(scheduleRows);
-
-    for (var w = 0; w < byWeek.length; w++) {
-      var wk = byWeek[w][0];
-      var matches = byWeek[w][1];
-
-      var dateKey = toISODateKey((matches[0] || {}).scheduled_date);
-      var time = (matches[0] || {}).scheduled_time || "18:00";
-      var tz = (matches[0] || {}).timezone || "EST";
-
-      var weekCard = document.createElement("div");
-      weekCard.className = "card";
-
-      var tonight = isTonight(dateKey);
-
-      weekCard.innerHTML =
-        '<div class="weekTitle">' +
-          '<h2>Week ' + wk + '</h2>' +
-          '<div class="small">' +
-            (dateKey ? (prettyDate(dateKey) + " • Stream starts " + time + " " + tz) : "Date TBD") +
-            (tonight ? ' • <span class="badge live">⚡ Tonight</span>' : "") +
-          '</div>' +
-        '</div>' +
-        '<div style="overflow:auto;">' +
-          '<table>' +
-            '<thead>' +
-              '<tr>' +
-                '<th>Match</th>' +
-                '<th class="right">Series</th>' +
-                '<th class="right hideMobile">Goals</th>' +
-                '<th class="right">Status</th>' +
-              '</tr>' +
-            '</thead>' +
-            '<tbody></tbody>' +
-          '</table>' +
-        '</div>';
-
-      var tbody = weekCard.querySelector("tbody");
-
-      for (var i = 0; i < matches.length; i++) {
-        var m = matches[i];
-
-        var home = teamMap.get(m.home_team_id) || { name: m.home_team_id, logo: "" };
-        var away = teamMap.get(m.away_team_id) || { name: m.away_team_id, logo: "" };
-
-        var status = normalizeStatus(m.status);
-        var series = String(m.series_score || "").trim();
-        var hs = String(m.home_score || "").trim();
-        var as = String(m.away_score || "").trim();
-
-        var goalsText = (hs !== "" || as !== "") ? ((hs || 0) + "–" + (as || 0)) : "—";
-        var seriesText = series ? series : "—";
-
-        var tr = document.createElement("tr");
-        tr.innerHTML =
-          '<td>' +
-            '<div class="matchCell">' +
-              '<div class="teamChip">' +
-                '<img class="logo" src="' + (home.logo || "") + '" alt="' + home.name + ' logo" loading="lazy">' +
-                '<span class="teamName">' + home.name + '</span>' +
-              '</div>' +
-              '<span class="vs">vs</span>' +
-              '<div class="teamChip">' +
-                '<img class="logo" src="' + (away.logo || "") + '" alt="' + away.name + ' logo" loading="lazy">' +
-                '<span class="teamName">' + away.name + '</span>' +
-              '</div>' +
-            '</div>' +
-            '<div class="footer">Match ID: <span class="num">' + (m.match_id || "") + '</span></div>' +
-          '</td>' +
-          '<td class="right num">' + seriesText + '</td>' +
-          '<td class="right num hideMobile">' + goalsText + '</td>' +
-          '<td class="right">' + badgeForStatus(status) + '</td>';
-
-        tbody.appendChild(tr);
-      }
-
-      weeksEl.appendChild(weekCard);
-    }
+  function inferHomeAway(row) {
+    const homeId = pick(row, ["home_team_id", "home", "home_team", "Home", "Home Team"], "");
+    const awayId = pick(row, ["away_team_id", "away", "away_team", "Away", "Away Team"], "");
+    return { homeId, awayId };
   }
 
-  function applyFilters(teamMap, rawSchedule) {
-    var statusChoice = document.getElementById("statusFilter").value;
-    var q = document.getElementById("searchBox").value.trim().toLowerCase();
-
-    var rows = rawSchedule.slice();
-
-    if (statusChoice !== "all") {
-      rows = rows.filter(function (r) { return normalizeStatus(r.status) === statusChoice; });
-    }
-    if (q) {
-      rows = rows.filter(function (r) { return matchSearchText(r, teamMap).indexOf(q) !== -1; });
-    }
-
-    var total = rawSchedule.length;
-    var played = rawSchedule.filter(function (r) { return normalizeStatus(r.status) === "played"; }).length;
-    var scheduled = rawSchedule.filter(function (r) { return normalizeStatus(r.status) === "scheduled"; }).length;
-
-    document.getElementById("counts").textContent =
-      "Matches: " + rows.length + " shown • " + scheduled + " scheduled • " + played + " played • " + total + " total";
-
-    renderWeeks(teamMap, rows);
+  function inferScore(row) {
+    const hs = pick(row, ["home_score", "Home Score", "home_goals", "Home Goals"], "");
+    const as = pick(row, ["away_score", "Away Score", "away_goals", "Away Goals"], "");
+    const has = hs !== "" && as !== "";
+    return { hs, as, has };
   }
 
-  function main() {
-    if (!window.OV_CONFIG || !window.OV_CONFIG.rlol) {
-      console.error("OV_CONFIG not found");
-      document.getElementById("asOf").textContent = "Missing config.";
+  // ---------- rendering ----------
+  function render(groups, opts) {
+    const root = $("#scheduleRoot");
+    if (!root) return;
+
+    if (!groups.length) {
+      root.innerHTML = `<div class="sub">No matches found for current filters.</div>`;
       return;
     }
 
-    var TEAMS_CSV_URL = window.OV_CONFIG.rlol.teamsCsv;
-    var SCHEDULE_CSV_URL = window.OV_CONFIG.rlol.scheduleCsv;
+    root.innerHTML = groups.map(g => {
+      const rowsHtml = g.matches.map(m => {
+        const home = m.home;
+        const away = m.away;
 
-    Promise.all([fetchCSV(TEAMS_CSV_URL), fetchCSV(SCHEDULE_CSV_URL)])
-      .then(function (res) {
-        var teamsRows = res[0];
-        var scheduleRows = res[1];
+        const logoHome = home.logo
+          ? `<img class="logo" src="${escapeHtml(home.logo)}" alt="${escapeHtml(home.name)} logo" loading="lazy" decoding="async">`
+          : `<span class="logo"></span>`;
 
-        var teamMap = buildTeamMap(teamsRows);
+        const logoAway = away.logo
+          ? `<img class="logo" src="${escapeHtml(away.logo)}" alt="${escapeHtml(away.name)} logo" loading="lazy" decoding="async">`
+          : `<span class="logo"></span>`;
 
-        scheduleRows.sort(function (a, b) {
-          return (Number(a.week || 0) - Number(b.week || 0)) ||
-                 String(a.match_id).localeCompare(String(b.match_id));
-        });
+        const score = m.score.has
+          ? `<span class="badge played"><span class="num">${escapeHtml(m.score.hs)}–${escapeHtml(m.score.as)}</span></span>`
+          : "";
 
-        var now = new Date();
-        document.getElementById("asOf").textContent =
-          "Updated " + now.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric" });
+        return `
+          <tr>
+            <td class="hideMobile">${escapeHtml(m.date || "")}</td>
+            <td class="hideMobile">${escapeHtml(m.time || "")}</td>
+            <td>
+              <div class="matchCell">
+                <div class="teamChip">
+                  ${logoHome}
+                  <span class="teamName">${escapeHtml(home.name)}</span>
+                </div>
+                <span class="vs">vs</span>
+                <div class="teamChip">
+                  ${logoAway}
+                  <span class="teamName">${escapeHtml(away.name)}</span>
+                </div>
+              </div>
+            </td>
+            <td class="right">
+              ${statusBadge(m.status)}
+              ${score}
+            </td>
+          </tr>
+        `;
+      }).join("");
 
-        var rawSchedule = scheduleRows;
+      return `
+        <div class="card">
+          <div class="weekTitle">
+            <h2>${escapeHtml(g.week)}</h2>
+            <div class="small">${g.matches.length} match${g.matches.length === 1 ? "" : "es"}</div>
+          </div>
 
-        var rerender = function () { applyFilters(teamMap, rawSchedule); };
-        document.getElementById("statusFilter").addEventListener("change", rerender);
-        document.getElementById("searchBox").addEventListener("input", rerender);
-
-        rerender();
-      })
-      .catch(function (err) {
-        console.error(err);
-        document.getElementById("asOf").textContent = "Failed to load schedule.";
-      });
+          <table>
+            <thead>
+              <tr>
+                <th class="hideMobile">Date</th>
+                <th class="hideMobile">Time</th>
+                <th>Matchup</th>
+                <th class="right">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }).join("");
   }
 
-  main();
+  function groupAndFilter(allMatches, weekValue, statusValue, searchValue) {
+    const weekFilter = String(weekValue || "all");
+    const statusFilter = String(statusValue || "all");
+    const q = String(searchValue || "").toLowerCase().trim();
+
+    const filtered = allMatches.filter(m => {
+      if (weekFilter !== "all" && m.week !== weekFilter) return false;
+      if (statusFilter !== "all" && m.status !== statusFilter) return false;
+
+      if (q) {
+        const hay = [
+          m.home.name, m.home.id, m.home.abbr,
+          m.away.name, m.away.id, m.away.abbr,
+          m.week, m.status
+        ].join(" ").toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+
+      return true;
+    });
+
+    // group by week in original order
+    const order = [];
+    const map = new Map();
+    for (const m of filtered) {
+      if (!map.has(m.week)) { map.set(m.week, []); order.push(m.week); }
+      map.get(m.week).push(m);
+    }
+
+    return order.map(w => ({ week: w, matches: map.get(w) || [] }));
+  }
+
+  function setStatusText(msg) {
+    const el = $("#schedStatusText");
+    if (el) el.textContent = msg;
+  }
+
+  function fillWeekDropdown(weeks) {
+    const sel = $("#weekFilter");
+    if (!sel) return;
+
+    const current = sel.value || "all";
+    sel.innerHTML = `<option value="all">All weeks</option>` + weeks
+      .map(w => `<option value="${escapeHtml(w)}">${escapeHtml(w)}</option>`)
+      .join("");
+
+    // keep selection if possible
+    sel.value = weeks.includes(current) ? current : "all";
+  }
+
+  // ---------- main ----------
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      if (!window.OV_CONFIG?.rlol?.teamsCsv || !window.OV_CONFIG?.rlol?.scheduleCsv) {
+        throw new Error("Missing OV_CONFIG rlol CSV links (config.js not loaded?)");
+      }
+
+      setStatusText("Loading teams + schedule…");
+
+      const [teamRows, scheduleRows] = await Promise.all([
+        fetchCsv(window.OV_CONFIG.rlol.teamsCsv),
+        fetchCsv(window.OV_CONFIG.rlol.scheduleCsv)
+      ]);
+
+      const teamMap = buildTeamMap(teamRows);
+
+      // Normalize schedule rows into matches
+      const matches = scheduleRows.map(r => {
+        const { homeId, awayId } = inferHomeAway(r);
+
+        const home = teamMap.get(homeId) || teamMap.get(pick(r, ["home_team", "Home Team"], "")) || { id: homeId || "TBD", name: homeId || "TBD", abbr: "", logo: "" };
+        const away = teamMap.get(awayId) || teamMap.get(pick(r, ["away_team", "Away Team"], "")) || { id: awayId || "TBD", name: awayId || "TBD", abbr: "", logo: "" };
+
+        const week = inferWeek(r);
+        const status = normalizeStatus(pick(r, ["status", "Status"], "scheduled")) || "scheduled";
+        const date = inferDate(r);
+        const time = inferTime(r);
+        const score = inferScore(r);
+
+        return {
+          raw: r,
+          week,
+          status,
+          date,
+          time,
+          home,
+          away,
+          score
+        };
+      });
+
+      // Build Week dropdown list (preserve order)
+      const weekOrder = [];
+      const seen = new Set();
+      for (const m of matches) {
+        if (!seen.has(m.week)) { seen.add(m.week); weekOrder.push(m.week); }
+      }
+      fillWeekDropdown(weekOrder);
+
+      setStatusText(`Loaded ${matches.length} matches`);
+
+      // Initial render
+      const doRender = () => {
+        const groups = groupAndFilter(
+          matches,
+          $("#weekFilter")?.value,
+          $("#statusFilter")?.value,
+          $("#searchInput")?.value
+        );
+        render(groups);
+      };
+
+      // Wire controls
+      $("#weekFilter")?.addEventListener("change", doRender);
+      $("#statusFilter")?.addEventListener("change", doRender);
+      $("#searchInput")?.addEventListener("input", doRender);
+
+      doRender();
+
+    } catch (err) {
+      console.error(err);
+      setStatusText(`Error: ${err.message}`);
+      const root = $("#scheduleRoot");
+      if (root) root.innerHTML = `<div class="sub">Could not load schedule. Check console for details.</div>`;
+    }
+  });
 })();
