@@ -931,3 +931,98 @@ body.rlol-schedule{
     0 0 18px rgba(255,138,0,0.14),
     0 10px 30px rgba(0,0,0,0.35);
 }
+
+/* =========================
+   RLOL STANDINGS
+   ========================= */
+.rlol-standings{
+  background: radial-gradient(1200px 600px at 30% 0%, #1a1a1d 0%, var(--bg) 55%);
+  min-height: 100vh;
+}
+
+.rlol-standings .standings-card{
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.rlol-standings .standings-table{
+  width:100%;
+  border-collapse: collapse;
+}
+
+.rlol-standings thead th{
+  text-align:left;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+  padding:12px 10px;
+  border-bottom:1px solid rgba(255,255,255,0.10);
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  cursor:pointer;
+  user-select:none;
+}
+
+.rlol-standings thead th.active{
+  color: var(--text);
+}
+
+.rlol-standings tbody td{
+  padding:12px 10px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  font-size:14px;
+  vertical-align:middle;
+}
+
+.rlol-standings tbody tr:hover{
+  background: rgba(255,138,0,.06);
+}
+
+.rlol-standings .teamCell{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width: 260px;
+}
+
+.rlol-standings .logo{
+  width:26px;height:26px;border-radius:8px;object-fit:contain;
+  background:#0b0b0c;border:1px solid rgba(255,255,255,.06);
+  flex: 0 0 auto;
+}
+
+.rlol-standings .logo.ph{
+  display:inline-block;
+}
+
+.rlol-standings .teamText{
+  display:flex;
+  flex-direction:column;
+  line-height:1.15;
+}
+
+.rlol-standings .teamName{
+  font-weight:900;
+}
+
+.rlol-standings .teamAbbr{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.rlol-standings .num{
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 760px){
+  .rlol-standings thead th:nth-child(6),
+  .rlol-standings thead th:nth-child(7),
+  .rlol-standings thead th:nth-child(8),
+  .rlol-standings tbody td:nth-child(6),
+  .rlol-standings tbody td:nth-child(7),
+  .rlol-standings tbody td:nth-child(8){
+    display:none;
+  }
+  .rlol-standings .teamCell{ min-width:auto; }
+}
