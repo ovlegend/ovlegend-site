@@ -1572,3 +1572,26 @@ body.rlol-hub #nextMatches .team{
     margin-top: 28px;
   }
 }
+
+/* ===== OV DISPLAY TYPE ===== */
+.display-title {
+  font-family: 'FeastOfFlesh', 'Montserrat', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  font-family: 'FeastOfFlesh', 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-family: 'FeastOfFlesh', 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.08em;
+}
