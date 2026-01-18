@@ -1026,3 +1026,52 @@ body.rlol-schedule{
   }
   .rlol-standings .teamCell{ min-width:auto; }
 }
+
+/* =========================
+   RLOL PLAYOFF STYLING
+   ========================= */
+
+/* Top 4 playoff teams */
+.playoffRow {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 86, 0, 0.18),
+    rgba(255, 86, 0, 0.05)
+  );
+  box-shadow: inset 4px 0 0 #ff5600;
+}
+
+.playoffRow .teamName {
+  color: #ff5600;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(255, 86, 0, 0.6);
+}
+
+.playoffRow .logo {
+  filter: drop-shadow(0 0 6px rgba(255, 86, 0, 0.8));
+}
+
+/* PLAYOFF LINE divider */
+.playoffLineRow td {
+  padding: 10px 0;
+  text-align: center;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 86, 0, 0.9),
+      transparent
+    );
+}
+
+.playoffLineRow span {
+  display: inline-block;
+  padding: 6px 14px;
+  background: #0b0b0d;
+  border: 1px solid #ff5600;
+  border-radius: 999px;
+  color: #ff5600;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 10px rgba(255, 86, 0, 0.8);
+}
