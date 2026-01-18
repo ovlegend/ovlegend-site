@@ -1,253 +1,264 @@
-:root {
-  --bg: #0b0b0d;
-  --panel: #151518;
-  --accent: #ff5600;
-  --text: #eaeaea;
-  --muted: #a0a0a0;
+:root{
+  --bg:#0b0b0d;
+  --panel:#151518;
+  --accent:#ff5600;
+  --text:#eaeaea;
+  --muted:#a0a0a0;
+
+  /* Type scale (controlled clamps) */
+  --fs-hero: clamp(2.1rem, 3.6vw, 3.25rem);   /* big page hero / hub title */
+  --fs-h1:   clamp(1.75rem, 2.2vw, 2.25rem);  /* standard page h1 */
+  --fs-h2:   clamp(1.25rem, 1.3vw, 1.5rem);   /* section headers */
+  --fs-h3:   clamp(1.05rem, 1.05vw, 1.2rem);  /* small headers */
+  --fs-body: clamp(0.98rem, 0.35vw, 1.06rem); /* normal reading text */
+  --fs-small:clamp(0.82rem, 0.25vw, 0.9rem);  /* muted / helper text */
+  --fs-micro:clamp(0.72rem, 0.2vw, 0.8rem);   /* table heads / labels */
+
+  --radius:16px;
+  --radius-sm:12px;
+
+  --border:1px solid rgba(255,255,255,0.10);
+  --border-soft:1px solid rgba(255,255,255,0.08);
+  --shadow:0 10px 30px rgba(0,0,0,0.35);
 }
 
-* {
-  box-sizing: border-box;
+*{ box-sizing:border-box; }
+
+html,body{ height:100%; }
+
+body{
+  margin:0;
+  font-family:"Montserrat", sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:var(--fs-body);
+  line-height:1.5;
 }
 
-body {
-  margin: 0;
-  font-family: "Montserrat", sans-serif;
-  background: var(--bg);
-  color: var(--text);
+/* =========================
+   GLOBAL UTILS
+   ========================= */
+
+a{ color:inherit; }
+a:hover{ color:var(--accent); }
+
+.num{ font-variant-numeric: tabular-nums; }
+
+/* Prevent “giant logos batman” anywhere */
+.team-logo,
+.logo-img,
+td img,
+th img{
+  width:28px;
+  height:28px;
+  max-width:28px;
+  max-height:28px;
+  object-fit:contain;
+  display:inline-block;
+  vertical-align:middle;
 }
 
-/* NAV (matches: <header class="nav"> ... <div class="nav-inner"> ) */
-.nav {
-  background: #000;
-  border-bottom: 1px solid #222;
+/* Buttons / pills (generic) */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  color:var(--text);
+  background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border:var(--border);
+  border-radius:var(--radius-sm);
+  padding:10px 12px;
+  font-size:var(--fs-small);
+}
+.btn:hover{ border-color: rgba(255,255,255,0.18); }
+
+/* Panels / cards (generic) */
+.card,
+.panel{
+  background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border:var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
 }
 
-.nav-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 14px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* =========================
+   NAV (matches: <header class="nav"> ... <div class="nav-inner"> )
+   ========================= */
+
+.nav{
+  background:#000;
+  border-bottom:1px solid #222;
 }
 
-.logo {
-  font-weight: 800;
-  font-size: 20px;
-  letter-spacing: 1px;
+.nav-inner{
+  max-width:1100px;
+  margin:0 auto;
+  padding:14px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
 }
 
-.logo span {
-  color: var(--accent);
+.logo{
+  font-weight:800;
+  letter-spacing:1px;
+  font-size:clamp(1.05rem, 0.6vw, 1.2rem);
 }
 
-nav a {
-  color: var(--text);
-  margin-left: 18px;
-  text-decoration: none;
-  font-weight: 600;
+.logo span{ color:var(--accent); }
+
+nav a{
+  color:var(--text);
+  margin-left:18px;
+  text-decoration:none;
+  font-weight:600;
+  font-size:var(--fs-small);
+}
+nav a:hover{ color:var(--accent); }
+
+/* =========================
+   HERO (matches: <section class="hero"> )
+   ========================= */
+
+.hero{
+  text-align:center;
+  padding: clamp(44px, 6vw, 80px) 20px clamp(34px, 4vw, 60px);
 }
 
-nav a:hover {
-  color: var(--accent);
+.hero h1{
+  font-size:var(--fs-hero);
+  margin:0 0 10px;
+  letter-spacing:0.4px;
 }
 
-/* HERO (matches: <section class="hero"> ) */
-.hero {
-  text-align: center;
-  padding: 80px 20px 60px;
+.tagline{
+  font-size:clamp(0.95rem, 0.55vw, 1.1rem); /* controlled */
+  color:var(--accent);
+  margin-bottom:8px;
 }
 
-.hero h1 {
-  font-size: 56px;
-  margin: 0 0 10px;
+.sub{
+  color:var(--muted);
+  font-size:var(--fs-small);
 }
 
-.tagline {
-  font-size: 18px;
-  color: var(--accent);
-  margin-bottom: 8px;
+/* =========================
+   CONTENT (matches: <main class="container"> + <div class="card"> )
+   ========================= */
+
+.container{
+  max-width:900px;
+  margin:0 auto;
+  padding:20px;
 }
 
-.sub {
-  color: var(--muted);
+.card{
+  padding: clamp(16px, 2.2vw, 24px);
+  border-radius:var(--radius);
 }
 
-/* CONTENT (matches: <main class="container"> + <div class="card"> ) */
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
+.card h2{
+  margin-top:0;
+  font-size:var(--fs-h2);
+  letter-spacing:0.2px;
 }
 
-.card {
-  background: var(--panel);
-  border-radius: 12px;
-  padding: 24px;
-  border: 1px solid #222;
+.card ul{
+  padding-left:18px;
+  margin:0;
+}
+.card li{ margin-bottom:8px; }
+.card strong{ color:var(--text); }
+
+/* =========================
+   FOOTER (matches: <footer class="footer"> )
+   ========================= */
+
+.footer{
+  text-align:center;
+  padding:20px;
+  font-size:var(--fs-small);
+  color:var(--muted);
+  border-top:1px solid #222;
+  margin-top:30px;
 }
 
-.card h2 {
-  margin-top: 0;
-}
+/* =========================
+   RLOL THEME OVERRIDES
+   ========================= */
 
-.card ul {
-  padding-left: 18px;
-  margin: 0;
-}
-
-.card li {
-  margin-bottom: 8px;
-}
-
-.card strong {
-  color: var(--text);
-}
-
-/* FOOTER (matches: <footer class="footer"> ) */
-.footer {
-  text-align: center;
-  padding: 20px;
-  font-size: 14px;
-  color: var(--muted);
-  border-top: 1px solid #222;
-  margin-top: 30px;
-}
-
-/* RLOL Teams */
-.teams-grid {
-  max-width: 1100px;
-  margin: 24px auto 0;
-  padding: 0 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-}
-
-.team-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-}
-
-.team-name {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-}
-
-.team-meta {
-  margin-top: 6px;
-  font-size: 13px;
-  opacity: 0.75;
-}
-
-/* RLOL Theme Overrides */
-.rlol {
-  --accent: #ff8a00; /* RLOL Orange */
-}
-
-/* RLOL Cards */
-.rlol .team-card {
-  background: var(--panel);
-  border-radius: 14px;
-  padding: 18px;
-  font-weight: 600;
-  transition: all 0.25s ease;
-}
-
-.rlol .team-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 0 0 1px var(--accent),
-    0 0 18px rgba(255, 138, 0, 0.35);
+.rlol{
+  --accent:#ff8a00; /* RLOL Orange */
 }
 
 /* RLOL: subtle league-mode header */
-.rlol .nav {
-  border-bottom: 1px solid rgba(255, 138, 0, 0.45);
+.rlol .nav{
+  border-bottom:1px solid rgba(255, 138, 0, 0.45);
   box-shadow:
     0 2px 12px rgba(255, 138, 0, 0.2),
     inset 0 -1px 0 rgba(255, 138, 0, 0.25);
 }
 
 /* =========================
-   RLOL HUB (Landing Page)
+   RLOL TEAMS GRID
    ========================= */
 
-.rlol-hero{
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 80px 20px 60px;
-  text-align: center;
+.teams-grid{
+  max-width:1100px;
+  margin:24px auto 0;
+  padding:0 20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:16px;
 }
 
-.rlol-hero h1{
-  font-size: 56px;
-  margin: 0 0 10px;
+.team-card{
+  background:rgba(255,255,255,0.04);
+  border:var(--border-soft);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:var(--shadow);
 }
 
-.rlol-sub{
-  color: var(--muted);
-  margin: 0 0 28px;
+.team-name{
+  font-size:clamp(1.05rem, 0.75vw, 1.15rem);
+  font-weight:800;
+  letter-spacing:0.3px;
 }
 
-.rlol-actions{
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
-  max-width: 900px;
-  margin: 0 auto;
+.team-meta{
+  margin-top:6px;
+  font-size:var(--fs-small);
+  opacity:0.75;
 }
 
-.rlol-btn{
-  display: block;
-  text-decoration: none;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 22px 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+/* RLOL card hover polish */
+.rlol .team-card{
+  background:var(--panel);
+  border-radius:14px;
+  padding:18px;
+  font-weight:600;
+  transition:transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
-
-.rlol-btn:hover{
-  transform: translateY(-4px);
-  border-color: var(--accent);
+.rlol .team-card:hover{
+  transform:translateY(-4px);
   box-shadow:
     0 0 0 1px var(--accent),
     0 0 18px rgba(255, 138, 0, 0.35);
 }
 
-.rlol-btn-title{
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: 0.2px;
-  color: var(--text);
-}
-
-.rlol-btn-sub{
-  margin-top: 6px;
-  font-size: 13px;
-  color: var(--muted);
-}
-
 /* =========================
-   RLOL HUB (landing)
+   RLOL HUB (Landing)
    ========================= */
 
 .rlol-hub{
-  /* hero image background like your old page */
-  --hero-image: url('https://i.imgur.com/vMKypFe.png');
+  --hero-image:url('https://i.imgur.com/vMKypFe.png');
 }
 
-.rlol-hub body{ background: var(--bg); }
-
-/* background + glow */
-.rlol-hub{
+/* IMPORTANT: body selectors should target body classes, not “.rlol-hub body” */
+body.rlol-hub{
   background:
     radial-gradient(1000px 700px at 15% -10%, rgba(255,138,0,.12), transparent),
     radial-gradient(900px 600px at 110% 10%, rgba(255,138,0,.09), transparent),
@@ -259,123 +270,132 @@ nav a:hover {
     radial-gradient(900px 600px at 110% 10%, rgba(255,138,0,.09), transparent),
     var(--bg);
 
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
-  background-position: center top, center, center, center;
-  background-size: 1200px auto, auto, auto, auto;
+  background-repeat:no-repeat, no-repeat, no-repeat, no-repeat;
+  background-position:center top, center, center, center;
+  background-size:1200px auto, auto, auto, auto;
 }
 
-/* overlay panel like old page */
 .rlol-hub .overlay{
-  min-height: 100dvh;
-  padding: clamp(24px, 4vw, 48px) 20px;
-  backdrop-filter: blur(2px);
-  background: linear-gradient(to bottom, rgba(0,0,0,0.62), rgba(0,0,0,0.88));
+  min-height:100dvh;
+  padding:clamp(24px, 4vw, 48px) 20px;
+  backdrop-filter:blur(2px);
+  background:linear-gradient(to bottom, rgba(0,0,0,0.62), rgba(0,0,0,0.88));
 }
 
 .rlol-hub .rlol-header{
-  max-width: 1100px;
-  margin: 0 auto 14px;
-  display: grid;
-  gap: 10px;
-  text-align: center;
+  max-width:1100px;
+  margin:0 auto 14px;
+  display:grid;
+  gap:10px;
+  text-align:center;
 }
 
 .rlol-hub .rlol-header h1{
-  font-size: clamp(2rem, 4.5vw, 3.25rem);
-  color: var(--accent);
-  text-shadow: 0 0 12px rgba(255,138,0,.45);
-  margin: 8px 0 0;
-  letter-spacing: 0.5px;
+  font-size:var(--fs-hero);
+  color:var(--accent);
+  text-shadow:0 0 12px rgba(255,138,0,.45);
+  margin:8px 0 0;
+  letter-spacing:0.5px;
 }
 
 .rlol-hub .tagline{
-  color: #c9d1d9;
-  font-size: clamp(1rem, 2.2vw, 1.15rem);
-  margin: 0 auto;
-  max-width: 920px;
-  line-height: 1.5;
+  color:#c9d1d9;
+  font-size:clamp(0.95rem, 0.55vw, 1.1rem); /* fixed clamp */
+  margin:0 auto;
+  max-width:920px;
+  line-height:1.55;
 }
+
+.rlol-hub .rlol-sub{
+  color:var(--muted);
+  margin:0 0 28px;
+  font-size:var(--fs-small);
+}
+
+.rlol-accent{ color:var(--accent); }
 
 /* champ callout */
 .rlol-hub .champ-callout{
-  max-width: 1100px;
-  margin: 14px auto 18px;
-  padding: 14px 16px;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255,138,0,0.14), rgba(255,138,0,0.06));
-  text-align: left;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 14px;
-  align-items: center;
+  max-width:1100px;
+  margin:14px auto 18px;
+  padding:14px 16px;
+  border:var(--border-soft);
+  border-radius:16px;
+  background:linear-gradient(180deg, rgba(255,138,0,0.14), rgba(255,138,0,0.06));
+  text-align:left;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:14px;
+  align-items:center;
 }
 
 .rlol-hub .champ-callout img{
-  height: 64px;
-  width: auto;
-  max-width: 140px;
-  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.45));
+  height:64px;
+  width:auto;
+  max-width:140px;
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,0.45));
 }
 
-.rlol-accent{ color: var(--accent); }
-
-/* buttons row */
+/* CTA row */
 .rlol-hub .cta-row{
-  margin: 18px auto 8px;
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0,1fr));
-  gap: 10px;
-  max-width: 1100px;
-  padding: 0 4px;
+  margin:18px auto 8px;
+  display:grid;
+  grid-template-columns:repeat(6, minmax(0, 1fr));
+  gap:10px;
+  max-width:1100px;
+  padding:0 4px;
 }
 
-/* panels + hub grid */
+/* hub content */
 .rlol-hub .content{
-  max-width: 1100px;
-  margin: 22px auto 0;
-  padding: 0 8px;
-  display: grid;
-  gap: 16px;
+  max-width:1100px;
+  margin:22px auto 0;
+  padding:0 8px;
+  display:grid;
+  gap:16px;
 }
 
 .rlol-hub .panel{
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: clamp(16px, 3.2vw, 22px);
-  text-align: left;
-  margin: 0 auto;
-  width: 100%;
+  padding:clamp(16px, 2.2vw, 22px);
+  text-align:left;
+  margin:0 auto;
+  width:100%;
 }
 
 .rlol-hub .hub-grid{
   display:grid;
-  grid-template-columns: 1.1fr 0.9fr 0.9fr;
-  gap: 16px;
+  grid-template-columns:1.1fr 0.9fr 0.9fr;
+  gap:16px;
   max-width:1100px;
-  margin: 14px auto 0;
-  padding: 0 8px;
+  margin:14px auto 0;
+  padding:0 8px;
 }
 
 /* kpis */
-.rlol-hub .kpi-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+.rlol-hub .kpi-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
 .rlol-hub .kpi{
-  flex: 1 1 140px;
-  border:1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.02);
+  flex:1 1 140px;
+  border:var(--border-soft);
+  background:rgba(255,255,255,0.02);
   border-radius:12px;
   padding:10px 12px;
 }
-.rlol-hub .kpi .label{ color:#c9d1d9; font-size:12px; }
-.rlol-hub .kpi .value{ font-size:18px; font-weight:900; margin-top:4px; }
-
-/* match list cards */
-.rlol-hub .match-list{ margin-top:10px; display:grid; gap:10px; }
-.rlol-hub .match{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+.rlol-hub .kpi .label{
+  color:#c9d1d9;
+  font-size:var(--fs-micro);
+  letter-spacing:0.4px;
+  text-transform:uppercase;
+}
+.rlol-hub .kpi .value{
+  font-size:clamp(1.05rem, 0.85vw, 1.2rem);
+  font-weight:900;
+  margin-top:4px;
+}
 
 /* =========================
    RLOL SCHEDULE
@@ -384,18 +404,16 @@ nav a:hover {
    <main class="rlol-wrap">...</main>
    ========================= */
 
-.rlol { --accent:#ff8a00; } /* RLOL Orange */
-
-.rlol-schedule{
-  background: radial-gradient(1200px 600px at 30% 0%, #1a1a1d 0%, var(--bg) 55%);
-  min-height: 100vh;
+body.rlol-schedule{
+  background:radial-gradient(1200px 600px at 30% 0%, #1a1a1d 0%, var(--bg) 55%);
+  min-height:100vh;
 }
 
 /* container */
 .rlol-wrap{
   max-width:1100px;
   margin:0 auto;
-  padding:24px;
+  padding:clamp(16px, 2.2vw, 24px);
 }
 
 /* top header row */
@@ -410,44 +428,25 @@ nav a:hover {
 
 .rlol-schedule h1{
   margin:0;
-  font-size:28px;
-  letter-spacing:.2px;
+  font-size:var(--fs-h1);
+  letter-spacing:0.2px;
 }
 
 .rlol-schedule .sub{
   color:var(--muted);
-  font-size:14px;
+  font-size:var(--fs-small);
   margin-top:6px;
 }
 
-/* nav buttons */
 .rlol-schedule .nav-btns{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
 }
 
-.rlol-schedule .btn{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  border:1px solid rgba(255,255,255,0.10);
-  color:var(--text);
-  text-decoration:none;
-  padding:10px 12px;
-  border-radius:12px;
-  font-size:14px;
-}
-.rlol-schedule .btn:hover{ border-color: rgba(255,255,255,0.18); }
-
 /* cards */
 .rlol-schedule .card{
-  background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  border:1px solid rgba(255,255,255,0.10);
-  border-radius:18px;
   padding:14px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
   overflow:hidden;
   margin-bottom:14px;
 }
@@ -466,11 +465,13 @@ nav a:hover {
   gap:8px;
   align-items:center;
   color:var(--muted);
-  font-size:13px;
+  font-size:var(--fs-small);
 }
 
 .rlol-schedule .dot{
-  width:8px;height:8px;border-radius:50%;
+  width:8px;
+  height:8px;
+  border-radius:50%;
   background:var(--accent);
   box-shadow:0 0 12px rgba(255,138,0,.45);
 }
@@ -490,7 +491,7 @@ nav a:hover {
   color:var(--text);
   padding:10px 10px;
   border-radius:12px;
-  font-size:14px;
+  font-size:var(--fs-small);
   outline:none;
 }
 .rlol-schedule input{ min-width:240px; }
@@ -504,31 +505,38 @@ nav a:hover {
   flex-wrap:wrap;
   margin:0 0 10px 0;
 }
-.rlol-schedule .weekTitle h2{ margin:0; font-size:18px; }
-.rlol-schedule .weekTitle .small{ color:var(--muted); font-size:12px; }
+.rlol-schedule .weekTitle h2{
+  margin:0;
+  font-size:var(--fs-h2);
+}
+.rlol-schedule .weekTitle .small{
+  color:var(--muted);
+  font-size:var(--fs-micro);
+}
 
 /* table */
 .rlol-schedule table{ width:100%; border-collapse:collapse; }
+
 .rlol-schedule thead th{
   text-align:left;
   color:var(--muted);
-  font-size:12px;
-  font-weight:600;
+  font-size:var(--fs-micro);
+  font-weight:700;
   padding:10px;
   border-bottom:1px solid rgba(255,255,255,0.10);
-  letter-spacing:.6px;
+  letter-spacing:0.6px;
   text-transform:uppercase;
 }
+
 .rlol-schedule tbody td{
   padding:12px 10px;
   border-bottom:1px solid rgba(255,255,255,0.08);
-  font-size:14px;
+  font-size:var(--fs-small);
   vertical-align:middle;
 }
 .rlol-schedule tbody tr:hover{ background:rgba(255,138,0,.06); }
 
 .rlol-schedule .right{ text-align:right; }
-.rlol-schedule .num{ font-variant-numeric:tabular-nums; }
 
 /* matchup row */
 .rlol-schedule .matchCell{
@@ -544,11 +552,22 @@ nav a:hover {
   min-width:240px;
 }
 .rlol-schedule .logo{
-  width:26px;height:26px;border-radius:8px;object-fit:contain;
-  background:#0b0b0c;border:1px solid rgba(255,255,255,.06);
+  width:26px;
+  height:26px;
+  border-radius:8px;
+  object-fit:contain;
+  background:#0b0b0c;
+  border:1px solid rgba(255,255,255,.06);
 }
-.rlol-schedule .teamName{ font-weight:800; }
-.rlol-schedule .vs{ color:var(--muted); font-weight:700; }
+.rlol-schedule .teamName{
+  font-weight:800;
+  font-size:var(--fs-small);
+}
+.rlol-schedule .vs{
+  color:var(--muted);
+  font-weight:700;
+  font-size:var(--fs-small);
+}
 
 /* badges */
 .rlol-schedule .badge{
@@ -560,7 +579,7 @@ nav a:hover {
   border:1px solid rgba(255,255,255,0.10);
   background:#0b0b0c;
   color:var(--muted);
-  font-size:12px;
+  font-size:var(--fs-micro);
 }
 
 .rlol-schedule .badge.live{
@@ -579,11 +598,11 @@ nav a:hover {
   border-color:rgba(120,160,255,.35);
 }
 
-/* footer text */
+/* schedule footer text */
 .rlol-schedule .footer{
   margin-top:10px;
   color:var(--muted);
-  font-size:12px;
+  font-size:var(--fs-micro);
 }
 
 /* mobile */
@@ -591,4 +610,15 @@ nav a:hover {
   .rlol-schedule .hideMobile{ display:none; }
   .rlol-schedule .teamChip{ min-width:auto; }
   .rlol-schedule input{ min-width:180px; }
+  nav a{ margin-left:12px; }
+}
+
+/* hub responsive columns */
+@media (max-width:1000px){
+  .rlol-hub .cta-row{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+  .rlol-hub .hub-grid{ grid-template-columns:1fr; }
+}
+
+@media (max-width:520px){
+  .rlol-hub .cta-row{ grid-template-columns:repeat(2, minmax(0,1fr)); }
 }
