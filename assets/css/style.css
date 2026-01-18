@@ -866,3 +866,59 @@ body.rlol-schedule{
   border-color: rgba(255,138,0,0.35);
   box-shadow: 0 0 18px rgba(255,138,0,0.12) inset;
 }
+
+/* =========================
+   RLOL HUB – Next Match List (Final Polish)
+   ========================= */
+
+/* Make list span full panel width */
+.rlol-hub #nextMatches{
+  display: grid;
+  gap: 12px;
+}
+
+/* Match card */
+.rlol-hub .match-item{
+  width: 100%;
+  padding: 14px 16px;
+}
+
+/* Keep everything inside the card, not floating */
+.rlol-hub .match-left{
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 12px;
+  align-items: center;
+}
+
+/* Stack names tighter */
+.rlol-hub .match-names{
+  display: grid;
+  gap: 2px;
+}
+
+.rlol-hub .match-team{
+  font-size: var(--fs-small);
+  font-weight: 800;
+}
+
+/* VS alignment */
+.rlol-hub .match-vs{
+  margin: 2px 0 2px 38px;
+}
+
+/* Status pill stays inside card edge */
+.rlol-hub .match-right{
+  justify-content: flex-start;
+}
+
+/* Selected / hover glow consistency */
+.rlol-hub .match-item:hover,
+.rlol-hub .match-item.active{
+  border-color: rgba(255,138,0,0.65);
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,0.9),
+    0 0 18px rgba(255,138,0,0.3),
+    0 10px 30px rgba(0,0,0,0.4);
+}
