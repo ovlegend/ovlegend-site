@@ -222,7 +222,7 @@
               ${th("PTS", "pts")}
             </tr>
           </thead>
-          <tbody>
+<tbody>
   ${rowsToShow.map((r, idx) => {
     const isPlayoff = r.rank <= 4;
 
@@ -232,28 +232,27 @@
         : "";
 
     return `
-              <tr class="${isPlayoff ? "playoffRow" : ""}">
-                <td class="num">${r.rank}</td>
-                <td class="teamCell">
-                  ${r.logo
-                    ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />`
-                    : `<div class="logo ph"></div>`}
-                  <div class="teamText">
-                    <div class="teamName">${r.team || r.abbr || r.teamId || "TBD"}</div>
-                    ${r.abbr ? `<div class="teamAbbr">${r.abbr}</div>` : ``}
-                  </div>
-                </td>
-                <td class="num">${r.w}</td>
-                <td class="num">${r.l}</td>
-                <td class="num">${r.gp}</td>
-                <td class="num">${r.gd}</td>
-                <td class="num">${r.gf}</td>
-                <td class="num">${r.ga}</td>
-                <td class="num">${r.pts}</td>
-              </tr>
-${playoffLine}
-            `).join("")}
-          </tbody>
+      <tr class="${isPlayoff ? "playoffRow" : ""}">
+        <td class="num">${r.rank === 999 ? "" : r.rank}</td>
+        <td class="teamCell">
+          ${r.logo ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />` : `<div class="logo ph"></div>`}
+          <div class="teamText">
+            <div class="teamName">${r.team || r.abbr || r.teamId || "TBD"}</div>
+            ${r.abbr ? `<div class="teamAbbr">${r.abbr}</div>` : ``}
+          </div>
+        </td>
+        <td class="num">${r.w}</td>
+        <td class="num">${r.l}</td>
+        <td class="num">${r.gp}</td>
+        <td class="num">${r.gd}</td>
+        <td class="num">${r.gf}</td>
+        <td class="num">${r.ga}</td>
+        <td class="num">${r.pts}</td>
+      </tr>
+      ${playoffLine}
+    `;
+  }).join("")}
+</tbody>
         </table>
       </div>
     `;
