@@ -165,3 +165,9 @@ nav a:hover {
     0 0 0 1px var(--accent),
     0 0 18px rgba(255, 138, 0, 0.35);
 }
+
+/* RLOL: subtle league-mode header */
+.rlol .nav {
+  border-bottom: 1px solid rgba(255, 138, 0, 0.35);
+  box-shadow: 0 2px 12px rgba(255, 138, 0, 0.15);
+}
