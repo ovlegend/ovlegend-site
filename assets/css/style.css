@@ -1081,3 +1081,241 @@ body.rlol-schedule{
 .playoffRow td {
   background: rgba(255,138,0,0.06);
 }
+
+/* =========================
+   RLOL Stats — League Polish
+   ========================= */
+
+:root{
+  --bg: #0b0b0d;
+  --panel: rgba(21,21,24,.82);
+  --panel-2: rgba(255,255,255,.04);
+  --stroke: rgba(255,255,255,.08);
+  --stroke-2: rgba(255,255,255,.12);
+  --text: #eaeaea;
+  --muted: rgba(234,234,234,.65);
+  --accent: #ff5600; /* OV Orange */
+  --accent2: #ff8a00; /* RLOL Orange alt */
+  --good: #49d17c;
+  --warn: #ffcc66;
+
+  --r: 16px;
+  --r2: 22px;
+  --shadow: 0 12px 40px rgba(0,0,0,.45);
+}
+
+body{
+  background: radial-gradient(1200px 600px at 30% -10%, rgba(255,86,0,.18), transparent 55%),
+              radial-gradient(900px 600px at 90% 0%, rgba(255,138,0,.12), transparent 50%),
+              var(--bg);
+  color: var(--text);
+}
+
+/* Page header */
+.page-title, h1{
+  letter-spacing: .5px;
+  font-weight: 900;
+  font-size: clamp(28px, 4vw, 44px);
+  margin: 18px 0 8px;
+}
+
+.subtext, .page-subtitle{
+  color: var(--muted);
+  margin-bottom: 18px;
+  line-height: 1.35;
+}
+
+/* Main container */
+.stats-wrap, .container, main{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 16px 40px;
+}
+
+/* Filters bar (selects + search) */
+.filters, .controls, .table-controls{
+  position: sticky;
+  top: 10px;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  background: linear-gradient(180deg, rgba(21,21,24,.92), rgba(21,21,24,.62));
+  border: 1px solid var(--stroke);
+  border-radius: var(--r2);
+  box-shadow: var(--shadow);
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 160px 90px 160px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.filters select,
+.filters input,
+.controls select,
+.controls input{
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--stroke);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  transition: .15s ease;
+}
+
+.filters select:focus,
+.filters input:focus,
+.controls select:focus,
+.controls input:focus{
+  border-color: rgba(255,86,0,.55);
+  box-shadow: 0 0 0 4px rgba(255,86,0,.12);
+}
+
+.filters input::placeholder{ color: rgba(234,234,234,.45); }
+
+/* "Loaded X rows" */
+.loaded-count, .status-line{
+  margin: 10px 2px 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Table shell */
+.table-shell, .table-wrap{
+  margin-top: 14px;
+  border: 1px solid var(--stroke);
+  border-radius: var(--r2);
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+  box-shadow: var(--shadow);
+}
+
+/* Table */
+table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+
+thead th{
+  position: sticky;
+  top: 74px; /* sits below sticky filter bar */
+  z-index: 40;
+  background: rgba(14,14,16,.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--stroke-2);
+
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: 12px;
+  color: rgba(234,234,234,.72);
+  padding: 12px 10px;
+  white-space: nowrap;
+}
+
+tbody td{
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  vertical-align: middle;
+}
+
+tbody tr:nth-child(odd){
+  background: rgba(255,255,255,.02);
+}
+
+tbody tr:hover{
+  background: rgba(255,86,0,.08);
+}
+
+td.num, th.num{ text-align: right; font-variant-numeric: tabular-nums; }
+td.center, th.center{ text-align: center; }
+
+/* Player cell: avatar + name */
+.player-cell{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.player-avatar{
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.05);
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.player-avatar img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.player-name{
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
+.player-sub{
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Team pill */
+.team-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+  color: rgba(234,234,234,.92);
+  font-weight: 700;
+}
+
+/* Highlight top performers */
+.is-leader{
+  position: relative;
+}
+
+.is-leader::before{
+  content:"";
+  position:absolute;
+  inset: -1px;
+  border-radius: 12px;
+  pointer-events:none;
+  background: linear-gradient(90deg, rgba(255,86,0,.00), rgba(255,86,0,.14), rgba(255,86,0,.00));
+  opacity: .9;
+}
+
+/* Ping styling */
+.ping-good{ color: var(--good); font-weight: 800; }
+.ping-mid{ color: var(--warn); font-weight: 800; }
+.ping-bad{ color: #ff6b6b; font-weight: 800; }
+
+/* Mobile handling */
+@media (max-width: 880px){
+  .filters, .controls, .table-controls{
+    grid-template-columns: 1fr 1fr;
+  }
+  thead th{ top: 118px; }
+}
+
+@media (max-width: 560px){
+  .filters, .controls, .table-controls{
+    grid-template-columns: 1fr;
+  }
+  thead th{ top: 176px; }
+  table{ font-size: 13px; }
+}
