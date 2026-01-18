@@ -988,3 +988,43 @@ body.rlol-stats{
   .rlol-stats thead th{ top: 176px; }
   .rlol-stats table{ font-size: 13px; }
 }
+
+/* =========================
+   HUB SAFETY PATCH (undo stats bleed)
+   Applies only to the RLOL hub page
+   ========================= */
+
+body.rlol-hub table{
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: var(--fs-small);
+}
+
+body.rlol-hub thead th{
+  position: static;
+  top: auto;
+  z-index: auto;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  padding: 10px 8px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  font-size: var(--fs-micro);
+  color: var(--muted);
+}
+
+body.rlol-hub tbody td{
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* remove the "carded row" pseudo elements on hub tables */
+body.rlol-hub tbody tr{
+  position: static;
+}
+body.rlol-hub tbody tr::before,
+body.rlol-hub tbody tr::after{
+  content: none !important;
+}
