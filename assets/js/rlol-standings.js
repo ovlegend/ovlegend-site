@@ -59,10 +59,12 @@
     return fallback;
   }
 
-  function num(v, fallback = 0) {
-    const n = Number(String(v ?? "").replace(/[^\d.-]/g, ""));
-    return Number.isFinite(n) ? n : fallback;
-  }
+function num(v, fallback = 0) {
+  const s = String(v ?? "").trim();
+  if (s === "") return fallback;          // <-- key fix
+  const n = Number(s.replace(/[^\d.-]/g, ""));
+  return Number.isFinite(n) ? n : fallback;
+}
 
   function normalizeKey(s) {
     return String(s || "").trim().toLowerCase();
