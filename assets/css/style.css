@@ -1867,3 +1867,36 @@ body.rlol-hub #nextMatches .team{
     align-items: flex-start;
   }
 }
+
+/* ===== HERO CENTER MODE (single column) ===== */
+.hero-center .hero-v2-inner {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+}
+
+.hero-center .hero-left {
+  align-items: center;
+}
+
+.hero-center .hero-wordmark {
+  max-width: 460px;
+}
+
+.hero-center .hero-lede {
+  max-width: 680px;
+}
+
+.hero-center .hero-actions {
+  justify-content: center;
+}
+
+.hero-mark-bottom {
+  margin-top: 34px;
+}
+
+.hero-center .hero-mark {
+  max-width: 220px;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 70px rgba(255, 86, 0, 0.35));
+}
