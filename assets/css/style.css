@@ -235,3 +235,144 @@ nav a:hover {
   color: var(--muted);
 }
 
+/* =========================
+   RLOL HUB (landing)
+   ========================= */
+
+.rlol-hub{
+  /* hero image background like your old page */
+  --hero-image: url('https://i.imgur.com/vMKypFe.png');
+}
+
+.rlol-hub body{ background: var(--bg); }
+
+/* background + glow */
+.rlol-hub{
+  background:
+    radial-gradient(1000px 700px at 15% -10%, rgba(255,138,0,.12), transparent),
+    radial-gradient(900px 600px at 110% 10%, rgba(255,138,0,.09), transparent),
+    var(--bg);
+
+  background-image:
+    var(--hero-image),
+    radial-gradient(1000px 700px at 15% -10%, rgba(255,138,0,.12), transparent),
+    radial-gradient(900px 600px at 110% 10%, rgba(255,138,0,.09), transparent),
+    var(--bg);
+
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-position: center top, center, center, center;
+  background-size: 1200px auto, auto, auto, auto;
+}
+
+/* overlay panel like old page */
+.rlol-hub .overlay{
+  min-height: 100dvh;
+  padding: clamp(24px, 4vw, 48px) 20px;
+  backdrop-filter: blur(2px);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.62), rgba(0,0,0,0.88));
+}
+
+.rlol-hub .rlol-header{
+  max-width: 1100px;
+  margin: 0 auto 14px;
+  display: grid;
+  gap: 10px;
+  text-align: center;
+}
+
+.rlol-hub .rlol-header h1{
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  color: var(--accent);
+  text-shadow: 0 0 12px rgba(255,138,0,.45);
+  margin: 8px 0 0;
+  letter-spacing: 0.5px;
+}
+
+.rlol-hub .tagline{
+  color: #c9d1d9;
+  font-size: clamp(1rem, 2.2vw, 1.15rem);
+  margin: 0 auto;
+  max-width: 920px;
+  line-height: 1.5;
+}
+
+/* champ callout */
+.rlol-hub .champ-callout{
+  max-width: 1100px;
+  margin: 14px auto 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255,138,0,0.14), rgba(255,138,0,0.06));
+  text-align: left;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.rlol-hub .champ-callout img{
+  height: 64px;
+  width: auto;
+  max-width: 140px;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.45));
+}
+
+.rlol-accent{ color: var(--accent); }
+
+/* buttons row */
+.rlol-hub .cta-row{
+  margin: 18px auto 8px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0,1fr));
+  gap: 10px;
+  max-width: 1100px;
+  padding: 0 4px;
+}
+
+/* panels + hub grid */
+.rlol-hub .content{
+  max-width: 1100px;
+  margin: 22px auto 0;
+  padding: 0 8px;
+  display: grid;
+  gap: 16px;
+}
+
+.rlol-hub .panel{
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: clamp(16px, 3.2vw, 22px);
+  text-align: left;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.rlol-hub .hub-grid{
+  display:grid;
+  grid-template-columns: 1.1fr 0.9fr 0.9fr;
+  gap: 16px;
+  max-width:1100px;
+  margin: 14px auto 0;
+  padding: 0 8px;
+}
+
+/* kpis */
+.rlol-hub .kpi-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+.rlol-hub .kpi{
+  flex: 1 1 140px;
+  border:1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  border-radius:12px;
+  padding:10px 12px;
+}
+.rlol-hub .kpi .label{ color:#c9d1d9; font-size:12px; }
+.rlol-hub .kpi .value{ font-size:18px; font-weight:900; margin-top:4px; }
+
+/* match list cards */
+.rlol-hub .match-list{ margin-top:10px; display:grid; gap:10px; }
+.rlol-hub .match{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
