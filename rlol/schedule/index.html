@@ -1,21 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>RLOL Schedule | OV Legend</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RLOL Season 2 — Schedule | OV Legend</title>
+  <meta name="theme-color" content="#ff8a00" />
   <link rel="stylesheet" href="/ovlegend-site/assets/css/style.css">
 </head>
-<body class="rlol">
+
+<body class="rlol rlol-schedule">
   <header class="nav">
     <div class="nav-inner">
       <div class="logo">OV <span>Legend</span></div>
+      <nav>
+        <a href="/ovlegend-site/rlol/">RLOL Hub</a>
+        <a href="/ovlegend-site/rlol/standings/">Standings</a>
+        <a href="/ovlegend-site/rlol/teams/">Teams</a>
+      </nav>
     </div>
   </header>
 
-  <main style="padding: 80px 20px; text-align: center;">
-    <h1>RLOL Schedule</h1>
-    <p>Upcoming and completed matches</p>
-    <p>Data coming next ⚡</p>
+  <main class="rlol-wrap">
+    <div class="topbar">
+      <div>
+        <h1>RLOL Season 2 — Schedule</h1>
+        <div class="sub">Friday nights • Stream starts 6:00 PM ET • Match order set on stream.</div>
+      </div>
+      <div class="nav-btns">
+        <a class="btn" href="/ovlegend-site/rlol/standings/">🏆 Standings</a>
+        <a class="btn" href="/ovlegend-site/rlol/schedule/">📅 Schedule</a>
+      </div>
+    </div>
+
+    <section class="card">
+      <div class="metaRow">
+        <div class="pill"><span class="dot"></span><span id="asOf">Loading…</span></div>
+        <div class="controls">
+          <select id="statusFilter" title="Filter by status">
+            <option value="all">All</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="played">Played</option>
+            <option value="postponed">Postponed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <input id="searchBox" placeholder="Search team name (ex: Bossy)" />
+        </div>
+      </div>
+      <div class="footer" id="counts"></div>
+    </section>
+
+    <div id="weeks"></div>
   </main>
+
+  <script src="/ovlegend-site/assets/js/config.js"></script>
+  <script src="/ovlegend-site/assets/js/rlol-schedule.js"></script>
 </body>
 </html>
