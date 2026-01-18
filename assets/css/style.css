@@ -1900,3 +1900,19 @@ body.rlol-hub #nextMatches .team{
   opacity: 0.95;
   filter: drop-shadow(0 0 90px rgba(255, 86, 0, 0.45));
 }
+
+/* RL Tracker embed container */
+.embed-wrap{
+  width: 100%;
+  height: 80vh;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.02);
+}
+
+.embed-frame{
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
