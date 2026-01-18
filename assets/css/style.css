@@ -1190,6 +1190,33 @@ body.rlol-hub .hub-grid .panel *::-webkit-scrollbar-track{
   margin-top: 12px;
 }
 
+.rlol-hub .stats-preview {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.rlol-hub .stat-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.04),
+    rgba(255,255,255,0.02)
+  );
+
+  max-width: 100%;
+  overflow: hidden;
+}
+
 /* =========================
    RLOL HUB — Next Match panel: fit column + scroll
    ========================= */
