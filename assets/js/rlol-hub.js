@@ -376,22 +376,31 @@
     return { row: best, val: bestVal };
   }
 
-  function renderRow(label, whoName, teamName, value, avatarUrl) {
-    const img = avatarUrl ? `<img src="${avatarUrl}" alt="" loading="lazy" />` : `<img src="" alt="" style="display:none" />`;
-    const team = teamName ? `<span class="team">• ${teamName}</span>` : "";
-    return `
-      <div class="stat-row">
-        <div>
-          <div class="label">${label}</div>
-          <div class="who">
-            ${avatarUrl ? img : ""}
-            <div class="name">${whoName || "—"}${team}</div>
+function renderRow(label, whoName, teamName, value, avatarUrl) {
+  const avatar = avatarUrl
+    ? `<img class="avatar" src="${avatarUrl}" alt="" loading="lazy" />`
+    : "";
+
+  const team = teamName
+    ? `<span class="team">${teamName}</span>`
+    : "";
+
+  return `
+    <div class="stat-row">
+      <div class="left">
+        <div class="label">${label}</div>
+        <div class="who">
+          ${avatar}
+          <div class="name">
+            ${whoName || "--"}
+            ${team}
           </div>
         </div>
-        <div class="value">${Number.isFinite(value) ? value : "—"}</div>
       </div>
-    `;
-  }
+      <div class="value">${Number.isFinite(value) ? value : ""}</div>
+    </div>
+  `;
+}
 
   async function init() {
     const mount = $("#statsPreview");
