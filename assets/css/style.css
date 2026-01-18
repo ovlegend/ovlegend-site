@@ -729,3 +729,38 @@ body.rlol-schedule{
   border-color: rgba(255,138,0,.45);
   box-shadow: 0 0 18px rgba(255,138,0,.12) inset;
 }
+
+/* --- Hub: Next Match compact layout --- */
+.rlol-hub .next-match{
+  display: grid;
+  gap: 8px;
+}
+
+.rlol-hub .next-match .match-left{
+  display: grid;
+  gap: 6px;
+}
+
+.rlol-hub .next-match .match-team{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rlol-hub .next-match .match-team .team-name{
+  font-weight: 800;
+  font-size: var(--fs-small);
+}
+
+.rlol-hub .next-match .match-vs{
+  margin-left: 38px;
+  color: var(--muted);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.rlol-hub .next-match .pill.status{
+  margin-top: 6px;
+  align-self: flex-start;
+}
