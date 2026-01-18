@@ -114,3 +114,33 @@ nav a:hover {
   border-top: 1px solid #222;
   margin-top: 30px;
 }
+
+/* RLOL Teams */
+.teams-grid {
+  max-width: 1100px;
+  margin: 24px auto 0;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.team-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.team-name {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.team-meta {
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.75;
+}
