@@ -2,6 +2,13 @@
 (function () {
   const $ = (sel) => document.querySelector(sel);
 
+  // ✅ Published CSV fallbacks (prevents CORS/login redirects)
+  const STANDINGS_CSV_FALLBACK =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCQnxfwBylnd5H8jHc_g9Gtv7wyhzelCLixlK3-Bi_Uw0pVJga8MPtgYf5740Csm7hbfLTJhHGdWzh/pub?gid=128420471&single=true&output=csv";
+
+  const STANDINGS_VIEW_CSV_FALLBACK =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCQnxfwBylnd5H8jHc_g9Gtv7wyhzelCLixlK3-Bi_Uw0pVJga8MPtgYf5740Csm7hbfLTJhHGdWzh/pub?gid=1039937861&single=true&output=csv";
+
   // ---------------- CSV parsing (quoted commas safe) ----------------
   function parseCSV(text) {
     const rows = [];
@@ -43,10 +50,30 @@
     return data;
   }
 
+  // ✅ Adds cache-buster + better errors
   async function fetchCsv(url) {
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return parseCSV(await res.text());
+    if (!url) throw new Error("CSV URL missing");
+
+    // Cache-bust (solves “works then stops”)
+    const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+
+    const res = await fetch(busted, { cache: "no-store" });
+
+    // If this happens again, you'll SEE what it redirected to
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status} while fetching CSV`);
+    }
+
+    const text = await res.text();
+
+    // If Google sends you to a login page or HTML, catch it immediately (CORS usually blocks before this,
+    // but this is a nice safeguard if the URL ever changes).
+    const looksLikeHtml = /^\s*</.test(text);
+    if (looksLikeHtml) {
+      throw new Error("CSV fetch returned HTML (likely not a published CSV link)");
+    }
+
+    return parseCSV(text);
   }
 
   // ---------------- helpers ----------------
@@ -59,12 +86,12 @@
     return fallback;
   }
 
-function num(v, fallback = 0) {
-  const s = String(v ?? "").trim();
-  if (s === "") return fallback;          // <-- key fix
-  const n = Number(s.replace(/[^\d.-]/g, ""));
-  return Number.isFinite(n) ? n : fallback;
-}
+  function num(v, fallback = 0) {
+    const s = String(v ?? "").trim();
+    if (s === "") return fallback;
+    const n = Number(s.replace(/[^\d.-]/g, ""));
+    return Number.isFinite(n) ? n : fallback;
+  }
 
   function normalizeKey(s) {
     return String(s || "").trim().toLowerCase();
@@ -90,7 +117,6 @@ function num(v, fallback = 0) {
 
       map.set(id, {
         id,
-        // Your Teams sheet headers: Team, team_id, logo_url
         name: String(t.Team || t.team_name || t.name || id).trim(),
         logo: String(t.logo_url || t.logo || "").trim()
       });
@@ -118,20 +144,15 @@ function num(v, fallback = 0) {
   let TEAM_MAP = new Map();
 
   function toStandingsModel(row) {
-    // Standings CSV headers (from your console):
-    // team_id,team_name,GP,W,L,GF,GA,GD,PTS
     const teamId = pick(row, ["team_id", "Team ID", "id", "ID"], "");
     const meta = (teamId && TEAM_MAP.get(teamId)) ? TEAM_MAP.get(teamId) : null;
 
-    // Prefer the Teams sheet display name if available (meta.name),
-    // otherwise fall back to standings team_name/team/team etc.
     const team =
       (meta && meta.name) ||
       pick(row, ["team_name", "team", "Team", "TEAM", "name", "Name"], teamId);
 
     const abbr = pick(row, ["abbr", "Abbr", "ABBR", "abbreviation", "Abbreviation"], "");
 
-    // Rank is optional; if missing we’ll generate later.
     const rank = num(pick(row, ["rank", "#", "pos", "position", "Position"], ""), 999);
 
     const w = num(pick(row, ["W", "w", "wins", "Wins"], "0"));
@@ -144,7 +165,6 @@ function num(v, fallback = 0) {
 
     const pts = num(pick(row, ["PTS", "pts", "points", "Points"], "0"));
 
-    // Prefer Teams sheet logo; fallback to any logo columns in standings (if you ever add them)
     const logo =
       (meta && meta.logo) ||
       pick(row, ["logo", "Logo", "logo_url", "Logo URL", "logoUrl"], "");
@@ -224,37 +244,37 @@ function num(v, fallback = 0) {
               ${th("PTS", "pts")}
             </tr>
           </thead>
-<tbody>
-  ${rowsToShow.map((r, idx) => {
-    const isPlayoff = r.rank <= 4;
+          <tbody>
+            ${rowsToShow.map((r, idx) => {
+              const isPlayoff = r.rank <= 4;
 
-    const playoffLine =
-      (state.viewMode !== "snapshot" && idx === 3)
-        ? `<tr class="playoffLineRow"><td colspan="9"><span>PLAYOFF LINE</span></td></tr>`
-        : "";
+              const playoffLine =
+                (state.viewMode !== "snapshot" && idx === 3)
+                  ? `<tr class="playoffLineRow"><td colspan="9"><span>PLAYOFF LINE</span></td></tr>`
+                  : "";
 
-    return `
-      <tr class="${isPlayoff ? "playoffRow" : ""}">
-        <td class="num">${r.rank === 999 ? "" : r.rank}</td>
-        <td class="teamCell">
-          ${r.logo ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />` : `<div class="logo ph"></div>`}
-          <div class="teamText">
-            <div class="teamName">${r.team || r.abbr || r.teamId || "TBD"}</div>
-            ${r.abbr ? `<div class="teamAbbr">${r.abbr}</div>` : ``}
-          </div>
-        </td>
-        <td class="num">${r.w}</td>
-        <td class="num">${r.l}</td>
-        <td class="num">${r.gp}</td>
-        <td class="num">${r.gd}</td>
-        <td class="num">${r.gf}</td>
-        <td class="num">${r.ga}</td>
-        <td class="num">${r.pts}</td>
-      </tr>
-      ${playoffLine}
-    `;
-  }).join("")}
-</tbody>
+              return `
+                <tr class="${isPlayoff ? "playoffRow" : ""}">
+                  <td class="num">${r.rank === 999 ? "" : r.rank}</td>
+                  <td class="teamCell">
+                    ${r.logo ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />` : `<div class="logo ph"></div>`}
+                    <div class="teamText">
+                      <div class="teamName">${r.team || r.abbr || r.teamId || "TBD"}</div>
+                      ${r.abbr ? `<div class="teamAbbr">${r.abbr}</div>` : ``}
+                    </div>
+                  </td>
+                  <td class="num">${r.w}</td>
+                  <td class="num">${r.l}</td>
+                  <td class="num">${r.gp}</td>
+                  <td class="num">${r.gd}</td>
+                  <td class="num">${r.gf}</td>
+                  <td class="num">${r.ga}</td>
+                  <td class="num">${r.pts}</td>
+                </tr>
+                ${playoffLine}
+              `;
+            }).join("")}
+          </tbody>
         </table>
       </div>
     `;
@@ -274,15 +294,15 @@ function num(v, fallback = 0) {
       const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
       if (!cfg) throw new Error("OV_CONFIG.rlol missing");
 
-      const fullUrl = cfg.standingsCsv;
-      const snapUrl = cfg.standingsViewCsv || cfg.standingsCsv;
+      // ✅ Use published fallbacks if config is missing/wrong
+      const fullUrl = (cfg.standingsCsv && String(cfg.standingsCsv).trim()) || STANDINGS_CSV_FALLBACK;
+      const snapUrl = (cfg.standingsViewCsv && String(cfg.standingsViewCsv).trim()) || STANDINGS_VIEW_CSV_FALLBACK;
 
       statusEl.textContent = "Loading standings…";
 
-      // ✅ load team logos/names FIRST
       TEAM_MAP = await buildTeamMap();
 
-      let data = await fetchCsv(fullUrl);
+      const data = await fetchCsv(fullUrl);
       let model = data.map(toStandingsModel);
 
       const needsRank = model.every((r) => r.rank === 999);
@@ -307,14 +327,14 @@ function num(v, fallback = 0) {
       viewModeEl.addEventListener("change", async () => {
         state.viewMode = viewModeEl.value;
 
-        if (state.viewMode === "snapshot" && snapUrl !== fullUrl) {
+        if (state.viewMode === "snapshot") {
           statusEl.textContent = "Loading snapshot…";
           const snapData = await fetchCsv(snapUrl);
           state.rows = snapData.map(toStandingsModel);
 
           const needsRank2 = state.rows.every((r) => r.rank === 999);
           if (needsRank2) state.rows.forEach((r, i) => (r.rank = i + 1));
-        } else if (state.viewMode === "full" && snapUrl !== fullUrl) {
+        } else {
           statusEl.textContent = "Loading standings…";
           const fullData = await fetchCsv(fullUrl);
           state.rows = fullData.map(toStandingsModel);
