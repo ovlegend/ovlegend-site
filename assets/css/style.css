@@ -764,3 +764,105 @@ body.rlol-schedule{
   margin-top: 6px;
   align-self: flex-start;
 }
+
+/* =========================
+   RLOL HUB – Next Week Match List Cards
+   ========================= */
+
+.rlol-hub .match-item{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 12px 14px;
+  margin-top: 10px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.rlol-hub .match-item:hover{
+  transform: translateY(-2px);
+  border-color: rgba(255,138,0,0.55);
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,0.85),
+    0 0 18px rgba(255,138,0,0.28),
+    0 10px 30px rgba(0,0,0,0.35);
+}
+
+/* left side (teams) */
+.rlol-hub .match-left{
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* team names stacked */
+.rlol-hub .match-names{
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rlol-hub .match-team{
+  font-weight: 900;
+  font-size: var(--fs-small);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rlol-hub .match-vs{
+  color: var(--muted);
+  font-weight: 800;
+  font-size: var(--fs-micro);
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+
+/* logos (keep small + consistent) */
+.rlol-hub .match-item .team-logo{
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: #0b0b0c;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* right side pills */
+.rlol-hub .match-right{
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.rlol-hub .pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.20);
+  color: var(--muted);
+  font-size: var(--fs-micro);
+  white-space: nowrap;
+}
+
+.rlol-hub .pill.status{
+  color: var(--text);
+  border-color: rgba(255,138,0,0.35);
+  box-shadow: 0 0 18px rgba(255,138,0,0.12) inset;
+}
