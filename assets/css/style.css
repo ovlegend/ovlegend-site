@@ -1459,3 +1459,9 @@ body.rlol-hub #nextMatches .team{
   overflow-wrap: anywhere;
   word-break: break;
 }
+
+.logo img {
+  height: 34px;
+  width: auto;
+  display: block;
+}
