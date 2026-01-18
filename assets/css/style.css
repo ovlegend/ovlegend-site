@@ -376,3 +376,184 @@ nav a:hover {
   display:flex;
   align-items:center;
   justify-content:space-between;
+
+/* =========================
+   RLOL SCHEDULE
+   ========================= */
+
+.rlol { --accent:#ff8a00; } /* RLOL Orange */
+
+.rlol-schedule{
+  background:
+    radial-gradient(1200px 600px at 30% 0%, #1a1a1d 0%, var(--bg) 55%);
+  min-height: 100vh;
+}
+
+.rlol-wrap{
+  max-width:1100px;
+  margin:0 auto;
+  padding:24px;
+}
+
+.rlol-schedule .topbar{
+  display:flex;
+  gap:12px;
+  align-items:flex-end;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+
+.rlol-schedule h1{
+  margin:0;
+  font-size:28px;
+  letter-spacing:.2px;
+}
+
+.rlol-schedule .sub{
+  color:var(--muted);
+  font-size:14px;
+  margin-top:6px;
+}
+
+.rlol-schedule .nav-btns{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.rlol-schedule .btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.10);
+  color:var(--text);
+  text-decoration:none;
+  padding:10px 12px;
+  border-radius:12px;
+  font-size:14px;
+}
+.rlol-schedule .btn:hover{ border-color: rgba(255,255,255,0.18); }
+
+.rlol-schedule .card{
+  background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  overflow:hidden;
+  margin-bottom:14px;
+}
+
+.rlol-schedule .metaRow{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+
+.rlol-schedule .pill{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.rlol-schedule .dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 12px rgba(255,138,0,.45);
+}
+
+.rlol-schedule .controls{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center
+}
+
+.rlol-schedule select,
+.rlol-schedule input{
+  background:#0b0b0c;
+  border:1px solid rgba(255,255,255,0.10);
+  color:var(--text);
+  padding:10px 10px;
+  border-radius:12px;
+  font-size:14px;
+  outline:none;
+}
+.rlol-schedule input{ min-width:240px; }
+
+.rlol-schedule .weekTitle{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:0 0 10px 0;
+}
+.rlol-schedule .weekTitle h2{ margin:0; font-size:18px; }
+.rlol-schedule .weekTitle .small{ color:var(--muted); font-size:12px; }
+
+.rlol-schedule table{ width:100%; border-collapse:collapse; }
+.rlol-schedule thead th{
+  text-align:left;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:600;
+  padding:10px;
+  border-bottom:1px solid rgba(255,255,255,0.10);
+  letter-spacing:.6px;
+  text-transform:uppercase;
+}
+.rlol-schedule tbody td{
+  padding:12px 10px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  font-size:14px;
+  vertical-align:middle;
+}
+.rlol-schedule tbody tr:hover{ background:rgba(255,138,0,.06); }
+
+.rlol-schedule .right{ text-align:right; }
+.rlol-schedule .num{ font-variant-numeric:tabular-nums; }
+
+.rlol-schedule .matchCell{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.rlol-schedule .teamChip{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:240px;
+}
+.rlol-schedule .logo{
+  width:26px;height:26px;border-radius:8px;object-fit:contain;
+  background:#0b0b0c;border:1px solid rgba(255,255,255,.06);
+}
+.rlol-schedule .teamName{ font-weight:800; }
+.rlol-schedule .vs{ color:var(--muted); font-weight:700; }
+
+.rlol-schedule .badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.10);
+  background:#0b0b0c;
+  color:var(--muted);
+  font-size:12px;
+}
+.rlol-schedule .badge.live{
+  color:var(--text);
+  border-color:rgba(255,138,0,.45);
+  box-shadow:0 0 18px rgba(255,138,0,.12) inset;
+}
+.rlol-schedule .badge.played{ color
