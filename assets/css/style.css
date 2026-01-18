@@ -1465,3 +1465,76 @@ body.rlol-hub #nextMatches .team{
   width: auto;
   display: block;
 }
+
+/* ===== HOMEPAGE HERO ===== */
+.hero-home {
+  padding: 60px 0 40px;
+}
+
+.hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero-wordmark {
+  max-width: 420px;
+  width: 100%;
+}
+
+.hero-tagline {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: 18px;
+  opacity: 0.9;
+  max-width: 520px;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.hero-visual {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-mark {
+  max-width: 360px;
+  width: 100%;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 40px rgba(255, 86, 0, 0.25));
+}
+
+@media (max-width: 900px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero-cta {
+    justify-content: center;
+  }
+
+  .hero-mark {
+    max-width: 260px;
+    margin-top: 24px;
+  }
+}
