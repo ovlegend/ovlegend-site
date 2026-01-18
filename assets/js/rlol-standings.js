@@ -223,8 +223,16 @@
             </tr>
           </thead>
           <tbody>
-            ${rowsToShow.map((r) => `
-              <tr>
+  ${rowsToShow.map((r, idx) => {
+    const isPlayoff = r.rank <= 4;
+
+    const playoffLine =
+      (state.viewMode !== "snapshot" && idx === 3)
+        ? `<tr class="playoffLineRow"><td colspan="9"><span>PLAYOFF LINE</span></td></tr>`
+        : "";
+
+    return `
+              <tr class="${isPlayoff ? "playoffRow" : ""}">
                 <td class="num">${r.rank}</td>
                 <td class="teamCell">
                   ${r.logo
@@ -243,6 +251,7 @@
                 <td class="num">${r.ga}</td>
                 <td class="num">${r.pts}</td>
               </tr>
+${playoffLine}
             `).join("")}
           </tbody>
         </table>
