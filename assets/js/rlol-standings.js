@@ -1,23 +1,3 @@
-async function buildTeamMap() {
-  const teams = await fetchCsv(window.OV_CONFIG.rlol.teamsCsv);
-  const map = new Map();
-
-  teams.forEach(t => {
-    const id = String(t.team_id || "").trim();
-    if (!id) return;
-
-    map.set(id, {
-      id,
-      // Your sheet uses "Team" (not team_name/abbr)
-      name: String(t.Team || id).trim(),
-      // Your sheet uses "logo_url" (not logo)
-      logo: String(t.logo_url || "").trim()
-    });
-  });
-
-  return map;
-}
-
 // /assets/js/rlol-standings.js
 (function () {
   const $ = (sel) => document.querySelector(sel);
@@ -89,7 +69,32 @@ async function buildTeamMap() {
   }
 
   function compare(a, b, dir) {
-    return dir === "asc" ? (a > b ? 1 : a < b ? -1 : 0) : (a < b ? 1 : a > b ? -1 : 0);
+    return dir === "asc"
+      ? (a > b ? 1 : a < b ? -1 : 0)
+      : (a < b ? 1 : a > b ? -1 : 0);
+  }
+
+  // ---------------- teams map ----------------
+  async function buildTeamMap() {
+    const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
+    if (!cfg || !cfg.teamsCsv) return new Map();
+
+    const teams = await fetchCsv(cfg.teamsCsv);
+    const map = new Map();
+
+    teams.forEach((t) => {
+      const id = String(t.team_id || t.Team_ID || t.id || "").trim();
+      if (!id) return;
+
+      map.set(id, {
+        id,
+        // Your Teams sheet headers: Team, team_id, logo_url
+        name: String(t.Team || t.team_name || t.name || id).trim(),
+        logo: String(t.logo_url || t.logo || "").trim()
+      });
+    });
+
+    return map;
   }
 
   // ---------------- render ----------------
@@ -107,26 +112,40 @@ async function buildTeamMap() {
     query: ""
   };
 
+  // filled during init()
+  let TEAM_MAP = new Map();
+
   function toStandingsModel(row) {
-    // Expect columns like: rank, team, w, l, gd, gf, ga, gp, points etc.
-    // We'll support multiple header variants safely.
+    // Standings CSV headers (from your console):
+    // team_id,team_name,GP,W,L,GF,GA,GD,PTS
     const teamId = pick(row, ["team_id", "Team ID", "id", "ID"], "");
-    const team   = pick(row, ["team_name", "team", "Team", "TEAM", "name", "Name"], teamId);
-    const abbr   = pick(row, ["abbr", "Abbr", "ABBR", "abbreviation", "Abbreviation"], "");
+    const meta = (teamId && TEAM_MAP.get(teamId)) ? TEAM_MAP.get(teamId) : null;
+
+    // Prefer the Teams sheet display name if available (meta.name),
+    // otherwise fall back to standings team_name/team/team etc.
+    const team =
+      (meta && meta.name) ||
+      pick(row, ["team_name", "team", "Team", "TEAM", "name", "Name"], teamId);
+
+    const abbr = pick(row, ["abbr", "Abbr", "ABBR", "abbreviation", "Abbreviation"], "");
+
+    // Rank is optional; if missing we’ll generate later.
     const rank = num(pick(row, ["rank", "#", "pos", "position", "Position"], ""), 999);
 
+    const w = num(pick(row, ["W", "w", "wins", "Wins"], "0"));
+    const l = num(pick(row, ["L", "l", "losses", "Losses"], "0"));
+    const gp = num(pick(row, ["GP", "gp", "games", "Games", "played", "Played"], String(w + l)));
 
-    const w = num(pick(row, ["w", "W", "wins", "Wins"], "0"));
-    const l = num(pick(row, ["l", "L", "losses", "Losses"], "0"));
-    const gp = num(pick(row, ["gp", "GP", "games", "Games", "played", "Played"], String(w + l)));
+    const gd = num(pick(row, ["GD", "gd", "goal diff", "Goal Diff", "goal_diff", "Goal_Diff"], "0"));
+    const gf = num(pick(row, ["GF", "gf", "goals for", "Goals For", "goals_for"], "0"));
+    const ga = num(pick(row, ["GA", "ga", "goals against", "Goals Against", "goals_against"], "0"));
 
-    const gd = num(pick(row, ["gd", "GD", "goal diff", "Goal Diff", "goal_diff", "Goal_Diff"], "0"));
-    const gf = num(pick(row, ["gf", "GF", "goals for", "Goals For", "goals_for"], "0"));
-    const ga = num(pick(row, ["ga", "GA", "goals against", "Goals Against", "goals_against"], "0"));
+    const pts = num(pick(row, ["PTS", "pts", "points", "Points"], "0"));
 
-    const pts = num(pick(row, ["pts", "PTS", "points", "Points"], "0"));
-
-    const logo = pick(row, ["logo", "Logo", "logo_url", "Logo URL", "logoUrl"], "");
+    // Prefer Teams sheet logo; fallback to any logo columns in standings (if you ever add them)
+    const logo =
+      (meta && meta.logo) ||
+      pick(row, ["logo", "Logo", "logo_url", "Logo URL", "logoUrl"], "");
 
     return { rank, teamId, team, abbr, w, l, gp, gd, gf, ga, pts, logo, _raw: row };
   }
@@ -136,7 +155,7 @@ async function buildTeamMap() {
 
     state.filtered = state.rows.filter((r) => {
       if (!q) return true;
-      const hay = normalizeKey([r.team, r.abbr].join(" "));
+      const hay = normalizeKey([r.team, r.abbr, r.teamId].join(" "));
       return hay.includes(q);
     });
   }
@@ -148,7 +167,7 @@ async function buildTeamMap() {
     const getVal = (r) => {
       switch (key) {
         case "team": return normalizeKey(r.team);
-        case "record": return r.w; // primary sort by wins
+        case "record": return r.w;
         case "w": return r.w;
         case "l": return r.l;
         case "gp": return r.gp;
@@ -162,10 +181,8 @@ async function buildTeamMap() {
     };
 
     state.filtered.sort((a, b) => {
-      // rank always stable if tied
       let res = compare(getVal(a), getVal(b), dir);
 
-      // smart tie-breaks
       if (res === 0 && key !== "gd") res = compare(a.gd, b.gd, "desc");
       if (res === 0 && key !== "gf") res = compare(a.gf, b.gf, "desc");
       if (res === 0) res = compare(a.rank, b.rank, "asc");
@@ -210,9 +227,11 @@ async function buildTeamMap() {
               <tr>
                 <td class="num">${r.rank === 999 ? "" : r.rank}</td>
                 <td class="teamCell">
-                  ${r.logo ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />` : `<div class="logo ph"></div>`}
+                  ${r.logo
+                    ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />`
+                    : `<div class="logo ph"></div>`}
                   <div class="teamText">
-                    <div class="teamName">${r.team || r.abbr || "TBD"}</div>
+                    <div class="teamName">${r.team || r.abbr || r.teamId || "TBD"}</div>
                     ${r.abbr ? `<div class="teamAbbr">${r.abbr}</div>` : ``}
                   </div>
                 </td>
@@ -230,7 +249,6 @@ async function buildTeamMap() {
       </div>
     `;
 
-    // click-to-sort
     root.querySelectorAll("th[data-key]").forEach((el) => {
       el.addEventListener("click", () => {
         const k = el.getAttribute("data-key");
@@ -246,16 +264,17 @@ async function buildTeamMap() {
       const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
       if (!cfg) throw new Error("OV_CONFIG.rlol missing");
 
-      // default to full standings CSV, but allow switching to the hub snapshot CSV if you want exact match
       const fullUrl = cfg.standingsCsv;
       const snapUrl = cfg.standingsViewCsv || cfg.standingsCsv;
 
       statusEl.textContent = "Loading standings…";
 
+      // ✅ load team logos/names FIRST
+      TEAM_MAP = await buildTeamMap();
+
       let data = await fetchCsv(fullUrl);
       let model = data.map(toStandingsModel);
 
-      // If ranks aren't provided, generate rank by sorting (W desc, GD desc)
       const needsRank = model.every((r) => r.rank === 999);
       if (needsRank) {
         model.sort((a, b) => {
@@ -270,7 +289,6 @@ async function buildTeamMap() {
       state.rows = model;
       state.viewMode = "full";
 
-      // UI wiring
       searchEl.addEventListener("input", () => {
         state.query = searchEl.value;
         render();
@@ -279,18 +297,18 @@ async function buildTeamMap() {
       viewModeEl.addEventListener("change", async () => {
         state.viewMode = viewModeEl.value;
 
-        // Optional: if you want snapshot to exactly match the hub view sheet, swap data source
         if (state.viewMode === "snapshot" && snapUrl !== fullUrl) {
           statusEl.textContent = "Loading snapshot…";
           const snapData = await fetchCsv(snapUrl);
           state.rows = snapData.map(toStandingsModel);
-          // snapshot ranks if missing
+
           const needsRank2 = state.rows.every((r) => r.rank === 999);
           if (needsRank2) state.rows.forEach((r, i) => (r.rank = i + 1));
         } else if (state.viewMode === "full" && snapUrl !== fullUrl) {
           statusEl.textContent = "Loading standings…";
           const fullData = await fetchCsv(fullUrl);
           state.rows = fullData.map(toStandingsModel);
+
           const needsRank3 = state.rows.every((r) => r.rank === 999);
           if (needsRank3) state.rows.forEach((r, i) => (r.rank = i + 1));
         }
