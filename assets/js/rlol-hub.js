@@ -163,7 +163,7 @@
       var status = normalizeStatus(m.status);
 
       var item = document.createElement("div");
-      item.className = "match-item";
+      item.className = "match-item next-match";
 
       item.innerHTML =
         '<div class="match-left">' +
