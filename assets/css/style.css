@@ -1419,3 +1419,43 @@ body.rlol-hub .stats-preview .stat-row:hover{
   box-shadow: 0 0 0 1px rgba(255,138,0,0.55), 0 0 18px rgba(255,138,0,0.18);
   transform: translateY(-1px);
 }
+
+/* =========================
+   RLOL HUB — Next Match: force fit + glow
+   ========================= */
+
+/* Make the panel content scroll instead of overflowing */
+body.rlol-hub #nextMatches{
+  max-height: 520px;            /* adjust if you want */
+  overflow: auto;
+  padding-right: 8px;
+}
+
+/* If your JS renders each match as a <div> direct child, style it */
+body.rlol-hub #nextMatches > div{
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 12px;
+  margin: 10px 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+  transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+  min-width: 0;
+}
+
+body.rlol-hub #nextMatches > div:hover{
+  border-color: rgba(255,138,0,0.75);
+  box-shadow: 0 0 0 1px rgba(255,138,0,0.55), 0 0 18px rgba(255,138,0,0.18);
+  transform: translateY(-1px);
+}
+
+/* Make long team names wrap inside the match blocks */
+body.rlol-hub #nextMatches *{
+  min-width: 0;
+}
+
+body.rlol-hub #nextMatches a,
+body.rlol-hub #nextMatches .name,
+body.rlol-hub #nextMatches .team{
+  overflow-wrap: anywhere;
+  word-break: break;
+}
