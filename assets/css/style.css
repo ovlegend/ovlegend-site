@@ -1028,3 +1028,31 @@ body.rlol-hub tbody tr::before,
 body.rlol-hub tbody tr::after{
   content: none !important;
 }
+
+/* =========================
+   HUB: ensure grid + panels behave
+   ========================= */
+body.rlol-hub .hub-grid{
+  display:grid;
+  grid-template-columns: 1.1fr 0.9fr 0.9fr;
+  gap:16px;
+  max-width:1100px;
+  margin:14px auto 0;
+  padding:0 8px;
+}
+
+@media (max-width:1000px){
+  body.rlol-hub .hub-grid{ grid-template-columns:1fr; }
+}
+
+/* Keep panels from stretching weird */
+body.rlol-hub .panel{
+  width:100%;
+  border-radius: var(--radius);
+  overflow:hidden;
+}
+
+/* Fix any accidental table shrink / overflow */
+body.rlol-hub .standings-table{
+  width:100%;
+}
