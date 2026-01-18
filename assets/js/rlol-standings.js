@@ -110,9 +110,10 @@ async function buildTeamMap() {
   function toStandingsModel(row) {
     // Expect columns like: rank, team, w, l, gd, gf, ga, gp, points etc.
     // We'll support multiple header variants safely.
-    const team = pick(row, ["team", "Team", "TEAM", "name", "Name"], "");
-    const abbr = pick(row, ["abbr", "Abbr", "ABBR", "abbreviation", "Abbreviation"], "");
-    const rank = num(pick(row, ["rank", "#", "pos", "position", "Position"], ""), 999);
+    const teamId = pick(row, ["team_id", "Team ID", "id", "ID"], "");
+    const team   = pick(row, ["team_name", "team", "Team", "TEAM", "name", "Name"], teamId);
+    const abbr   = pick(row, ["abbr", "Abbr", "ABBR", "abbreviation", "Abbreviation"], "");
+
 
     const w = num(pick(row, ["w", "W", "wins", "Wins"], "0"));
     const l = num(pick(row, ["l", "L", "losses", "Losses"], "0"));
