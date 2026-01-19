@@ -2427,3 +2427,26 @@ body.rlol-hub #nextMatches .team{
   text-align:center;
   margin-top: 16px;
 }
+/* ===== OV LIGHTNING PULSE (SUBTLE) ===== */
+@keyframes ovGlowPulse {
+  0% {
+    box-shadow:
+      0 0 0 rgba(255,86,0,0),
+      0 0 0 rgba(255,86,0,0);
+  }
+  50% {
+    box-shadow:
+      0 0 18px rgba(255,86,0,.35),
+      0 0 36px rgba(255,86,0,.15);
+  }
+  100% {
+    box-shadow:
+      0 0 0 rgba(255,86,0,0),
+      0 0 0 rgba(255,86,0,0);
+  }
+}
+
+.ac-card:hover{
+  animation: ovGlowPulse 1.6s ease-out infinite;
+  border-color: rgba(255,86,0,.55);
+}
