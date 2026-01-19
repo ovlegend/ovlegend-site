@@ -1,156 +1,155 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OV Legend</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The OV Shop | OV Legend</title>
 
-  <!-- Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- Site CSS -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
 
-  <!-- Main CSS (GitHub Pages base path) -->
-  <link rel="stylesheet" href="/ovlegend-site/assets/css/style.css">
+  <!-- Small page-specific styles -->
+  <style>
+    .shop-wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:36px 16px 60px;
+      color:#fff;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    }
+    .shop-hero{
+      background: linear-gradient(180deg, rgba(255,86,0,.95), rgba(255,86,0,.78));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 20px;
+      padding: 28px 18px;
+      text-align:center;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      margin-bottom: 22px;
+    }
+    .shop-hero h1{
+      margin:0 0 8px 0;
+      font-family:"Impact","Arial Black",system-ui;
+      font-size: clamp(34px, 4vw, 56px);
+      letter-spacing: 1px;
+      text-shadow: 0 0 14px rgba(0,0,0,.25);
+    }
+    .shop-hero p{
+      margin:0 auto;
+      max-width: 820px;
+      opacity:.95;
+      line-height:1.5;
+    }
+
+    .shop-actions{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .btn{
+      display:inline-block;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#111;
+      color:#fff;
+      text-decoration:none;
+      border:1px solid rgba(255,86,0,.55);
+      box-shadow: 0 0 18px rgba(255,86,0,.18);
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .btn:hover{
+      border-color: rgba(255,86,0,.9);
+      box-shadow: 0 0 26px rgba(255,86,0,.28);
+    }
+    .btn-outline{
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.22);
+    }
+    .btn-outline:hover{
+      border-color: rgba(255,255,255,.40);
+    }
+
+    .shop-panel{
+      background: rgba(18,18,20,.85);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 20px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    .shop-embed{
+      width:100%;
+      height: 82vh;
+      min-height: 720px;
+      border: 0;
+      display:block;
+      background: #0b0b0d;
+    }
+
+    .shop-fallback{
+      display:none;
+      padding: 22px 18px;
+      text-align:center;
+    }
+    .shop-fallback p{
+      margin: 0 0 12px 0;
+      opacity: .9;
+      line-height: 1.5;
+    }
+
+    /* Nice on mobile */
+    @media (max-width: 640px){
+      .shop-embed{ min-height: 620px; height: 76vh; }
+    }
+  </style>
 </head>
 
 <body>
+  <main class="shop-wrap">
 
-  <!-- NAV -->
-  <header class="nav">
-    <div class="nav-inner">
-      <a class="logo" href="/ovlegend-site/">
-        <img class="nav-logo" src="/ovlegend-site/assets/img/brand/ov-mark.png" alt="OV Legend" />
-      </a>
+    <section class="shop-hero">
+      <h1>The OV Shop</h1>
+      <p>Official OV Legend merch — built for the Legends. New drops, limited runs, and the classics.</p>
 
-      <nav>
-        <a class="active" href="/ovlegend-site/">Home</a>
-        <a href="/ovlegend-site/rlol/">RLOL</a>
-        <a href="/ovlegend-site/stats/">Stats</a>
-        <a href="/ovlegend-site/lvb/">Legends vs. Bozos</a>
-        <a href="/ovlegend-site/builds/">Builds</a>
-        <a href="/ovlegend-site/the-ov-shop/">THE OV SHOP</a>
-      </nav>
-    </div>
-  </header>
-
-  <!-- HERO (Centered, clean, no duplicates) -->
-  <section class="hero hero-v2 hero-center">
-    <div class="hero-v2-inner">
-
-      <div class="hero-left">
-        <img
-          src="/ovlegend-site/assets/img/brand/ov-wordmark.png"
-          alt="What's Up Twitches"
-          class="hero-wordmark"
-        />
-
-        <div class="hero-kicker">Rocket League • Content • Community</div>
-
-        <p class="hero-lede">
-          Built around high-energy streams, legendary queue nights, custom builds,
-          and a community league that turns matches into events.
-        </p>
-
-        <!-- Primary site CTAs -->
-        <div class="hero-actions">
-          <a class="btn primary" href="/ovlegend-site/builds/">Browse Builds</a>
-          <a class="btn" href="/ovlegend-site/lvb/">Legends vs. Bozos</a>
-          <a class="btn ghost" href="/ovlegend-site/rlol/">RLOL Hub</a>
-        </div>
-
-        <!-- Social links (working) -->
-        <div class="hero-socials">
-          <a class="btn ghost" href="https://discord.gg/sGXgUNAtDp" target="_blank" rel="noopener noreferrer">Discord</a>
-          <a class="btn ghost" href="https://twitch.tv/the_ov_legend" target="_blank" rel="noopener noreferrer">Twitch</a>
-          <a class="btn ghost" href="https://www.youtube.com/@OVLegend" target="_blank" rel="noopener noreferrer">YouTube</a>
-        </div>
-
-        <!-- Brand mark (anchored) -->
-        <div class="hero-mark-wrap hero-mark-bottom">
-          <img
-            src="/ovlegend-site/assets/img/brand/ov-mark.png"
-            alt=""
-            class="hero-mark"
-          />
-        </div>
+      <div class="shop-actions">
+        <a class="btn" href="#store">Shop Now</a>
+        <a class="btn btn-outline" href="/live/">Watch Live</a>
       </div>
+    </section>
 
-    </div>
-  </section>
+    <section id="store" class="shop-panel">
+      <!-- EMBED -->
+      <iframe
+        class="shop-embed"
+        src="https://streamlabs.com/ovlegend/merch"
+        title="OV Legend Streamlabs Store"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
 
-  <!-- CONTENT -->
-  <main class="container home-v2">
-
-    <!-- OV HQ -->
-    <section class="section">
-      <div class="section-head">
-        <h2 class="section-title">OV Headquarters</h2>
-        <p class="section-sub">Everything you need, organized — no fluff.</p>
-      </div>
-
-      <div class="feature-grid">
-        <a class="feature-card" href="/ovlegend-site/builds/">
-          <div class="feature-top">
-            <div class="card-title">Builds</div>
-            <span class="chip">Take a Look</span>
-          </div>
-          <p class="muted">AlphaConsole presets, car styles, and branded configs.</p>
-          <div class="feature-link">Open Builds →</div>
-        </a>
-
-        <a class="feature-card" href="/ovlegend-site/lvb/">
-          <div class="feature-top">
-            <div class="card-title">Legends vs. Bozos</div>
-            <span class="chip">Tracker</span>
-          </div>
-          <p class="muted">Wins, losses, streaks, and the ongoing BOZO war.</p>
-          <div class="feature-link">Check the stats →</div>
-        </a>
-
-        <a class="feature-card" href="/ovlegend-site/rlol/">
-          <div class="feature-top">
-            <div class="card-title">RLOL</div>
-            <span class="chip">League Hub</span>
-          </div>
-          <p class="muted">Standings, schedule, teams — built like a mini-RLCS.</p>
-          <div class="feature-link">Enter RLOL →</div>
-        </a>
-
-<a class="feature-card" href="/ovlegend-site/cotw/">
-  <div class="feature-top">
-    <div class="card-title">Clip of the Week</div>
-    <span class="chip">COTW</span>
-  </div>
-
-  <p class="muted">
-    Weekly community highlight. One clip crowned. Infinite bragging rights.
-  </p>
-
-  <div class="feature-link">Watch the winner →</div>
-</a>
-
-        <a class="feature-card" href="/ovlegend-site/stats/">
-          <div class="feature-top">
-            <div class="card-title">Rank</div>
-            <span class="chip">Stats</span>
-          </div>
-          <p class="muted">View OV's RL Tracker</p>
-          <div class="feature-link">RL Tracker →</div>
-        </a>
+      <!-- FALLBACK (if embed is blocked) -->
+      <div class="shop-fallback" id="shopFallback">
+        <p>Your browser (or Streamlabs) is blocking the embedded shop.</p>
+        <a class="btn" href="https://streamlabs.com/ovlegend/merch" target="_blank" rel="noopener">Open The OV Shop</a>
       </div>
     </section>
 
   </main>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    © <span id="year"></span> OV Legend
-  </footer>
-
   <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+    // If the iframe is blocked by X-Frame-Options / CSP, users often see a blank panel.
+    // This adds a simple fallback message after a short delay.
+    (function(){
+      const fallback = document.getElementById('shopFallback');
+      setTimeout(() => {
+        // Show fallback for safety; if embed loads, users will still see it above.
+        // (We can't reliably detect cross-origin iframe success.)
+        fallback.style.display = 'block';
+      }, 2500);
+    })();
   </script>
-
 </body>
 </html>
