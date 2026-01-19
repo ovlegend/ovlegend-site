@@ -54,6 +54,19 @@
       gap: 14px;
     }
 
+    /* HQ brand mark (under hub on the right) */
+    .hq-mark-wrap{
+      margin-top: 22px;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .hq-mark{
+      width: 96px;
+      opacity: 0.65;
+      filter: drop-shadow(0 0 14px rgba(255,86,0,.35));
+    }
+
     /* Mobile: stack */
     @media (max-width: 980px){
       .home-top{
@@ -66,6 +79,9 @@
       }
       .home-top-wrap{
         padding-top: 18px;
+      }
+      .hq-mark-wrap{
+        margin-top: 18px;
       }
     }
   </style>
@@ -97,8 +113,8 @@
       <!-- HERO (Left) -->
       <section class="hero hero-v2 hero-center">
         <div class="hero-v2-inner">
-
           <div class="hero-left">
+
             <img
               src="/ovlegend-site/assets/img/brand/ov-wordmark.png"
               alt="What's Up Twitches"
@@ -126,15 +142,9 @@
               <a class="btn ghost" href="https://www.youtube.com/@OVLegend" target="_blank" rel="noopener noreferrer">YouTube</a>
             </div>
 
-            <!-- OV Brand Mark (HQ anchor) -->
-<div class="hq-mark-wrap">
-  <img
-    src="/ovlegend-site/assets/img/brand/ov-mark.png"
-    alt="OV Legend"
-    class="hq-mark"
-  />
-</div>
-
+          </div>
+        </div>
+      </section>
 
       <!-- HQ (Right) -->
       <section class="section hq-side" id="hq">
@@ -179,6 +189,15 @@
             <p class="muted">See how OV is playing</p>
             <div class="feature-link">View RL Tracker →</div>
           </a>
+        </div>
+
+        <!-- OV logo under the hub (right column) -->
+        <div class="hq-mark-wrap">
+          <img
+            src="/ovlegend-site/assets/img/brand/ov-mark.png"
+            alt="OV Legend"
+            class="hq-mark"
+          />
         </div>
       </section>
 
