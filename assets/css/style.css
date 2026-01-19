@@ -2450,3 +2450,35 @@ body.rlol-hub #nextMatches .team{
   animation: ovGlowPulse 1.6s ease-out infinite;
   border-color: rgba(255,86,0,.55);
 }
+
+/* Ambient lightning glow */
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(600px 300px at 15% 20%, rgba(255,86,0,.08), transparent 60%),
+    radial-gradient(500px 260px at 85% 30%, rgba(255,86,0,.06), transparent 65%),
+    radial-gradient(700px 400px at 50% 80%, rgba(255,86,0,.05), transparent 70%);
+  animation: lightningGlow 14s ease-in-out infinite alternate;
+  z-index: -1;
+}
+
+@keyframes lightningGlow{
+  0%   { opacity: .35; }
+  50%  { opacity: .7; }
+  100% { opacity: .45; }
+}
+
+@keyframes lightningFlicker{
+  0%, 96%, 100% { opacity: .45; }
+  97% { opacity: .9; }
+  98% { opacity: .55; }
+}
+
+body::before{
+  animation:
+    lightningGlow 14s ease-in-out infinite alternate,
+    lightningFlicker 6s linear infinite;
+}
