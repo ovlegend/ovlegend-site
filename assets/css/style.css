@@ -2482,3 +2482,24 @@ body::before{
     lightningGlow 14s ease-in-out infinite alternate,
     lightningFlicker 6s linear infinite;
 }
+
+/* HQ brand mark */
+.hq-mark-wrap{
+  margin-top: 26px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.hq-mark{
+  width: 96px;
+  opacity: 0.65;
+  filter: drop-shadow(0 0 14px rgba(255,86,0,.35));
+}
+
+/* Mobile: give it breathing room */
+@media (max-width: 980px){
+  .hq-mark-wrap{
+    margin-top: 18px;
+  }
+}
