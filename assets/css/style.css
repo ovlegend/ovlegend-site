@@ -1916,3 +1916,71 @@ body.rlol-hub #nextMatches .team{
   height: 100%;
   border: 0;
 }
+
+/* ===== STATS PAGE ===== */
+.stats-page{
+  padding-top: 26px;
+  padding-bottom: 26px;
+  max-width: 1200px;
+}
+
+.stats-head{
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.stats-title{
+  margin: 0;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.stats-sub{
+  margin: 8px 0 0 0;
+  opacity: 0.82;
+  max-width: 720px;
+}
+
+.stats-actions{
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* RL Tracker embed container */
+.embed-wrap{
+  width: 100%;
+  height: calc(100vh - 220px); /* fills screen minus nav/title */
+  min-height: 720px;           /* prevents tiny embed */
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.02);
+  box-shadow: 0 20px 80px rgba(0,0,0,0.55);
+}
+
+.embed-frame{
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Mobile */
+@media (max-width: 700px){
+  .stats-head{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .stats-actions{
+    justify-content: flex-start;
+  }
+  .embed-wrap{
+    height: calc(100vh - 260px);
+    min-height: 640px;
+  }
+}
