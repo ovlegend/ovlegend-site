@@ -2255,3 +2255,35 @@ body.rlol-hub #nextMatches .team{
       0 0 72px rgba(255,86,0,.4);
   }
 }
+
+/* ===== LVB TITLE — GLOW + PULSE ===== */
+.lvb-title {
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #ff8a00;
+
+  text-shadow:
+    0 0 14px rgba(255,138,0,.55),
+    0 0 32px rgba(255,86,0,.45),
+    0 0 56px rgba(255,86,0,.25);
+
+  animation: lvbGlowPulse 3.2s ease-in-out infinite;
+}
+
+@keyframes lvbGlowPulse {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow:
+      0 0 12px rgba(255,138,0,.45),
+      0 0 28px rgba(255,86,0,.35),
+      0 0 48px rgba(255,86,0,.15);
+  }
+
+  50% {
+    transform: scale(1.02);
+    text-shadow:
+      0 0 20px rgba(255,138,0,.9),
+      0 0 44px rgba(255,86,0,.75),
+      0 0 72px rgba(255,86,0,.45);
+  }
+}
