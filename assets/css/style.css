@@ -2741,3 +2741,158 @@ body::before{
     lightningGlow 14s ease-in-out infinite alternate,
     lightningFlicker 7s linear infinite;
 }
+
+/* =========================================================
+   1) HQ PANEL SPACING + BREATHING ROOM
+   ========================================================= */
+
+/* More space under "OV Headquarters" and around card grid */
+.hq-side .section-head{
+  margin-bottom: 18px !important;
+}
+
+/* More gap between cards */
+.hq-side .feature-grid{
+  gap: 18px !important;
+}
+
+/* Make cards feel roomier */
+.hq-side .feature-card{
+  padding: 18px 18px 16px !important;
+}
+
+/* A little more separation between title/chip row and text */
+.hq-side .feature-top{
+  margin-bottom: 10px !important;
+}
+
+/* =========================================================
+   2) BIGGER OV SEAL (UNDER HUB)
+   ========================================================= */
+
+.hq-mark-wrap{
+  margin-top: 26px !important;
+}
+
+.hq-mark{
+  width: 190px !important;           /* BIGGER */
+  max-width: 55%;
+  opacity: 0.82;
+  filter:
+    drop-shadow(0 0 18px rgba(255,86,0,.55))
+    drop-shadow(0 0 38px rgba(255,86,0,.30));
+  animation: sealPulse 3.8s ease-in-out infinite;
+}
+
+@keyframes sealPulse{
+  0%, 100% { transform: scale(1); opacity: .78; }
+  50%      { transform: scale(1.04); opacity: .92; }
+}
+
+@media (max-width: 980px){
+  .hq-mark{ width: 160px !important; }
+}
+
+/* =========================================================
+   3) FULL LIGHTNING STORM (ENERGY MODE)
+   - Layered glows + diagonal "veins" + flicker flashes
+   - Still CSS-only and light enough for GH Pages
+   ========================================================= */
+
+body{
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Base storm haze + big glows */
+body::before{
+  content:"";
+  position: fixed;
+  inset: -10%;
+  pointer-events: none;
+  background:
+    radial-gradient(800px 420px at 15% 18%, rgba(255,86,0,.16), transparent 62%),
+    radial-gradient(760px 420px at 85% 22%, rgba(255,86,0,.12), transparent 65%),
+    radial-gradient(900px 520px at 50% 82%, rgba(255,86,0,.12), transparent 70%),
+    radial-gradient(1200px 800px at 50% 50%, rgba(255,255,255,.035), transparent 60%);
+  opacity: .65;
+  filter: blur(0px);
+  z-index: -3;
+  animation: stormGlow 10.5s ease-in-out infinite alternate;
+}
+
+/* Lightning veins (faint diagonal streaks) */
+body::after{
+  content:"";
+  position: fixed;
+  inset: -20%;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg,
+      transparent 43%,
+      rgba(255,86,0,.11) 48%,
+      transparent 52%),
+    linear-gradient(240deg,
+      transparent 52%,
+      rgba(255,86,0,.09) 57%,
+      transparent 62%),
+    linear-gradient(200deg,
+      transparent 60%,
+      rgba(255,86,0,.06) 63%,
+      transparent 66%);
+  opacity: .22;
+  mix-blend-mode: screen;
+  z-index: -2;
+  animation: veinsDrift 16s ease-in-out infinite alternate;
+}
+
+/* Occasional “flash” overlay (pseudo lightning strikes) */
+.hero::before{
+  content:"";
+  position: absolute;
+  inset: -40px;
+  pointer-events: none;
+  background:
+    radial-gradient(700px 380px at 40% 40%, rgba(255,255,255,.10), transparent 60%),
+    radial-gradient(520px 300px at 70% 30%, rgba(255,86,0,.14), transparent 65%);
+  opacity: 0;
+  z-index: 0;
+  animation: lightningFlash 6.8s linear infinite;
+}
+
+/* Make sure hero content stays above flash layer */
+.hero-v2-inner, .hero-left{
+  position: relative;
+  z-index: 1;
+}
+
+/* Animations */
+@keyframes stormGlow{
+  0%   { opacity: .55; filter: blur(0px); }
+  50%  { opacity: .85; filter: blur(1px); }
+  100% { opacity: .62; filter: blur(0px); }
+}
+
+@keyframes veinsDrift{
+  0%   { transform: translate3d(-1%, -1%, 0) scale(1); opacity: .18; }
+  50%  { transform: translate3d(1.5%, .5%, 0) scale(1.01); opacity: .28; }
+  100% { transform: translate3d(-.5%, 1%, 0) scale(1); opacity: .20; }
+}
+
+/* Flash timing: mostly calm, then a quick “strike” */
+@keyframes lightningFlash{
+  0%, 82%, 100% { opacity: 0; }
+  84% { opacity: .55; }
+  85% { opacity: .18; }
+  86% { opacity: .75; }
+  87% { opacity: .10; }
+  88% { opacity: .40; }
+  89% { opacity: 0; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  body::before, body::after, .hero::before, .hq-mark{
+    animation: none !important;
+  }
+}
