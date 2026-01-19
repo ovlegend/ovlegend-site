@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legends vs. Bozos | OV Legend</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS (same as the rest of your rebuild) -->
+  <link rel="stylesheet" href="/ovlegend-site/assets/css/style.css">
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="/ovlegend-site/">
+        <img src="/ovlegend-site/assets/img/brand/ov-wordmark.png" alt="OV Legend" />
+      </a>
+
+      <nav>
+        <a href="/ovlegend-site/">Home</a>
+        <a href="/ovlegend-site/rlol/">RLOL</a>
+        <a href="/ovlegend-site/stats/">Stats</a>
+        <a href="/ovlegend-site/lvb/">Legends vs. Bozos</a>
+        <a href="/ovlegend-site/builds/">Builds</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- PAGE -->
+  <main class="container">
+    <section class="panel panel-wide lvb-hero">
+      <div class="lvb-head">
+        <div class="lvb-kicker">OV Legend ⚡ War Record</div>
+        <h1 class="lvb-title">Legends vs. Bozos</h1>
+
+        <p class="lvb-sub">
+          This page tracks the ongoing community war record — updated automatically after streams.
+        </p>
+
+        <div class="lvb-actions">
+          <a class="btn ghost" href="https://twitch.tv/the_ov_legend" target="_blank" rel="noopener noreferrer">Watch on Twitch</a>
+          <a class="btn ghost" href="/ovlegend-site/">Back Home</a>
+        </div>
+      </div>
+
+      <div class="lvb-grid">
+        <div class="stat-card">
+          <div class="stat-label">Legends Wins</div>
+          <div class="stat-value" id="lw">—</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Bozos Wins</div>
+          <div class="stat-value" id="bw">—</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Total Games</div>
+          <div class="stat-value" id="tg">—</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Win %</div>
+          <div class="stat-value" id="wp">—</div>
+        </div>
+
+        <div class="streak-card" id="streakWrap" aria-live="polite">
+          <div class="streak-label">Current Streak</div>
+          <div class="streak-value">
+            <span class="streak-flame">🔥</span>
+            <span id="streak">—</span>
+          </div>
+          <div class="streak-hint" id="streakHint">Updates automatically.</div>
+        </div>
+      </div>
+
+      <div class="lvb-foot muted">
+        Data source: Google Sheets (published CSV)
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    © <span id="year"></span> OV Legend
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcEA64SCB5PySpPVfagT2DUHyJSqq27IIiWzuR2vXI4xiuQ_QBQx_HhdHi_v8gUZxzS28CL1JypVoA/pub?gid=108397746&single=true&output=csv";
+
+    function safeText(id, value){
+      const el = document.getElementById(id);
+      if(el) el.textContent = (value ?? "—");
+    }
+
+    fetch(CSV_URL, { cache: "no-store" })
+      .then(r => r.text())
+      .then(t => {
+        const lines = t.trim().split("\n");
+        if(lines.length < 2) throw new Error("CSV empty");
+
+        // Expect: key,value
+        const rows = lines.slice(1).map(line => {
+          const i = line.indexOf(",");
+          if(i === -1) return [line.trim(), ""];
+          return [line.slice(0, i).trim(), line.slice(i + 1).trim()];
+        });
+
+        const map = {};
+        rows.forEach(([k, v]) => (map[k] = v));
+
+        const lw = map.all_time_legends_wins;
+        const bw = map.all_time_bozos_wins;
+        const tg = map.all_time_games;
+
+        const winPctRaw = parseFloat(map.all_time_win_pct || "");
+        const wp = Number.isFinite(winPctRaw) ? (winPctRaw * 100).toFixed(2) + "%" : "—";
+
+        const lastRes = (map.last_result || "").trim();   // "W" or "L"
+        const streakCount = (map.current_streak || "").trim();
+
+        safeText("lw", lw);
+        safeText("bw", bw);
+        safeText("tg", tg);
+        safeText("wp", wp);
+
+        // Streak display: "W 2" / "L 1"
+        const streakText = (lastRes && streakCount) ? `${lastRes} ${streakCount}` : "—";
+        safeText("streak", streakText);
+
+        // Pulse / styling
+        const wrap = document.getElementById("streakWrap");
+        const hint = document.getElementById("streakHint");
+        if(wrap){
+          wrap.classList.remove("is-win", "is-loss");
+          if(lastRes === "W") {
+            wrap.classList.add("is-win");
+            if(hint) hint.textContent = "Legends are rolling. Keep it going.";
+          } else if(lastRes === "L") {
+            wrap.classList.add("is-loss");
+            if(hint) hint.textContent = "Bozos got one. Run it back.";
+          } else {
+            if(hint) hint.textContent = "Updates automatically.";
+          }
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        const hint = document.getElementById("streakHint");
+        if(hint) hint.textContent = "Couldn’t load stats right now. Try refresh.";
+      });
+  </script>
+
+</body>
+</html>
