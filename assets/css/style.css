@@ -2093,3 +2093,138 @@ body.rlol-hub #nextMatches .team{
     font-size: 36px;
   }
 }
+
+/* =========================
+   LVB (Legends vs. Bozos)
+========================= */
+
+.panel.panel-wide{
+  max-width: 1100px;
+}
+
+.lvb-hero{
+  padding: 26px;
+}
+
+.lvb-head{
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.lvb-kicker{
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.lvb-title{
+  margin: 0 0 10px;
+  font-size: clamp(34px, 5vw, 64px);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.lvb-sub{
+  margin: 0 auto 16px;
+  max-width: 760px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.lvb-actions{
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.lvb-grid{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(170px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+@media (max-width: 920px){
+  .lvb-grid{ grid-template-columns: repeat(2, minmax(170px, 1fr)); }
+}
+@media (max-width: 520px){
+  .lvb-grid{ grid-template-columns: 1fr; }
+}
+
+.stat-card, .streak-card{
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.stat-label{
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.stat-value{
+  font-size: 34px;
+  font-weight: 800;
+}
+
+.streak-card{
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.streak-label{
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+
+.streak-value{
+  font-size: 22px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.streak-flame{
+  filter: drop-shadow(0 0 14px rgba(255, 86, 0, 0.45));
+}
+
+.streak-hint{
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Win pulse */
+.streak-card.is-win{
+  border-color: rgba(255, 86, 0, 0.32);
+  box-shadow: 0 0 0 1px rgba(255, 86, 0, 0.12), 0 0 40px rgba(255, 86, 0, 0.12);
+  animation: lvbPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes lvbPulse{
+  0%,100%{ transform: translateY(0); filter: brightness(1); }
+  50%{ transform: translateY(-1px); filter: brightness(1.08); }
+}
+
+/* Loss styling (subtle) */
+.streak-card.is-loss{
+  border-color: rgba(255,255,255,0.14);
+  box-shadow: none;
+}
+
+.lvb-foot{
+  margin-top: 16px;
+  text-align: center;
+  font-size: 12px;
+}
