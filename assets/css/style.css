@@ -2228,3 +2228,30 @@ body.rlol-hub #nextMatches .team{
   text-align: center;
   font-size: 12px;
 }
+
+/* ===== LEGENDS VS BOZOS — HERO GLOW ===== */
+.lvb-title {
+  color: #ff8a00;
+  text-shadow:
+    0 0 12px rgba(255,138,0,.55),
+    0 0 28px rgba(255,86,0,.45),
+    0 0 48px rgba(255,86,0,.25);
+  animation: lvbGlow 3.2s ease-in-out infinite;
+}
+
+@keyframes lvbGlow {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow:
+      0 0 12px rgba(255,138,0,.45),
+      0 0 28px rgba(255,86,0,.35),
+      0 0 48px rgba(255,86,0,.15);
+  }
+  50% {
+    transform: scale(1.015);
+    text-shadow:
+      0 0 18px rgba(255,138,0,.85),
+      0 0 42px rgba(255,86,0,.7),
+      0 0 72px rgba(255,86,0,.4);
+  }
+}
