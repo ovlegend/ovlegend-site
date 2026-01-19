@@ -30,33 +30,35 @@
     </div>
   </header>
 
-  <main class="container" style="padding-top: 28px;">
-    <div class="card" style="padding: 18px;">
-      <h2 style="margin:0 0 8px 0;">OV Legend • Player Stats</h2>
-      <p class="muted" style="margin:0 0 14px 0;">
-        If the embed doesn’t load, RL Tracker blocks embedding. Use the button below.
+<main class="container stats-page">
+  <div class="stats-head">
+    <div>
+      <h1 class="stats-title">Player Stats</h1>
+      <p class="stats-sub">
+        Live profile via RL Tracker. If it ever fails to load, use the button.
       </p>
-
-      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
-        <a class="btn primary"
-           href="https://rocketleague.tracker.network/rocket-league/profile/epic/OV_Legend/overview"
-           target="_blank" rel="noopener noreferrer">
-          Open on RL Tracker
-        </a>
-        <a class="btn ghost" href="/ovlegend-site/">Back Home</a>
-      </div>
-
-      <div class="embed-wrap">
-        <iframe
-          class="embed-frame"
-          src="https://rocketleague.tracker.network/rocket-league/profile/epic/OV_Legend/overview"
-          title="OV Legend RL Tracker"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-        ></iframe>
-      </div>
     </div>
-  </main>
+
+    <div class="stats-actions">
+      <a class="btn primary"
+         href="https://rocketleague.tracker.network/rocket-league/profile/epic/OV_Legend/overview"
+         target="_blank" rel="noopener noreferrer">
+        Open on RL Tracker
+      </a>
+      <a class="btn ghost" href="/ovlegend-site/">Back Home</a>
+    </div>
+  </div>
+
+  <div class="embed-wrap">
+    <iframe
+      class="embed-frame"
+      src="https://rocketleague.tracker.network/rocket-league/profile/epic/OV_Legend/overview"
+      title="OV Legend RL Tracker"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+    ></iframe>
+  </div>
+</main>
 
   <footer class="footer">
     © <span id="year"></span> OV Legend
