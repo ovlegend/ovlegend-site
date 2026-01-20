@@ -2775,9 +2775,10 @@ body::before{
 }
 
 .hq-mark{
-  width: 190px !important;           /* BIGGER */
-  max-width: 55%;
-  opacity: 0.82;
+  width: 240px !important;     /* was 190 */
+  max-width: 100% !important;  /* was 55% (this was limiting you) */
+  height: auto;
+  opacity: 0.86;
   filter:
     drop-shadow(0 0 18px rgba(255,86,0,.55))
     drop-shadow(0 0 38px rgba(255,86,0,.30));
@@ -2790,7 +2791,7 @@ body::before{
 }
 
 @media (max-width: 980px){
-  .hq-mark{ width: 160px !important; }
+  .hq-mark{ width: 190px !important; }
 }
 
 /* =========================================================
