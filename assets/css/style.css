@@ -2770,6 +2770,11 @@ body::before{
 .hq-side .feature-grid{
   grid-template-columns: repeat(2, minmax(340px, 1fr)) !important;
 }
+.hq-panels{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+}
 /* =========================================================
    2) BIGGER OV SEAL (UNDER HUB)
    ========================================================= */
