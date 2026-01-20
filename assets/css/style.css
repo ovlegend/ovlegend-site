@@ -2775,6 +2775,9 @@ body::before{
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 20px;
 }
+.hq-side .feature-card.cotw{
+  grid-column: auto !important;   /* prevents full-width spanning */
+}
 /* =========================================================
    2) BIGGER OV SEAL (UNDER HUB)
    ========================================================= */
