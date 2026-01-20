@@ -2766,6 +2766,10 @@ body::before{
   margin-bottom: 10px !important;
 }
 
+/* Make HQ panels a bit wider so headings fit */
+.hq-side .feature-grid{
+  grid-template-columns: repeat(2, minmax(340px, 1fr)) !important;
+}
 /* =========================================================
    2) BIGGER OV SEAL (UNDER HUB)
    ========================================================= */
