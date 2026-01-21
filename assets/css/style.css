@@ -998,3 +998,235 @@ body.rlol-stats .nowrap{ white-space: nowrap; }
     padding: 28px 12px 60px !important;
   }
 }
+
+/* =========================================================
+   RLOL STANDINGS + STATS — match "clean" look using YOUR classes
+   Paste at the END of style.css
+   ========================================================= */
+
+/* Page containers */
+body.rlol-standings .overlay,
+body.rlol-stats .overlay{
+  width: 100%;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+body.rlol-standings main.rlol-wrap,
+body.rlol-stats main.rlol-wrap{
+  width: min(1200px, 100%);
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 36px 16px 70px !important;
+}
+
+/* Topbar header */
+body.rlol-standings .topbar,
+body.rlol-stats .topbar{
+  text-align: center;
+  margin: 0 auto 14px;
+}
+
+body.rlol-standings .topbar h1,
+body.rlol-stats .topbar h1{
+  margin: 0 0 8px;
+  font-size: clamp(34px, 4vw, 56px);
+  letter-spacing: .5px;
+}
+
+body.rlol-standings .topbar .sub,
+body.rlol-stats .topbar .sub{
+  opacity: .9;
+  margin: 0 auto;
+  max-width: 920px;
+}
+
+/* Nav buttons row */
+body.rlol-standings .nav-btns,
+body.rlol-stats .nav-btns{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0 14px;
+}
+
+body.rlol-standings .nav-btns .btn,
+body.rlol-stats .nav-btns .btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.25);
+  color: rgba(234,234,234,.9);
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 13px;
+  transition: transform .08s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+body.rlol-standings .nav-btns .btn:hover,
+body.rlol-stats .nav-btns .btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255,138,0,.35);
+  box-shadow: 0 0 0 3px rgba(255,138,0,.10);
+}
+
+/* The main card container (your "panel") */
+body.rlol-standings .card,
+body.rlol-stats .card{
+  background: linear-gradient(180deg, rgba(21,21,24,.92), rgba(12,12,14,.88));
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+  margin: 12px 0 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 10px 40px rgba(0,0,0,.45),
+    0 0 0 1px rgba(255,86,0,.10),
+    0 0 32px rgba(255,86,0,.08);
+}
+
+body.rlol-standings .card::before,
+body.rlol-stats .card::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius: 18px;
+  pointer-events:none;
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,.22),
+    0 0 22px rgba(255,138,0,.10),
+    inset 0 0 0 1px rgba(255,255,255,.06);
+}
+
+/* Controls row inside .card */
+body.rlol-standings .controls,
+body.rlol-stats .controls{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 8px 0 10px;
+}
+
+/* Inputs + selects */
+body.rlol-standings input[type="text"],
+body.rlol-standings input[type="search"],
+body.rlol-stats input[type="text"],
+body.rlol-stats input[type="search"],
+body.rlol-standings select,
+body.rlol-stats select{
+  background: rgba(0,0,0,.35);
+  color: #eaeaea;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 10px;
+  padding: 8px 10px;
+  outline: none;
+  font-size: 13px;
+  min-height: 36px;
+}
+
+body.rlol-standings input::placeholder,
+body.rlol-stats input::placeholder{
+  color: rgba(234,234,234,.55);
+}
+
+body.rlol-standings input:focus,
+body.rlol-standings select:focus,
+body.rlol-stats input:focus,
+body.rlol-stats select:focus{
+  border-color: rgba(255,138,0,.45);
+  box-shadow: 0 0 0 3px rgba(255,138,0,.12);
+}
+
+/* "Loaded X rows" / status line */
+body.rlol-standings .loaded,
+body.rlol-stats .loaded{
+  color: rgba(234,234,234,.70);
+  font-size: 13px;
+  margin: 6px 0 10px;
+}
+
+/* Tables: wrap/scroll safely (stats table is wide) */
+body.rlol-standings table,
+body.rlol-stats table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+body.rlol-stats table{
+  min-width: 860px; /* forces horizontal scroll on smaller widths */
+}
+
+body.rlol-standings .card,
+body.rlol-stats .card{
+  overflow: hidden;
+}
+
+body.rlol-standings .card table,
+body.rlol-stats .card table{
+  display: block;
+  overflow: auto;
+  max-width: 100%;
+}
+
+/* Header cells */
+body.rlol-standings th,
+body.rlol-stats th{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: rgba(10,10,12,.92);
+  color: rgba(234,234,234,.88);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: .10em;
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  cursor: pointer;
+}
+
+/* Body cells */
+body.rlol-standings td,
+body.rlol-stats td{
+  padding: 12px 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  vertical-align: middle;
+}
+
+body.rlol-standings tr:hover td,
+body.rlol-stats tr:hover td{
+  background: rgba(255,255,255,.03);
+}
+
+/* Any inline logo images in tables */
+body.rlol-standings td img,
+body.rlol-stats td img{
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  object-fit: cover;
+  vertical-align: middle;
+  margin-right: 10px;
+  border: 1px solid rgba(255,255,255,.10);
+}
+
+/* Mobile tweaks */
+@media (max-width: 720px){
+  body.rlol-standings main.rlol-wrap,
+  body.rlol-stats main.rlol-wrap{
+    padding: 28px 12px 60px !important;
+  }
+  body.rlol-standings .controls,
+  body.rlol-stats .controls{
+    justify-content: center;
+  }
+}
