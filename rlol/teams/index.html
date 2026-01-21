@@ -1,24 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RLOL Teams | OV Legend</title>
-  <link rel="stylesheet" href="/ovlegend-site/assets/css/style.css">
-</head>
-<body class="rlol">
-  <header class="nav">
-    <div class="nav-inner">
-      <div class="logo">OV <span>Legend</span></div>
-    </div>
-  </header>
 
-  <main style="padding: 80px 20px; text-align: center;">
-    <h1>RLOL Teams</h1>
-    <p>All teams competing in RLOL</p>
-    <p>Data coming next ⚡</p>
+  <meta name="theme-color" content="#ff8a00" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+
+<body class="rlol rlol-teams">
+  <main class="rlol-wrap">
+    <div class="topbar">
+      <div>
+        <h1>RLOL Teams</h1>
+        <div class="sub">Auto-updates from Google Sheets • Logos, rosters, and team info</div>
+      </div>
+
+      <div class="nav-btns" aria-label="RLOL navigation">
+        <a class="btn" href="/">Home</a>
+        <a class="btn" href="/rlol/">Hub</a>
+        <a class="btn" href="/rlol/schedule/">Schedule</a>
+        <a class="btn" href="/rlol/standings/">Standings</a>
+        <a class="btn" href="/rlol/stats/">Stats</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="metaRow">
+        <div class="pill">
+          <span class="dot"></span>
+          <span id="teamsStatus">Loading teams…</span>
+        </div>
+
+        <div class="controls">
+          <input id="searchTeam" type="text" placeholder="Search team (e.g., WLW)" />
+        </div>
+      </div>
+
+      <div id="teamsRoot"></div>
+
+      <div class="footer">
+        Tip: Search matches team names, abbreviations, and player names (if included).
+      </div>
+    </div>
   </main>
-<script src="/ovlegend-site/assets/js/config.js"></script>
-<script src="/ovlegend-site/assets/js/teams.js"></script>
-  
+
+  <!-- Config + page logic (ABSOLUTE PATHS) -->
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/rlol-teams.js"></script>
 </body>
 </html>
