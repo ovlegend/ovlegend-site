@@ -2,41 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>RLOL Stats</title>
+  <title>RLOL Stats | OV Legend</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ff8a00" />
 
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
+
 <body class="rlol rlol-stats">
+  <main class="rlol-wrap">
+    <div class="topbar">
+      <div>
+        <h1>RLOL Player Stats</h1>
+        <div class="sub">Auto-updates from Google Sheets • Season & Per-Game Stats</div>
+      </div>
 
-  <main class="page">
-    <h1>RLOL Player Stats</h1>
-    <p class="subtext">
-      Auto-updates from Google Sheets · Season & Per-Game Stats
-    </p>
-
-    <div class="controls">
-      <select id="viewMode">
-        <option value="season_totals">Season Totals</option>
-        <option value="per_game">Per Game</option>
-      </select>
-
-      <select id="seasonSel"></select>
-      <select id="weekSel"></select>
-      <select id="teamSel"></select>
-
-      <input
-        id="searchPlayer"
-        type="text"
-        placeholder="Search player or team…"
-      />
+      <div class="nav-btns" aria-label="RLOL navigation">
+        <a class="btn" href="/">Home</a>
+        <a class="btn" href="/rlol/">Hub</a>
+        <a class="btn" href="/rlol/schedule/">Schedule</a>
+        <a class="btn" href="/rlol/standings/">Standings</a>
+        <a class="btn" href="/rlol/teams/">Teams</a>
+      </div>
     </div>
 
-    <div id="statsStatus" class="status">Loading stats…</div>
-    <div id="statsRoot"></div>
+    <div class="card">
+      <div class="controls">
+        <select id="viewMode" aria-label="View mode">
+          <option value="season_totals">Season Totals</option>
+          <option value="per_game">Per Game</option>
+        </select>
+
+        <select id="seasonSel" aria-label="Season"></select>
+        <select id="weekSel" aria-label="Week"></select>
+        <select id="teamSel" aria-label="Team"></select>
+
+        <input
+          id="searchPlayer"
+          type="text"
+          placeholder="Search player or team…"
+          aria-label="Search player or team"
+        />
+      </div>
+
+      <div id="statsStatus" class="status">Loading stats…</div>
+      <div id="statsRoot"></div>
+    </div>
   </main>
 
-  <script defer src="../../assets/js/config.js"></script>
-  <script defer src="../../assets/js/rlol-stats.js"></script>
+  <!-- Config + page logic (ABSOLUTE PATHS) -->
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/rlol-stats.js"></script>
 </body>
 </html>
