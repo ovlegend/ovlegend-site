@@ -1,22 +1,54 @@
-// /assets/js/rlol-standings.js
+// /assets/js/rlol-stats.js
 (function () {
   const $ = (sel) => document.querySelector(sel);
 
-  // Published CSV fallbacks (safe if config is missing/wrong)
-  const STANDINGS_CSV_FALLBACK =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCQnxfwBylnd5H8jHc_g9Gtv7wyhzelCLixlK3-Bi_Uw0pVJga8MPtgYf5740Csm7hbfLTJhHGdWzh/pub?gid=128420471&single=true&output=csv";
+  // ---- REQUIRED IDs (already in your HTML) ----
+  const viewModeEl = $("#viewMode");   // values: "season_totals" | "per_game"
+  const seasonEl   = $("#seasonSel");
+  const weekEl     = $("#weekSel");
+  const teamEl     = $("#teamSel");
 
-  const STANDINGS_VIEW_CSV_FALLBACK =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCQnxfwBylnd5H8jHc_g9Gtv7wyhzelCLixlK3-Bi_Uw0pVJga8MPtgYf5740Csm7hbfLTJhHGdWzh/pub?gid=1039937861&single=true&output=csv";
+  // Optional (if present in your HTML)
+  const searchEl =
+    $("#searchPlayer") ||
+    $("#search") ||
+    $('input[type="search"]') ||
+    $('input[placeholder*="Search"]');
 
-  // ---------------- CSV parsing (quoted commas safe) ----------------
+  // Where we render:
+  // Prefer #statsRoot if you have it; otherwise render inside .card
+  let root = $("#statsRoot");
+  const card = $(".card");
+  if (!root && card) {
+    root = document.createElement("div");
+    root.id = "statsRoot";
+    card.appendChild(root);
+  }
+
+  // Status line: prefer #statsStatus; else create inside card
+  let statusEl = $("#statsStatus") || $(".loaded");
+  if (!statusEl && card) {
+    statusEl = document.createElement("div");
+    statusEl.id = "statsStatus";
+    statusEl.className = "loaded";
+    statusEl.style.margin = "6px 0 10px";
+    card.insertBefore(statusEl, root);
+  }
+
+  // If we can't render, bail loudly
+  if (!root) {
+    console.error("RLOL Stats: Missing #statsRoot and no .card container found.");
+    return;
+  }
+
+  // ---- CSV parsing (quoted commas safe) ----
   function parseCSV(text) {
     const rows = [];
     let row = [];
     let cur = "";
     let inQuotes = false;
 
-    text = String(text || "").replace(/\uFEFF/g, "");
+    text = String(text || "").replace(/\uFEFF/g, ""); // strip BOM
 
     for (let i = 0; i < text.length; i++) {
       const c = text[i];
@@ -59,19 +91,19 @@
 
     const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
     const res = await fetch(busted, { cache: "no-store" });
-
     if (!res.ok) throw new Error(`HTTP ${res.status} while fetching CSV`);
 
     const text = await res.text();
 
-    // If the URL ever stops being a published CSV, Google may return HTML
-    const looksLikeHtml = /^\s*</.test(text);
-    if (looksLikeHtml) throw new Error("CSV fetch returned HTML (not a published CSV link)");
+    // Google returns HTML if it's not a published CSV
+    if (/^\s*</.test(text)) {
+      throw new Error("CSV fetch returned HTML (check that the Sheet is published to CSV)");
+    }
 
     return parseCSV(text);
   }
 
-  // ---------------- helpers ----------------
+  // ---- helpers ----
   function pick(row, keys, fallback = "") {
     for (const k of keys) {
       const v = row[k];
@@ -87,7 +119,7 @@
     return Number.isFinite(n) ? n : fallback;
   }
 
-  function normalizeKey(s) { return String(s || "").trim().toLowerCase(); }
+  function norm(s) { return String(s || "").trim().toLowerCase(); }
 
   function compare(a, b, dir) {
     return dir === "asc"
@@ -95,79 +127,106 @@
       : (a < b ? 1 : a > b ? -1 : 0);
   }
 
-  // ---------------- teams map ----------------
-  async function buildTeamMap() {
-    const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
-    if (!cfg || !cfg.teamsCsv) return new Map();
-
-    const teams = await fetchCsv(cfg.teamsCsv);
-    const map = new Map();
-
-    teams.forEach((t) => {
-      const id = String(t.team_id || t.Team_ID || t.TeamID || t.id || "").trim();
-      if (!id) return;
-
-      map.set(id, {
-        id,
-        name: String(t.Team || t.team_name || t.name || id).trim(),
-        logo: String(t.logo_url || t.logo || "").trim()
-      });
-    });
-
-    return map;
-  }
-
-  // ---------------- render ----------------
-  const root = $("#standingsRoot");
-  const statusEl = $("#standingsStatus");
-  const searchEl = $("#searchTeam");
-  const viewModeEl = $("#viewMode");
-
-  const state = {
-    rows: [],
-    filtered: [],
-    sortKey: "rank",
-    sortDir: "asc",
-    viewMode: "full",
-    query: ""
+  // Try to infer common column names
+  const COL = {
+    player: ["Player", "player", "Name", "name", "Epic", "epic", "Steam", "steam"],
+    team:   ["Team", "team", "Team Name", "team_name", "teamName"],
+    season: ["Season", "season"],
+    week:   ["Week", "week", "Match Week", "match_week"],
+    gp:     ["GP", "gp", "Games", "games", "Played", "played"],
+    score:  ["Score", "score", "Points", "points"],
+    goals:  ["G", "g", "Goals", "goals"],
+    assists:["A", "a", "Assists", "assists"],
+    saves:  ["Saves", "saves"],
+    shots:  ["Shots", "shots"],
+    ping:   ["Ping", "ping", "Avg Ping", "avg_ping", "avgPing"],
+    logo:   ["logo", "logo_url", "Logo", "Logo URL"]
   };
 
-  let TEAM_MAP = new Map();
+  // ---- config url selection ----
+  function getUrls() {
+    const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
+    if (!cfg) throw new Error("OV_CONFIG.rlol missing. Check /assets/js/config.js is loading.");
 
-  function toStandingsModel(row) {
-    const teamId = pick(row, ["team_id", "Team ID", "TeamID", "id", "ID"], "");
-    const meta = teamId && TEAM_MAP.get(teamId) ? TEAM_MAP.get(teamId) : null;
+    // Accept multiple possible keys so you don’t have to rename anything
+    const seasonUrl =
+      (cfg.statsSeasonCsv || cfg.playerStatsSeasonCsv || cfg.statsCsv || cfg.playerStatsCsv || "").trim();
 
-    const team =
-      (meta && meta.name) ||
-      pick(row, ["team_name", "team", "Team", "name", "Name"], teamId);
+    const perGameUrl =
+      (cfg.statsPerGameCsv || cfg.playerStatsPerGameCsv || cfg.statsPerGame || cfg.playerStatsPerGame || seasonUrl || "").trim();
 
-    const abbr = pick(row, ["abbr", "Abbr", "ABBR", "abbreviation", "Abbreviation"], "");
+    if (!seasonUrl) {
+      throw new Error(
+        "Stats CSV URL missing in OV_CONFIG.rlol. Add one of: statsSeasonCsv / playerStatsSeasonCsv / statsCsv / playerStatsCsv"
+      );
+    }
 
-    const rank = num(pick(row, ["rank", "#", "pos", "position", "Position"], ""), 999);
+    return { seasonUrl, perGameUrl };
+  }
 
-    const w = num(pick(row, ["W", "w", "wins", "Wins"], "0"));
-    const l = num(pick(row, ["L", "l", "losses", "Losses"], "0"));
-    const gp = num(pick(row, ["GP", "gp", "games", "Games", "played", "Played"], String(w + l)));
+  // ---- state ----
+  const state = {
+    raw: [],
+    rows: [],
+    filtered: [],
+    sortKey: "score",
+    sortDir: "desc",
+    query: "",
+    season: "all",
+    week: "all",
+    team: "all",
+    viewMode: "season_totals"
+  };
 
-    const gd = num(pick(row, ["GD", "gd", "goal diff", "Goal Diff", "goal_diff", "Goal_Diff"], "0"));
-    const gf = num(pick(row, ["GF", "gf", "goals for", "Goals For", "goals_for"], "0"));
-    const ga = num(pick(row, ["GA", "ga", "goals against", "Goals Against", "goals_against"], "0"));
+  function toModel(row) {
+    const player = pick(row, COL.player, "Unknown");
+    const team   = pick(row, COL.team, "");
+    const season = pick(row, COL.season, "");
+    const week   = pick(row, COL.week, "");
 
-    const pts = num(pick(row, ["PTS", "pts", "points", "Points"], "0"));
+    const gp     = num(pick(row, COL.gp, "0"));
+    const score  = num(pick(row, COL.score, "0"));
+    const g      = num(pick(row, COL.goals, "0"));
+    const a      = num(pick(row, COL.assists, "0"));
+    const saves  = num(pick(row, COL.saves, "0"));
+    const shots  = num(pick(row, COL.shots, "0"));
+    const ping   = num(pick(row, COL.ping, "0"));
 
-    const logo =
-      (meta && meta.logo) ||
-      pick(row, ["logo", "Logo", "logo_url", "Logo URL", "logoUrl"], "");
+    const logo   = pick(row, COL.logo, "");
 
-    return { rank, teamId, team, abbr, w, l, gp, gd, gf, ga, pts, logo, _raw: row };
+    return { player, team, season, week, gp, score, g, a, saves, shots, ping, logo, _raw: row };
+  }
+
+  function uniqSorted(list) {
+    return Array.from(new Set(list.filter(Boolean))).sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
+  }
+
+  function fillSelect(sel, values, allLabel) {
+    if (!sel) return;
+    sel.innerHTML = "";
+    const optAll = document.createElement("option");
+    optAll.value = "all";
+    optAll.textContent = allLabel;
+    sel.appendChild(optAll);
+
+    values.forEach((v) => {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      sel.appendChild(opt);
+    });
   }
 
   function applyFilters() {
-    const q = normalizeKey(state.query);
+    const q = norm(state.query);
+
     state.filtered = state.rows.filter((r) => {
+      if (state.season !== "all" && r.season !== state.season) return false;
+      if (state.week !== "all" && r.week !== state.week) return false;
+      if (state.team !== "all" && r.team !== state.team) return false;
+
       if (!q) return true;
-      const hay = normalizeKey([r.team, r.abbr, r.teamId].join(" "));
+      const hay = norm([r.player, r.team].join(" "));
       return hay.includes(q);
     });
   }
@@ -178,163 +237,175 @@
 
     const getVal = (r) => {
       switch (key) {
-        case "team": return normalizeKey(r.team);
-        case "record": return r.w; // legacy
-        case "w": return r.w;
-        case "l": return r.l;
+        case "player": return norm(r.player);
+        case "team": return norm(r.team);
         case "gp": return r.gp;
-        case "gd": return r.gd;
-        case "gf": return r.gf;
-        case "ga": return r.ga;
-        case "pts": return r.pts;
-        case "rank":
-        default: return r.rank;
+        case "score": return r.score;
+        case "g": return r.g;
+        case "a": return r.a;
+        case "saves": return r.saves;
+        case "shots": return r.shots;
+        case "ping": return r.ping;
+        default: return r.score;
       }
     };
 
     state.filtered.sort((a, b) => {
-      let res = compare(getVal(a), getVal(b), dir);
-      if (res === 0 && key !== "gd") res = compare(a.gd, b.gd, "desc");
-      if (res === 0 && key !== "gf") res = compare(a.gf, b.gf, "desc");
-      if (res === 0) res = compare(a.rank, b.rank, "asc");
+      const va = getVal(a);
+      const vb = getVal(b);
+      let res = compare(va, vb, dir);
+      if (res === 0 && key !== "score") res = compare(a.score, b.score, "desc");
       return res;
     });
   }
 
   function th(label, key) {
     const isActive = state.sortKey === key;
-    const dir = isActive ? state.sortDir : "asc";
+    const dir = isActive ? state.sortDir : "desc";
     const arrow = isActive ? (state.sortDir === "asc" ? " ▲" : " ▼") : "";
     return `<th data-key="${key}" class="${isActive ? "active" : ""}" aria-sort="${dir}">${label}${arrow}</th>`;
   }
 
   function render() {
-    if (!root) return;
-
     applyFilters();
     sortRows();
 
-    const rowsToShow = state.viewMode === "snapshot" ? state.filtered.slice(0, 4) : state.filtered;
-
     root.innerHTML = `
-      <div class="standings-card">
-        <table class="standings-table">
+      <div class="stats-card">
+        <table class="stats-table">
           <thead>
             <tr>
-              ${th("#", "rank")}
+              ${th("Player", "player")}
               ${th("Team", "team")}
-              ${th("W", "w")}
-              ${th("L", "l")}
               ${th("GP", "gp")}
-              ${th("GD", "gd")}
-              ${th("GF", "gf")}
-              ${th("GA", "ga")}
-              ${th("PTS", "pts")}
+              ${th("Score", "score")}
+              ${th("G", "g")}
+              ${th("A", "a")}
+              ${th("Saves", "saves")}
+              ${th("Shots", "shots")}
+              ${th("Ping", "ping")}
             </tr>
           </thead>
           <tbody>
-            ${rowsToShow.map((r, idx) => {
-              const isPlayoff = r.rank <= 4;
-              const playoffLine =
-                (state.viewMode !== "snapshot" && idx === 3)
-                  ? `<tr class="playoffLineRow"><td colspan="9"><span>PLAYOFF LINE</span></td></tr>`
-                  : "";
-
-              return `
-                <tr class="${isPlayoff ? "playoffRow" : ""}">
-                  <td class="num">${r.rank === 999 ? "" : r.rank}</td>
-                  <td class="teamCell">
-                    ${r.logo ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />` : `<div class="logo ph"></div>`}
-                    <div class="teamText">
-                      <div class="teamName">${r.team || r.abbr || r.teamId || "TBD"}</div>
-                      ${r.abbr ? `<div class="teamAbbr">${r.abbr}</div>` : ``}
-                    </div>
-                  </td>
-                  <td class="num">${r.w}</td>
-                  <td class="num">${r.l}</td>
-                  <td class="num">${r.gp}</td>
-                  <td class="num">${r.gd}</td>
-                  <td class="num">${r.gf}</td>
-                  <td class="num">${r.ga}</td>
-                  <td class="num">${r.pts}</td>
-                </tr>
-                ${playoffLine}
-              `;
-            }).join("")}
+            ${state.filtered.map((r) => `
+              <tr>
+                <td class="playerCell">
+                  ${r.logo ? `<img class="logo" src="${r.logo}" alt="" loading="lazy" />` : ``}
+                  <span class="playerName">${r.player}</span>
+                </td>
+                <td class="teamCell">${r.team || ""}</td>
+                <td class="num">${r.gp}</td>
+                <td class="num">${r.score}</td>
+                <td class="num">${r.g}</td>
+                <td class="num">${r.a}</td>
+                <td class="num">${r.saves}</td>
+                <td class="num">${r.shots}</td>
+                <td class="num">${r.ping || ""}</td>
+              </tr>
+            `).join("")}
           </tbody>
         </table>
       </div>
     `;
 
+    // header sorting
     root.querySelectorAll("th[data-key]").forEach((thEl) => {
       thEl.addEventListener("click", () => {
         const k = thEl.getAttribute("data-key");
         if (state.sortKey === k) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
         else {
           state.sortKey = k;
-          state.sortDir = (k === "team" || k === "rank") ? "asc" : "desc";
+          state.sortDir = (k === "player" || k === "team") ? "asc" : "desc";
         }
         render();
+        if (statusEl) statusEl.textContent = `Loaded ${state.filtered.length} rows`;
       });
     });
+
+    if (statusEl) statusEl.textContent = `Loaded ${state.filtered.length} rows`;
+  }
+
+  async function loadAndBuild() {
+    const { seasonUrl, perGameUrl } = getUrls();
+    const url = (state.viewMode === "per_game") ? perGameUrl : seasonUrl;
+
+    if (statusEl) statusEl.textContent = "Loading stats…";
+    root.innerHTML = `<div class="stats-loading">Loading stats…</div>`;
+
+    const csv = await fetchCsv(url);
+    state.raw = csv;
+    state.rows = csv.map(toModel);
+
+    // Populate dropdowns if we actually have those columns
+    const seasons = uniqSorted(state.rows.map((r) => r.season));
+    const weeks   = uniqSorted(state.rows.map((r) => r.week));
+    const teams   = uniqSorted(state.rows.map((r) => r.team));
+
+    if (seasonEl) {
+      fillSelect(seasonEl, seasons, "All");
+      seasonEl.value = state.season;
+      seasonEl.disabled = seasons.length === 0;
+    }
+    if (weekEl) {
+      fillSelect(weekEl, weeks, "All");
+      weekEl.value = state.week;
+      weekEl.disabled = weeks.length === 0;
+    }
+    if (teamEl) {
+      fillSelect(teamEl, teams, "All Teams");
+      teamEl.value = state.team;
+      teamEl.disabled = teams.length === 0;
+    }
+
+    render();
   }
 
   async function init() {
     try {
-      const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
-      if (!cfg) throw new Error("OV_CONFIG.rlol missing");
+      // confirm scripts are loading
+      console.log("RLOL Stats loaded:", document.currentScript?.src || "(inline)");
 
-      const fullUrl = (cfg.standingsCsv && String(cfg.standingsCsv).trim()) || STANDINGS_CSV_FALLBACK;
-      const snapUrl = (cfg.standingsViewCsv && String(cfg.standingsViewCsv).trim()) || STANDINGS_VIEW_CSV_FALLBACK;
+      // read view mode default
+      if (viewModeEl) state.viewMode = viewModeEl.value || "season_totals";
 
-      if (statusEl) statusEl.textContent = "Loading standings…";
-
-      TEAM_MAP = await buildTeamMap();
-
-      const data = await fetchCsv(fullUrl);
-      let model = data.map(toStandingsModel);
-
-      // If rank column isn’t present, build ranking by W desc, GD desc, GF desc
-      const needsRank = model.every((r) => r.rank === 999);
-      if (needsRank) {
-        model.sort((a, b) => (b.w - a.w) || (b.gd - a.gd) || (b.gf - a.gf));
-        model.forEach((r, i) => (r.rank = i + 1));
-      }
-
-      state.rows = model;
-      state.viewMode = "full";
-
-      if (searchEl) {
-        searchEl.addEventListener("input", () => {
-          state.query = searchEl.value;
-          render();
-        });
-      }
-
+      // wire controls
       if (viewModeEl) {
         viewModeEl.addEventListener("change", async () => {
           state.viewMode = viewModeEl.value;
-
-          if (statusEl) statusEl.textContent = state.viewMode === "snapshot" ? "Loading snapshot…" : "Loading standings…";
-
-          const url = state.viewMode === "snapshot" ? snapUrl : fullUrl;
-          const csv = await fetchCsv(url);
-          state.rows = csv.map(toStandingsModel);
-
-          const needsRank2 = state.rows.every((r) => r.rank === 999);
-          if (needsRank2) state.rows.forEach((r, i) => (r.rank = i + 1));
-
-          render();
-          if (statusEl) statusEl.textContent = `Loaded ${state.rows.length} teams`;
+          await loadAndBuild();
         });
       }
 
-      render();
-      if (statusEl) statusEl.textContent = `Loaded ${state.rows.length} teams`;
+      if (seasonEl) {
+        seasonEl.addEventListener("change", () => {
+          state.season = seasonEl.value || "all";
+          render();
+        });
+      }
+      if (weekEl) {
+        weekEl.addEventListener("change", () => {
+          state.week = weekEl.value || "all";
+          render();
+        });
+      }
+      if (teamEl) {
+        teamEl.addEventListener("change", () => {
+          state.team = teamEl.value || "all";
+          render();
+        });
+      }
+      if (searchEl) {
+        searchEl.addEventListener("input", () => {
+          state.query = searchEl.value || "";
+          render();
+        });
+      }
+
+      await loadAndBuild();
     } catch (err) {
       console.error(err);
-      if (statusEl) statusEl.textContent = "Failed to load standings";
-      if (root) root.innerHTML = `<div class="error">Error: ${String(err.message || err)}</div>`;
+      if (statusEl) statusEl.textContent = "Failed to load stats";
+      root.innerHTML = `<div class="error">Error: ${String(err.message || err)}</div>`;
     }
   }
 
