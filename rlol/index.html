@@ -1,58 +1,170 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>RLOL Teams | OV Legend</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rocket League of Legends (RLOL) | OV Legend</title>
+  <meta name="description" content="RLOL is a community-driven 2v2 Rocket League league hosted by OV Legend. Standings, schedules, highlights, and Season 2 info + rules." />
 
+  <meta property="og:title" content="Rocket League of Legends (RLOL) — OV Legend" />
+  <meta property="og:description" content="Season 2 is live. See schedule, standings, and league updates." />
+  <meta property="og:image" content="https://i.imgur.com/vMKypFe.png" />
+  <meta property="og:type" content="website" />
   <meta name="theme-color" content="#ff8a00" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
 
-<body class="rlol rlol-teams">
-  <main class="rlol-wrap">
-    <div class="topbar">
+<body class="rlol rlol-hub">
+  <div class="overlay">
+
+    <!-- NAV -->
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="logo" href="/" aria-label="OV Legend Home">OV <span>Legend</span></a>
+        <nav class="nav-links" aria-label="Site">
+          <a href="/">Home</a>
+          <a class="active" href="/rlol/">RLOL</a>
+          <a href="/stats/">Rank</a>
+          <a href="/lvb/">Legends v Bozos</a>
+          <a href="/builds/">Builds</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- HEADER -->
+    <header class="rlol-header">
+      <h1>Rocket League of Legends</h1>
+      <p class="tagline">
+        Season 2 is live: <strong>Friday Nights</strong>, <strong>Bo3 Series</strong>, and the road to playoffs starts now.
+      </p>
+    </header>
+
+    <!-- CHAMP CALLOUT -->
+    <section class="champ-callout" role="note" aria-label="Season 1 Champions">
+      <img src="https://i.imgur.com/WQrBDOv.png" alt="Alpha 80 logo" />
       <div>
-        <h1>RLOL Teams</h1>
-        <div class="sub">Auto-updates from Google Sheets • Logos, rosters, and team info</div>
+        <h2>🏆 Season 1 Champions: <span class="rlol-accent">Alpha 80</span></h2>
+        <p>Clinical finish. Catch Season 2 match nights live — and watch the standings evolve each week.</p>
       </div>
+    </section>
 
-      <div class="nav-btns" aria-label="RLOL navigation">
-        <a class="btn" href="/">Home</a>
-        <a class="btn" href="/rlol/">Hub</a>
-        <a class="btn" href="/rlol/schedule/">Schedule</a>
-        <a class="btn" href="/rlol/standings/">Standings</a>
-        <a class="btn" href="/rlol/stats/">Stats</a>
-      </div>
-    </div>
+    <!-- CTAs -->
+    <nav class="cta-row" aria-label="Primary">
+      <a class="btn primary" href="/rlol/schedule/">Schedule</a>
+      <a class="btn" href="/rlol/standings/">Standings</a>
+      <a class="btn" href="/rlol/stats/">Stats</a>
+      <a class="btn" href="https://twitch.tv/The_OV_Legend" target="_blank" rel="noopener">Twitch</a>
+      <a class="btn" href="https://discord.gg/sGXgUNAtDp" target="_blank" rel="noopener">Discord</a>
+      <a class="btn" href="/rlol/teams/">Teams</a>
+    </nav>
 
-    <div class="card">
-      <div class="metaRow">
-        <div class="pill">
-          <span class="dot"></span>
-          <span id="teamsStatus">Loading teams…</span>
+    <!-- HUB GRID -->
+    <section class="hub-grid" aria-label="League Hub">
+
+      <!-- Next Match Night -->
+      <section class="panel" aria-labelledby="next-night">
+        <h2 id="next-night">Next Match Night</h2>
+        <p class="small" id="nextMeta">Loading next match night…</p>
+
+        <div class="kpi-row">
+          <div class="kpi">
+            <div class="label">Stream Start</div>
+            <div class="value">6:00 PM ET</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Format</div>
+            <div class="value">Bo3 Series</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Tiebreaker</div>
+            <div class="value">Goal Diff</div>
+          </div>
         </div>
 
-        <div class="controls">
-          <input id="searchTeam" type="text" placeholder="Search team (e.g., WLW)" />
+        <div class="match-list" id="nextMatches"></div>
+
+        <p class="tiny" style="margin-top:10px;">
+          Full schedule: <a class="soft-link" href="/rlol/schedule/">/rlol/schedule/</a>
+        </p>
+      </section>
+
+      <!-- Standings Snapshot -->
+      <section class="panel" aria-labelledby="snapshot">
+        <h2 id="snapshot">Standings Snapshot</h2>
+        <p class="small" id="standMeta">Loading standings…</p>
+
+        <div class="table-wrap">
+          <table aria-label="Top 4 Standings">
+            <thead>
+              <tr>
+                <th class="rank">#</th>
+                <th>Team</th>
+                <th class="right nowrap">W-L</th>
+                <th class="right nowrap">GD</th>
+              </tr>
+            </thead>
+            <tbody id="top4"></tbody>
+          </table>
         </div>
-      </div>
 
-      <div id="teamsRoot"></div>
+        <p class="tiny" style="margin-top:10px;">
+          Full standings: <a class="soft-link" href="/rlol/standings/">/rlol/standings/</a>
+        </p>
+      </section>
 
-      <div class="footer">
-        Tip: Search matches team names, abbreviations, and player names (if included).
-      </div>
-    </div>
-  </main>
+      <!-- Stats Preview -->
+      <section class="panel" aria-labelledby="stats-preview">
+        <h2 id="stats-preview">Stats Preview</h2>
 
-  <!-- Config + page logic (ABSOLUTE PATHS) -->
+        <p class="sub">
+          Top performers • auto-updates from Google Sheets
+        </p>
+
+        <div id="statsPreview" class="stats-preview">
+          <div class="stats-preview__loading">Loading stats…</div>
+        </div>
+
+        <p class="tiny" style="margin-top:10px;">
+          Full player stats:
+          <a class="soft-link" href="/rlol/stats/">/rlol/stats/</a>
+        </p>
+      </section>
+
+    </section><!-- /hub-grid -->
+
+    <!-- BELOW GRID CONTENT -->
+    <main class="content">
+      <section class="panel" aria-labelledby="about">
+        <h2 id="about">About the League</h2>
+        <p>
+          RLOL is a community-run 2v2 league with weekly match days, highlight reels, and live coverage on stream.
+          Season 2 is built for consistency: structured scheduling, Bo3 series, and standings tracked automatically.
+        </p>
+      </section>
+
+      <section class="panel" aria-labelledby="rules">
+        <h2 id="rules">Season 2 Rules</h2>
+        <div class="rules">
+          <div class="rule"><strong>Match Night:</strong> Fridays • Stream begins at <em>6:00 PM ET</em>.</div>
+          <div class="rule"><strong>Series Format:</strong> Regular season matches are <em>Best-of-3</em>.</div>
+          <div class="rule"><strong>No 1v1 or 1v2:</strong> Must have at least 2 players on the pitch.</div>
+          <div class="rule"><strong>Roster changes:</strong> Submit changes by Thursday (day before games).</div>
+          <div class="rule"><strong>Tiebreaker:</strong> Goal Differential.</div>
+          <div class="rule"><strong>Forfeits:</strong> 10–0 loss in BOTH matches.</div>
+        </div>
+        <p class="small" style="margin-top:10px;">Updated Jan 2026.</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      © <span id="year"></span> OV Legend • RLOL • All rights reserved
+    </footer>
+
+  </div><!-- /overlay -->
+
+  <!-- Config + Hub logic (ABSOLUTE PATHS) -->
   <script src="/assets/js/config.js"></script>
-  <script src="/assets/js/rlol-teams.js"></script>
+  <script src="/assets/js/rlol-hub.js"></script>
 </body>
 </html>
