@@ -32,134 +32,141 @@
       </div>
     </header>
 
-    <!-- HEADER -->
-    <header class="rlol-header">
-      <h1>Rocket League of Legends</h1>
-      <p class="tagline">
-        Season 2 is live: <strong>Friday Nights</strong>, <strong>Bo3 Series</strong>, and the road to playoffs starts now.
-      </p>
-    </header>
+    <!-- PAGE WRAP (everything on hub lives inside this) -->
+    <main class="rlol-wrap">
 
-    <!-- CHAMP CALLOUT -->
-    <section class="champ-callout" role="note" aria-label="Season 1 Champions">
-      <img src="https://i.imgur.com/WQrBDOv.png" alt="Alpha 80 logo" />
-      <div>
-        <h2>🏆 Season 1 Champions: <span class="rlol-accent">Alpha 80</span></h2>
-        <p>Clinical finish. Catch Season 2 match nights live — and watch the standings evolve each week.</p>
-      </div>
-    </section>
+      <!-- HEADER -->
+      <header class="rlol-header">
+        <h1>Rocket League of Legends</h1>
+        <p class="tagline">
+          Season 2 is live: <strong>Friday Nights</strong>, <strong>Bo3 Series</strong>, and the road to playoffs starts now.
+        </p>
+      </header>
 
-    <!-- CTAs -->
-    <nav class="cta-row" aria-label="Primary">
-      <a class="btn primary" href="/rlol/schedule/">Schedule</a>
-      <a class="btn" href="/rlol/standings/">Standings</a>
-      <a class="btn" href="/rlol/stats/">Stats</a>
-      <a class="btn" href="https://twitch.tv/The_OV_Legend" target="_blank" rel="noopener">Twitch</a>
-      <a class="btn" href="https://discord.gg/sGXgUNAtDp" target="_blank" rel="noopener">Discord</a>
-      <a class="btn" href="/rlol/teams/">Teams</a>
-    </nav>
+      <!-- CHAMP CALLOUT -->
+      <section class="champ-callout" role="note" aria-label="Season 1 Champions">
+        <img src="https://i.imgur.com/WQrBDOv.png" alt="Alpha 80 logo" />
+        <div>
+          <h2>🏆 Season 1 Champions: <span class="rlol-accent">Alpha 80</span></h2>
+          <p>Clinical finish. Catch Season 2 match nights live — and watch the standings evolve each week.</p>
+        </div>
+      </section>
 
-    <!-- HUB GRID -->
-    <section class="hub-grid" aria-label="League Hub">
+      <!-- CTAs -->
+      <nav class="cta-row" aria-label="Primary">
+        <a class="btn primary" href="/rlol/schedule/">Schedule</a>
+        <a class="btn" href="/rlol/standings/">Standings</a>
+        <a class="btn" href="/rlol/stats/">Stats</a>
+        <a class="btn" href="https://twitch.tv/The_OV_Legend" target="_blank" rel="noopener">Twitch</a>
+        <a class="btn" href="https://discord.gg/sGXgUNAtDp" target="_blank" rel="noopener">Discord</a>
+        <a class="btn" href="/rlol/teams/">Teams</a>
+      </nav>
 
-      <!-- Next Match Night -->
-      <section class="panel" aria-labelledby="next-night">
-        <h2 id="next-night">Next Match Night</h2>
-        <p class="small" id="nextMeta">Loading next match night…</p>
+      <!-- HUB GRID -->
+      <section class="hub-grid" aria-label="League Hub">
 
-        <div class="kpi-row">
-          <div class="kpi">
-            <div class="label">Stream Start</div>
-            <div class="value">6:00 PM ET</div>
+        <!-- Next Match Night -->
+        <section class="panel" aria-labelledby="next-night">
+          <h2 id="next-night">Next Match Night</h2>
+          <p class="small" id="nextMeta">Loading next match night…</p>
+
+          <div class="kpi-row">
+            <div class="kpi">
+              <div class="label">Stream Start</div>
+              <div class="value">6:00 PM ET</div>
+            </div>
+            <div class="kpi">
+              <div class="label">Format</div>
+              <div class="value">Bo3 Series</div>
+            </div>
+            <div class="kpi">
+              <div class="label">Tiebreaker</div>
+              <div class="value">Goal Diff</div>
+            </div>
           </div>
-          <div class="kpi">
-            <div class="label">Format</div>
-            <div class="value">Bo3 Series</div>
+
+          <div class="match-list" id="nextMatches"></div>
+
+          <p class="tiny" style="margin-top:10px;">
+            Full schedule: <a class="soft-link" href="/rlol/schedule/">/rlol/schedule/</a>
+          </p>
+        </section>
+
+        <!-- Standings Snapshot -->
+        <section class="panel" aria-labelledby="snapshot">
+          <h2 id="snapshot">Standings Snapshot</h2>
+          <p class="small" id="standMeta">Loading standings…</p>
+
+          <div class="table-wrap">
+            <table aria-label="Top 4 Standings">
+              <thead>
+                <tr>
+                  <th class="rank">#</th>
+                  <th>Team</th>
+                  <th class="right nowrap">W-L</th>
+                  <th class="right nowrap">GD</th>
+                </tr>
+              </thead>
+              <tbody id="top4"></tbody>
+            </table>
           </div>
-          <div class="kpi">
-            <div class="label">Tiebreaker</div>
-            <div class="value">Goal Diff</div>
+
+          <p class="tiny" style="margin-top:10px;">
+            Full standings: <a class="soft-link" href="/rlol/standings/">/rlol/standings/</a>
+          </p>
+        </section>
+
+        <!-- Stats Preview -->
+        <section class="panel" aria-labelledby="stats-preview">
+          <h2 id="stats-preview">Stats Preview</h2>
+
+          <p class="sub">
+            Top performers • auto-updates from Google Sheets
+          </p>
+
+          <div id="statsPreview" class="stats-preview">
+            <div class="stats-preview__loading">Loading stats…</div>
           </div>
-        </div>
 
-        <div class="match-list" id="nextMatches"></div>
+          <p class="tiny" style="margin-top:10px;">
+            Full player stats:
+            <a class="soft-link" href="/rlol/stats/">/rlol/stats/</a>
+          </p>
+        </section>
 
-        <p class="tiny" style="margin-top:10px;">
-          Full schedule: <a class="soft-link" href="/rlol/schedule/">/rlol/schedule/</a>
-        </p>
-      </section>
+      </section><!-- /hub-grid -->
 
-      <!-- Standings Snapshot -->
-      <section class="panel" aria-labelledby="snapshot">
-        <h2 id="snapshot">Standings Snapshot</h2>
-        <p class="small" id="standMeta">Loading standings…</p>
+      <!-- BELOW GRID CONTENT -->
+      <section class="content">
 
-        <div class="table-wrap">
-          <table aria-label="Top 4 Standings">
-            <thead>
-              <tr>
-                <th class="rank">#</th>
-                <th>Team</th>
-                <th class="right nowrap">W-L</th>
-                <th class="right nowrap">GD</th>
-              </tr>
-            </thead>
-            <tbody id="top4"></tbody>
-          </table>
-        </div>
+        <section class="panel" aria-labelledby="about">
+          <h2 id="about">About the League</h2>
+          <p>
+            RLOL is a community-run 2v2 league with weekly match days, highlight reels, and live coverage on stream.
+            Season 2 is built for consistency: structured scheduling, Bo3 series, and standings tracked automatically.
+          </p>
+        </section>
 
-        <p class="tiny" style="margin-top:10px;">
-          Full standings: <a class="soft-link" href="/rlol/standings/">/rlol/standings/</a>
-        </p>
-      </section>
+        <section class="panel" aria-labelledby="rules">
+          <h2 id="rules">Season 2 Rules</h2>
+          <div class="rules">
+            <div class="rule"><strong>Match Night:</strong> Fridays • Stream begins at <em>6:00 PM ET</em>.</div>
+            <div class="rule"><strong>Series Format:</strong> Regular season matches are <em>Best-of-3</em>.</div>
+            <div class="rule"><strong>No 1v1 or 1v2:</strong> Must have at least 2 players on the pitch.</div>
+            <div class="rule"><strong>Roster changes:</strong> Submit changes by Thursday (day before games).</div>
+            <div class="rule"><strong>Tiebreaker:</strong> Goal Differential.</div>
+            <div class="rule"><strong>Forfeits:</strong> 10–0 loss in BOTH matches.</div>
+          </div>
+          <p class="small" style="margin-top:10px;">Updated Jan 2026.</p>
+        </section>
 
-      <!-- Stats Preview -->
-      <section class="panel" aria-labelledby="stats-preview">
-        <h2 id="stats-preview">Stats Preview</h2>
+      </section><!-- /content -->
 
-        <p class="sub">
-          Top performers • auto-updates from Google Sheets
-        </p>
+      <footer class="footer">
+        © <span id="year"></span> OV Legend • RLOL • All rights reserved
+      </footer>
 
-        <div id="statsPreview" class="stats-preview">
-          <div class="stats-preview__loading">Loading stats…</div>
-        </div>
-
-        <p class="tiny" style="margin-top:10px;">
-          Full player stats:
-          <a class="soft-link" href="/rlol/stats/">/rlol/stats/</a>
-        </p>
-      </section>
-
-    </section><!-- /hub-grid -->
-
-    <!-- BELOW GRID CONTENT -->
-    <main class="content">
-      <section class="panel" aria-labelledby="about">
-        <h2 id="about">About the League</h2>
-        <p>
-          RLOL is a community-run 2v2 league with weekly match days, highlight reels, and live coverage on stream.
-          Season 2 is built for consistency: structured scheduling, Bo3 series, and standings tracked automatically.
-        </p>
-      </section>
-
-      <section class="panel" aria-labelledby="rules">
-        <h2 id="rules">Season 2 Rules</h2>
-        <div class="rules">
-          <div class="rule"><strong>Match Night:</strong> Fridays • Stream begins at <em>6:00 PM ET</em>.</div>
-          <div class="rule"><strong>Series Format:</strong> Regular season matches are <em>Best-of-3</em>.</div>
-          <div class="rule"><strong>No 1v1 or 1v2:</strong> Must have at least 2 players on the pitch.</div>
-          <div class="rule"><strong>Roster changes:</strong> Submit changes by Thursday (day before games).</div>
-          <div class="rule"><strong>Tiebreaker:</strong> Goal Differential.</div>
-          <div class="rule"><strong>Forfeits:</strong> 10–0 loss in BOTH matches.</div>
-        </div>
-        <p class="small" style="margin-top:10px;">Updated Jan 2026.</p>
-      </section>
-    </main>
-
-    <footer class="footer">
-      © <span id="year"></span> OV Legend • RLOL • All rights reserved
-    </footer>
+    </main><!-- /rlol-wrap -->
 
   </div><!-- /overlay -->
 
