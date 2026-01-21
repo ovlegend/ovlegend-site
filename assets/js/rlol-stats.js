@@ -103,16 +103,24 @@
   }
 
   // URL detection + safe image html
-  function isImageUrl(v) {
-    const s = norm(v);
-    return /^https?:\/\/.+\.(png|jpg|jpeg|webp|gif)(\?.*)?$/i.test(s);
-  }
-  function imgHTML(url, alt) {
-    const u = norm(url);
-    if (!isImageUrl(u)) return "";
-    return `<img class="logo" src="${u}" alt="${alt || ""}" loading="lazy" />`;
-  }
+function isImageUrl(v) {
+  const s = norm(v);
+  return /^https?:\/\/.+\.(png|jpg|jpeg|webp|gif)(\?.*)?$/i.test(s);
+}
 
+function imgHTML(url, alt) {
+  const u = norm(url);
+  if (!isImageUrl(u)) return "";
+  return `<img class="logo" src="${u}" alt="${alt || ""}" loading="lazy" />`;
+}
+
+function firstNonUrl(row, keys) {
+  for (const k of keys) {
+    const v = norm(getAny(row, [k]));
+    if (v && !isImageUrl(v)) return v;
+  }
+  return "";
+}
   // Read a value by trying multiple possible headers (case sensitive + insensitive)
   function getAny(row, keys) {
     for (const k of keys) {
@@ -168,8 +176,8 @@
 
   // ---- model (strong header mapping) ----
   function toModel(row) {
-    const player = norm(getAny(row, ["player_name", "Player", "player", "name", "Player Name"]));
-    const team = norm(getAny(row, ["team_name", "Team", "team", "Team Name"]));
+    const player = firstNonUrl(row, ["player_name", "Player", "player", "name", "Player Name"]) || "Unknown";
+const team   = firstNonUrl(row, ["team_name", "Team Name", "team", "Team"]) || "";
 
     // support both player + team logos if you have them
     const playerLogo = norm(getAny(row, ["player_logo", "Player Logo", "PlayerLogo", "player_logo_url", "Player Logo URL", "player_pfp", "PFP", "Avatar", "player_avatar"]));
