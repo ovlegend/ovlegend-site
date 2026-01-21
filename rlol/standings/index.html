@@ -1,10 +1,13 @@
 <!doctype html>
-<html lang="en" class="rlol rlol-standings">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>RLOL Standings</title>
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <title>RLOL Standings | OV Legend</title>
+
+  <meta name="theme-color" content="#ff8a00" />
+
+  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
 
 <body class="rlol rlol-standings">
@@ -15,16 +18,21 @@
         <div class="sub">Auto-updates from Google Sheets • Click headers to sort</div>
       </div>
 
-      <div class="nav-btns">
-        <a class="btn" href="/ovlegend-site/rlol/">Hub</a>
-        <a class="btn" href="/ovlegend-site/rlol/schedule/">Schedule</a>
-        <a class="btn" href="/ovlegend-site/rlol/teams/">Teams</a>
+      <div class="nav-btns" aria-label="RLOL navigation">
+        <a class="btn" href="/">Home</a>
+        <a class="btn" href="/rlol/">Hub</a>
+        <a class="btn" href="/rlol/schedule/">Schedule</a>
+        <a class="btn" href="/rlol/teams/">Teams</a>
+        <a class="btn" href="/rlol/stats/">Stats</a>
       </div>
     </div>
 
     <div class="card">
       <div class="metaRow">
-        <div class="pill"><span class="dot"></span> <span id="standingsStatus">Loading standings…</span></div>
+        <div class="pill">
+          <span class="dot"></span>
+          <span id="standingsStatus">Loading standings…</span>
+        </div>
 
         <div class="controls">
           <input id="searchTeam" type="text" placeholder="Search team (e.g., WLW)" />
@@ -43,7 +51,8 @@
     </div>
   </main>
 
-  <script src="/ovlegend-site/assets/js/config.js?v=2"></script>
-  <script src="/ovlegend-site/assets/js/rlol-standings.js?v=3"></script>
+  <!-- Config + page logic (ABSOLUTE PATHS) -->
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/rlol-standings.js"></script>
 </body>
 </html>
