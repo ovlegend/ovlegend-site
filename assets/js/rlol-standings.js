@@ -1,5 +1,5 @@
 // /assets/js/rlol-standings.js
-;(function () {
+(function () {
   const $ = (sel) => document.querySelector(sel);
 
   // ✅ Published CSV fallbacks (prevents CORS/login redirects)
@@ -35,7 +35,6 @@
 
       cur += c;
     }
-
     row.push(cur);
     if (row.some((x) => String(x).trim() !== "")) rows.push(row);
 
@@ -51,23 +50,21 @@
     return data;
   }
 
-  // ✅ Adds cache-buster + better errors + HTML safeguard
+  // ✅ Fetch CSV w/ cache buster + HTML safety check
   async function fetchCsv(url) {
     if (!url) throw new Error("CSV URL missing");
 
     const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
     const res = await fetch(busted, { cache: "no-store" });
 
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status} while fetching CSV`);
-    }
+    if (!res.ok) throw new Error(`HTTP ${res.status} while fetching CSV`);
 
     const text = await res.text();
 
-    // If Google sends a login page or HTML, catch it.
+    // If Google sends HTML (login/redirect), bail
     const looksLikeHtml = /^\s*</.test(text);
     if (looksLikeHtml) {
-      throw new Error("CSV fetch returned HTML (likely not a published CSV link)");
+      throw new Error("CSV fetch returned HTML (not a published CSV link)");
     }
 
     return parseCSV(text);
@@ -184,7 +181,7 @@
     const getVal = (r) => {
       switch (key) {
         case "team": return normalizeKey(r.team);
-        case "record": return r.w; // optional alias
+        case "record": return r.w;
         case "w": return r.w;
         case "l": return r.l;
         case "gp": return r.gp;
@@ -199,7 +196,6 @@
 
     state.filtered.sort((a, b) => {
       let res = compare(getVal(a), getVal(b), dir);
-
       if (res === 0 && key !== "gd") res = compare(a.gd, b.gd, "desc");
       if (res === 0 && key !== "gf") res = compare(a.gf, b.gf, "desc");
       if (res === 0) res = compare(a.rank, b.rank, "asc");
@@ -209,10 +205,9 @@
 
   function th(label, key) {
     const isActive = state.sortKey === key;
-    const dir = isActive ? state.sortDir : "asc";
+    const ariaDir = isActive ? state.sortDir : "asc";
     const arrow = isActive ? (state.sortDir === "asc" ? " ▲" : " ▼") : "";
-
-    return `<th data-key="${key}" class="${isActive ? "active" : ""}" aria-sort="${dir}">
+    return `<th data-key="${key}" class="${isActive ? "active" : ""}" aria-sort="${ariaDir}">
       ${label}${arrow}
     </th>`;
   }
@@ -223,9 +218,7 @@
     applyFilters();
     sortRows();
 
-    const rowsToShow = state.viewMode === "snapshot"
-      ? state.filtered.slice(0, 4)
-      : state.filtered;
+    const rowsToShow = state.viewMode === "snapshot" ? state.filtered.slice(0, 4) : state.filtered;
 
     root.innerHTML = `
       <div class="standings-card">
@@ -246,7 +239,6 @@
           <tbody>
             ${rowsToShow.map((r, idx) => {
               const isPlayoff = r.rank <= 4;
-
               const playoffLine =
                 (state.viewMode !== "snapshot" && idx === 3)
                   ? `<tr class="playoffLineRow"><td colspan="9"><span>PLAYOFF LINE</span></td></tr>`
@@ -256,10 +248,7 @@
                 <tr class="${isPlayoff ? "playoffRow" : ""}">
                   <td class="num">${r.rank === 999 ? "" : r.rank}</td>
                   <td class="teamCell">
-                    ${r.logo
-                      ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />`
-                      : `<div class="logo ph"></div>`
-                    }
+                    ${r.logo ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />` : `<div class="logo ph"></div>`}
                     <div class="teamText">
                       <div class="teamName">${r.team || r.abbr || r.teamId || "TBD"}</div>
                       ${r.abbr ? `<div class="teamAbbr">${r.abbr}</div>` : ``}
@@ -284,9 +273,8 @@
     root.querySelectorAll("th[data-key]").forEach((el) => {
       el.addEventListener("click", () => {
         const k = el.getAttribute("data-key");
-        if (state.sortKey === k) {
-          state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
-        } else {
+        if (state.sortKey === k) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+        else {
           state.sortKey = k;
           state.sortDir = (k === "team" || k === "rank") ? "asc" : "desc";
         }
@@ -297,22 +285,20 @@
 
   async function init() {
     try {
-      if (!statusEl || !root) return;
-
       const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
       if (!cfg) throw new Error("OV_CONFIG.rlol missing");
 
       const fullUrl = (cfg.standingsCsv && String(cfg.standingsCsv).trim()) || STANDINGS_CSV_FALLBACK;
       const snapUrl = (cfg.standingsViewCsv && String(cfg.standingsViewCsv).trim()) || STANDINGS_VIEW_CSV_FALLBACK;
 
-      statusEl.textContent = "Loading standings…";
+      if (statusEl) statusEl.textContent = "Loading standings…";
 
       TEAM_MAP = await buildTeamMap();
 
-      const data = await fetchCsv(fullUrl);
-      let model = data.map(toStandingsModel);
+      const fullData = await fetchCsv(fullUrl);
+      let model = fullData.map(toStandingsModel);
 
-      // If rank isn't present, compute it by W desc, GD desc, GF desc
+      // If rank column missing, compute it
       const needsRank = model.every((r) => r.rank === 999);
       if (needsRank) {
         model.sort((a, b) => {
@@ -338,29 +324,21 @@
         viewModeEl.addEventListener("change", async () => {
           state.viewMode = viewModeEl.value;
 
-          if (state.viewMode === "snapshot") {
-            statusEl.textContent = "Loading snapshot…";
-            const snapData = await fetchCsv(snapUrl);
-            state.rows = snapData.map(toStandingsModel);
+          if (statusEl) statusEl.textContent = (state.viewMode === "snapshot") ? "Loading snapshot…" : "Loading standings…";
 
-            const needsRank2 = state.rows.every((r) => r.rank === 999);
-            if (needsRank2) state.rows.forEach((r, i) => (r.rank = i + 1));
-          } else {
-            statusEl.textContent = "Loading standings…";
-            const fullData = await fetchCsv(fullUrl);
-            state.rows = fullData.map(toStandingsModel);
+          const data = await fetchCsv(state.viewMode === "snapshot" ? snapUrl : fullUrl);
+          state.rows = data.map(toStandingsModel);
 
-            const needsRank3 = state.rows.every((r) => r.rank === 999);
-            if (needsRank3) state.rows.forEach((r, i) => (r.rank = i + 1));
-          }
+          const needsRank2 = state.rows.every((r) => r.rank === 999);
+          if (needsRank2) state.rows.forEach((r, i) => (r.rank = i + 1));
 
           render();
-          statusEl.textContent = `Loaded ${state.rows.length} teams`;
+          if (statusEl) statusEl.textContent = `Loaded ${state.rows.length} teams`;
         });
       }
 
       render();
-      statusEl.textContent = `Loaded ${state.rows.length} teams`;
+      if (statusEl) statusEl.textContent = `Loaded ${state.rows.length} teams`;
     } catch (err) {
       console.error(err);
       if (statusEl) statusEl.textContent = "Failed to load standings";
