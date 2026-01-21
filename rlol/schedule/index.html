@@ -3,13 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RLOL Schedule</title>
+  <title>RLOL Schedule | OV Legend</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#ff8a00" />
 
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
 
 <body class="rlol rlol-schedule">
@@ -20,16 +22,21 @@
         <div class="sub">Auto-updates from Google Sheets • Filter by week, status, or team</div>
       </div>
 
-      <div class="nav-btns">
-        <a class="btn" href="/ovlegend-site/rlol/">Hub</a>
-        <a class="btn" href="/ovlegend-site/rlol/standings/">Standings</a>
-        <a class="btn" href="/ovlegend-site/rlol/teams/">Teams</a>
+      <div class="nav-btns" aria-label="RLOL navigation">
+        <a class="btn" href="/">Home</a>
+        <a class="btn" href="/rlol/">Hub</a>
+        <a class="btn" href="/rlol/standings/">Standings</a>
+        <a class="btn" href="/rlol/teams/">Teams</a>
+        <a class="btn" href="/rlol/stats/">Stats</a>
       </div>
     </div>
 
     <div class="card">
       <div class="metaRow">
-        <div class="pill"><span class="dot"></span><span id="schedStatusText">Loading schedule…</span></div>
+        <div class="pill">
+          <span class="dot"></span>
+          <span id="schedStatusText">Loading schedule…</span>
+        </div>
 
         <div class="controls">
           <select id="weekFilter" aria-label="Filter by week">
@@ -55,7 +62,8 @@
     </div>
   </main>
 
-<script src="/ovlegend-site/assets/js/config.js"></script>
-<script src="/ovlegend-site/assets/js/rlol-schedule.js"></script>
+  <!-- Config + page logic (ABSOLUTE PATHS) -->
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/rlol-schedule.js"></script>
 </body>
 </html>
