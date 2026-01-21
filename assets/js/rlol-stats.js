@@ -2,43 +2,22 @@
 (function () {
   const $ = (sel) => document.querySelector(sel);
 
-  // Controls (your HTML already has these)
-  const viewModeEl = $("#viewMode");     // values: "season_totals" | "per_game"
-  const seasonEl   = $("#seasonSel");
-  const weekEl     = $("#weekSel");
-  const teamEl     = $("#teamSel");
+  // ---- DOM ----
+  const viewModeEl = $("#viewMode");
+  const seasonEl = $("#seasonSel");
+  const weekEl = $("#weekSel");
+  const teamEl = $("#teamSel");
+  const searchEl = $("#searchPlayer");
 
-  const searchEl =
-    $("#searchPlayer") ||
-    $("#search") ||
-    $('input[type="search"]') ||
-    $('input[placeholder*="Search"]');
-
-  // Render root: use #statsRoot if present, else inject into .card
-  let root = $("#statsRoot");
-  const card = $(".card");
-  if (!root && card) {
-    root = document.createElement("div");
-    root.id = "statsRoot";
-    card.appendChild(root);
-  }
-
-  // Status: use existing "Loaded X rows" element if you have it, else create
-  let statusEl = $("#statsStatus") || $(".loaded");
-  if (!statusEl && card) {
-    statusEl = document.createElement("div");
-    statusEl.id = "statsStatus";
-    statusEl.className = "loaded";
-    statusEl.style.margin = "6px 0 10px";
-    card.insertBefore(statusEl, root);
-  }
+  const statusEl = $("#statsStatus");
+  const root = $("#statsRoot");
 
   if (!root) {
-    console.error("RLOL Stats: No render root found (#statsRoot or .card).");
+    console.error("RLOL Stats: #statsRoot not found.");
     return;
   }
 
-  // ---------------- CSV parsing (quoted commas safe) ----------------
+  // ---- CSV parsing (quoted commas safe) ----
   function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -91,11 +70,12 @@
     if (!res.ok) throw new Error(`HTTP ${res.status} while fetching CSV`);
 
     const text = await res.text();
-    if (/^\s*</.test(text)) throw new Error("CSV fetch returned HTML (Sheet not published as CSV)");
+    if (/^\s*</.test(text)) throw new Error("CSV fetch returned HTML (not a published CSV link)");
 
     return parseCSV(text);
   }
 
+  // ---- helpers ----
   function pick(row, keys, fallback = "") {
     for (const k of keys) {
       const v = row[k];
@@ -113,38 +93,53 @@
 
   function norm(s) { return String(s || "").trim().toLowerCase(); }
 
-  function compare(a, b, dir) {
-    return dir === "asc"
-      ? (a > b ? 1 : a < b ? -1 : 0)
-      : (a < b ? 1 : a > b ? -1 : 0);
+  function uniqSorted(list) {
+    return Array.from(new Set(list.filter(Boolean))).sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
   }
 
-  // Common column name variants
+  function fillSelect(sel, values, allLabel) {
+    sel.innerHTML = "";
+    const all = document.createElement("option");
+    all.value = "all";
+    all.textContent = allLabel;
+    sel.appendChild(all);
+
+    values.forEach((v) => {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      sel.appendChild(opt);
+    });
+
+    sel.value = "all";
+    sel.disabled = values.length === 0;
+  }
+
+  // ---- column mapping (handles common names) ----
   const COL = {
     player: ["Player", "player", "Name", "name", "Epic", "epic"],
-    team:   ["Team", "team", "Team Name", "team_name"],
+    team: ["Team", "team", "Team Name", "team_name"],
     season: ["Season", "season"],
-    week:   ["Week", "week"],
-    gp:     ["GP", "gp", "Games", "games", "Played", "played"],
-    score:  ["Score", "score", "Points", "points"],
-    goals:  ["G", "g", "Goals", "goals"],
-    assists:["A", "a", "Assists", "assists"],
-    saves:  ["Saves", "saves"],
-    shots:  ["Shots", "shots"],
-    ping:   ["Ping", "ping", "Avg Ping", "avg_ping"],
-    logo:   ["logo", "logo_url", "Logo", "Logo URL"]
+    week: ["Week", "week", "Match Week", "match_week"],
+    gp: ["GP", "gp", "Games", "games", "Played", "played"],
+    score: ["Score", "score", "Points", "points"],
+    goals: ["G", "g", "Goals", "goals"],
+    assists: ["A", "a", "Assists", "assists"],
+    saves: ["Saves", "saves"],
+    shots: ["Shots", "shots"],
+    ping: ["Ping", "ping", "Avg Ping", "avg_ping"]
   };
 
-  // ---- IMPORTANT: matches your config.js keys ----
+  // ---- config urls (YOUR KEYS) ----
   function getUrls() {
     const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
-    if (!cfg) throw new Error("OV_CONFIG.rlol missing (is /assets/js/config.js loaded?)");
+    if (!cfg) throw new Error("OV_CONFIG.rlol missing (config.js not loaded?)");
 
     const seasonUrl = String(cfg.playerSeasonStatsCsv || "").trim();
     const perGameUrl = String(cfg.playerGameStatsCsv || "").trim();
 
     if (!seasonUrl && !perGameUrl) {
-      throw new Error("Missing stats CSV URLs. Need playerSeasonStatsCsv and/or playerGameStatsCsv in config.");
+      throw new Error("Missing playerSeasonStatsCsv / playerGameStatsCsv in OV_CONFIG.rlol");
     }
 
     return {
@@ -169,39 +164,18 @@
   function toModel(row) {
     return {
       player: pick(row, COL.player, "Unknown"),
-      team:   pick(row, COL.team, ""),
+      team: pick(row, COL.team, ""),
       season: pick(row, COL.season, ""),
-      week:   pick(row, COL.week, ""),
-      gp:     num(pick(row, COL.gp, "0")),
-      score:  num(pick(row, COL.score, "0")),
-      g:      num(pick(row, COL.goals, "0")),
-      a:      num(pick(row, COL.assists, "0")),
-      saves:  num(pick(row, COL.saves, "0")),
-      shots:  num(pick(row, COL.shots, "0")),
-      ping:   num(pick(row, COL.ping, "")),
-      logo:   pick(row, COL.logo, ""),
+      week: pick(row, COL.week, ""),
+      gp: num(pick(row, COL.gp, "0")),
+      score: num(pick(row, COL.score, "0")),
+      g: num(pick(row, COL.goals, "0")),
+      a: num(pick(row, COL.assists, "0")),
+      saves: num(pick(row, COL.saves, "0")),
+      shots: num(pick(row, COL.shots, "0")),
+      ping: num(pick(row, COL.ping, "")),
       _raw: row
     };
-  }
-
-  function uniqSorted(list) {
-    return Array.from(new Set(list.filter(Boolean))).sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
-  }
-
-  function fillSelect(sel, values, allLabel) {
-    if (!sel) return;
-    sel.innerHTML = "";
-    const all = document.createElement("option");
-    all.value = "all";
-    all.textContent = allLabel;
-    sel.appendChild(all);
-
-    values.forEach((v) => {
-      const opt = document.createElement("option");
-      opt.value = v;
-      opt.textContent = v;
-      sel.appendChild(opt);
-    });
   }
 
   function applyFilters() {
@@ -215,6 +189,12 @@
       if (!q) return true;
       return norm(`${r.player} ${r.team}`).includes(q);
     });
+  }
+
+  function compare(a, b, dir) {
+    return dir === "asc"
+      ? (a > b ? 1 : a < b ? -1 : 0)
+      : (a < b ? 1 : a > b ? -1 : 0);
   }
 
   function sortRows() {
@@ -272,11 +252,8 @@
           <tbody>
             ${state.filtered.map((r) => `
               <tr>
-                <td class="playerCell">
-                  ${r.logo ? `<img class="logo" src="${r.logo}" alt="" loading="lazy" />` : ``}
-                  <span class="playerName">${r.player}</span>
-                </td>
-                <td class="teamCell">${r.team || ""}</td>
+                <td><strong>${r.player}</strong></td>
+                <td>${r.team || ""}</td>
                 <td class="num">${r.gp}</td>
                 <td class="num">${r.score}</td>
                 <td class="num">${r.g}</td>
@@ -317,32 +294,37 @@
     const csv = await fetchCsv(url);
     state.rows = csv.map(toModel);
 
-    // Fill dropdowns if data exists
-    const seasons = uniqSorted(state.rows.map((r) => r.season));
-    const weeks   = uniqSorted(state.rows.map((r) => r.week));
-    const teams   = uniqSorted(state.rows.map((r) => r.team));
+    // Dropdowns
+    fillSelect(seasonEl, uniqSorted(state.rows.map((r) => r.season)), "All");
+    fillSelect(weekEl, uniqSorted(state.rows.map((r) => r.week)), "All");
+    fillSelect(teamEl, uniqSorted(state.rows.map((r) => r.team)), "All Teams");
 
-    if (seasonEl) { fillSelect(seasonEl, seasons, "All"); seasonEl.disabled = seasons.length === 0; }
-    if (weekEl)   { fillSelect(weekEl, weeks, "All");     weekEl.disabled = weeks.length === 0; }
-    if (teamEl)   { fillSelect(teamEl, teams, "All Teams"); teamEl.disabled = teams.length === 0; }
+    // reset filters
+    state.season = "all";
+    state.week = "all";
+    state.team = "all";
 
     render();
   }
 
   async function init() {
     try {
-      console.log("RLOL Stats loaded:", document.currentScript?.src || "(inline)");
+      console.log("RLOL Stats running:", document.currentScript?.src || "(inline)");
 
-      if (viewModeEl) {
-        viewModeEl.addEventListener("change", async () => {
-          state.viewMode = viewModeEl.value || "season_totals";
-          await loadAndBuild();
-        });
-      }
-      if (seasonEl) seasonEl.addEventListener("change", () => { state.season = seasonEl.value || "all"; render(); });
-      if (weekEl)   weekEl.addEventListener("change", () => { state.week = weekEl.value || "all"; render(); });
-      if (teamEl)   teamEl.addEventListener("change", () => { state.team = teamEl.value || "all"; render(); });
-      if (searchEl) searchEl.addEventListener("input", () => { state.query = searchEl.value || ""; render(); });
+      // Wire controls
+      viewModeEl.addEventListener("change", async () => {
+        state.viewMode = viewModeEl.value || "season_totals";
+        await loadAndBuild();
+      });
+
+      seasonEl.addEventListener("change", () => { state.season = seasonEl.value || "all"; render(); });
+      weekEl.addEventListener("change", () => { state.week = weekEl.value || "all"; render(); });
+      teamEl.addEventListener("change", () => { state.team = teamEl.value || "all"; render(); });
+
+      searchEl.addEventListener("input", () => {
+        state.query = searchEl.value || "";
+        render();
+      });
 
       await loadAndBuild();
     } catch (err) {
