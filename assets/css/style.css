@@ -1472,3 +1472,52 @@ body.rlol-stats tr:hover td{ background: rgba(255,255,255,.03); }
   box-shadow: 0 0 0 1px rgba(255,86,0,.18), 0 0 22px rgba(255,86,0,.16);
   border-radius: 18px;
 }
+
+/* ===== RLOL Stats: make table fill the card & keep columns consistent ===== */
+.stats-card,
+.ov-card{
+  width: 100%;
+}
+
+.stats-table{
+  width: 100%;
+  table-layout: fixed;           /* key: locks column widths so integrity stays */
+  border-collapse: collapse;
+}
+
+.stats-table th,
+.stats-table td{
+  padding: 12px 12px;
+  vertical-align: middle;
+  overflow: hidden;              /* prevents long text from blowing up columns */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Give Player/Team more room, keep numbers tight */
+.stats-table th:nth-child(1),
+.stats-table td:nth-child(1){
+  width: 220px;                  /* Player */
+}
+
+.stats-table th:nth-child(2),
+.stats-table td:nth-child(2){
+  width: 300px;                  /* Team */
+}
+
+.stats-table th:nth-child(n+3),
+.stats-table td:nth-child(n+3){
+  width: 72px;                   /* GP/Score/G/A/Saves/Shots/Ping */
+  text-align: right;
+}
+
+/* Make the Player/Team cell layout behave nicely inside fixed columns */
+.playerCell .cellFlex,
+.teamCell .cellFlex{
+  min-width: 0;                  /* allows ellipsis to work */
+}
+
+.cellText,
+.cellMain{
+  min-width: 0;
+}
