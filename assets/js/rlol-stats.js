@@ -2,21 +2,19 @@
 (function () {
   const $ = (sel) => document.querySelector(sel);
 
-  // ---- REQUIRED IDs (already in your HTML) ----
-  const viewModeEl = $("#viewMode");   // values: "season_totals" | "per_game"
+  // Controls (your HTML already has these)
+  const viewModeEl = $("#viewMode");     // values: "season_totals" | "per_game"
   const seasonEl   = $("#seasonSel");
   const weekEl     = $("#weekSel");
   const teamEl     = $("#teamSel");
 
-  // Optional (if present in your HTML)
   const searchEl =
     $("#searchPlayer") ||
     $("#search") ||
     $('input[type="search"]') ||
     $('input[placeholder*="Search"]');
 
-  // Where we render:
-  // Prefer #statsRoot if you have it; otherwise render inside .card
+  // Render root: use #statsRoot if present, else inject into .card
   let root = $("#statsRoot");
   const card = $(".card");
   if (!root && card) {
@@ -25,7 +23,7 @@
     card.appendChild(root);
   }
 
-  // Status line: prefer #statsStatus; else create inside card
+  // Status: use existing "Loaded X rows" element if you have it, else create
   let statusEl = $("#statsStatus") || $(".loaded");
   if (!statusEl && card) {
     statusEl = document.createElement("div");
@@ -35,20 +33,19 @@
     card.insertBefore(statusEl, root);
   }
 
-  // If we can't render, bail loudly
   if (!root) {
-    console.error("RLOL Stats: Missing #statsRoot and no .card container found.");
+    console.error("RLOL Stats: No render root found (#statsRoot or .card).");
     return;
   }
 
-  // ---- CSV parsing (quoted commas safe) ----
+  // ---------------- CSV parsing (quoted commas safe) ----------------
   function parseCSV(text) {
     const rows = [];
     let row = [];
     let cur = "";
     let inQuotes = false;
 
-    text = String(text || "").replace(/\uFEFF/g, ""); // strip BOM
+    text = String(text || "").replace(/\uFEFF/g, "");
 
     for (let i = 0; i < text.length; i++) {
       const c = text[i];
@@ -85,25 +82,20 @@
     return data;
   }
 
-  // Adds cache-buster + better errors + HTML guard
   async function fetchCsv(url) {
     if (!url) throw new Error("CSV URL missing");
 
     const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
     const res = await fetch(busted, { cache: "no-store" });
+
     if (!res.ok) throw new Error(`HTTP ${res.status} while fetching CSV`);
 
     const text = await res.text();
-
-    // Google returns HTML if it's not a published CSV
-    if (/^\s*</.test(text)) {
-      throw new Error("CSV fetch returned HTML (check that the Sheet is published to CSV)");
-    }
+    if (/^\s*</.test(text)) throw new Error("CSV fetch returned HTML (Sheet not published as CSV)");
 
     return parseCSV(text);
   }
 
-  // ---- helpers ----
   function pick(row, keys, fallback = "") {
     for (const k of keys) {
       const v = row[k];
@@ -127,46 +119,42 @@
       : (a < b ? 1 : a > b ? -1 : 0);
   }
 
-  // Try to infer common column names
+  // Common column name variants
   const COL = {
-    player: ["Player", "player", "Name", "name", "Epic", "epic", "Steam", "steam"],
-    team:   ["Team", "team", "Team Name", "team_name", "teamName"],
+    player: ["Player", "player", "Name", "name", "Epic", "epic"],
+    team:   ["Team", "team", "Team Name", "team_name"],
     season: ["Season", "season"],
-    week:   ["Week", "week", "Match Week", "match_week"],
+    week:   ["Week", "week"],
     gp:     ["GP", "gp", "Games", "games", "Played", "played"],
     score:  ["Score", "score", "Points", "points"],
     goals:  ["G", "g", "Goals", "goals"],
     assists:["A", "a", "Assists", "assists"],
     saves:  ["Saves", "saves"],
     shots:  ["Shots", "shots"],
-    ping:   ["Ping", "ping", "Avg Ping", "avg_ping", "avgPing"],
+    ping:   ["Ping", "ping", "Avg Ping", "avg_ping"],
     logo:   ["logo", "logo_url", "Logo", "Logo URL"]
   };
 
-  // ---- config url selection ----
+  // ---- IMPORTANT: matches your config.js keys ----
   function getUrls() {
     const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
-    if (!cfg) throw new Error("OV_CONFIG.rlol missing. Check /assets/js/config.js is loading.");
+    if (!cfg) throw new Error("OV_CONFIG.rlol missing (is /assets/js/config.js loaded?)");
 
-    // Accept multiple possible keys so you don’t have to rename anything
-    const seasonUrl =
-      (cfg.statsSeasonCsv || cfg.playerStatsSeasonCsv || cfg.statsCsv || cfg.playerStatsCsv || "").trim();
+    const seasonUrl = String(cfg.playerSeasonStatsCsv || "").trim();
+    const perGameUrl = String(cfg.playerGameStatsCsv || "").trim();
 
-    const perGameUrl =
-      (cfg.statsPerGameCsv || cfg.playerStatsPerGameCsv || cfg.statsPerGame || cfg.playerStatsPerGame || seasonUrl || "").trim();
-
-    if (!seasonUrl) {
-      throw new Error(
-        "Stats CSV URL missing in OV_CONFIG.rlol. Add one of: statsSeasonCsv / playerStatsSeasonCsv / statsCsv / playerStatsCsv"
-      );
+    if (!seasonUrl && !perGameUrl) {
+      throw new Error("Missing stats CSV URLs. Need playerSeasonStatsCsv and/or playerGameStatsCsv in config.");
     }
 
-    return { seasonUrl, perGameUrl };
+    return {
+      seasonUrl: seasonUrl || perGameUrl,
+      perGameUrl: perGameUrl || seasonUrl
+    };
   }
 
   // ---- state ----
   const state = {
-    raw: [],
     rows: [],
     filtered: [],
     sortKey: "score",
@@ -175,26 +163,25 @@
     season: "all",
     week: "all",
     team: "all",
-    viewMode: "season_totals"
+    viewMode: (viewModeEl && viewModeEl.value) ? viewModeEl.value : "season_totals"
   };
 
   function toModel(row) {
-    const player = pick(row, COL.player, "Unknown");
-    const team   = pick(row, COL.team, "");
-    const season = pick(row, COL.season, "");
-    const week   = pick(row, COL.week, "");
-
-    const gp     = num(pick(row, COL.gp, "0"));
-    const score  = num(pick(row, COL.score, "0"));
-    const g      = num(pick(row, COL.goals, "0"));
-    const a      = num(pick(row, COL.assists, "0"));
-    const saves  = num(pick(row, COL.saves, "0"));
-    const shots  = num(pick(row, COL.shots, "0"));
-    const ping   = num(pick(row, COL.ping, "0"));
-
-    const logo   = pick(row, COL.logo, "");
-
-    return { player, team, season, week, gp, score, g, a, saves, shots, ping, logo, _raw: row };
+    return {
+      player: pick(row, COL.player, "Unknown"),
+      team:   pick(row, COL.team, ""),
+      season: pick(row, COL.season, ""),
+      week:   pick(row, COL.week, ""),
+      gp:     num(pick(row, COL.gp, "0")),
+      score:  num(pick(row, COL.score, "0")),
+      g:      num(pick(row, COL.goals, "0")),
+      a:      num(pick(row, COL.assists, "0")),
+      saves:  num(pick(row, COL.saves, "0")),
+      shots:  num(pick(row, COL.shots, "0")),
+      ping:   num(pick(row, COL.ping, "")),
+      logo:   pick(row, COL.logo, ""),
+      _raw: row
+    };
   }
 
   function uniqSorted(list) {
@@ -204,10 +191,10 @@
   function fillSelect(sel, values, allLabel) {
     if (!sel) return;
     sel.innerHTML = "";
-    const optAll = document.createElement("option");
-    optAll.value = "all";
-    optAll.textContent = allLabel;
-    sel.appendChild(optAll);
+    const all = document.createElement("option");
+    all.value = "all";
+    all.textContent = allLabel;
+    sel.appendChild(all);
 
     values.forEach((v) => {
       const opt = document.createElement("option");
@@ -226,8 +213,7 @@
       if (state.team !== "all" && r.team !== state.team) return false;
 
       if (!q) return true;
-      const hay = norm([r.player, r.team].join(" "));
-      return hay.includes(q);
+      return norm(`${r.player} ${r.team}`).includes(q);
     });
   }
 
@@ -251,9 +237,7 @@
     };
 
     state.filtered.sort((a, b) => {
-      const va = getVal(a);
-      const vb = getVal(b);
-      let res = compare(va, vb, dir);
+      let res = compare(getVal(a), getVal(b), dir);
       if (res === 0 && key !== "score") res = compare(a.score, b.score, "desc");
       return res;
     });
@@ -261,9 +245,8 @@
 
   function th(label, key) {
     const isActive = state.sortKey === key;
-    const dir = isActive ? state.sortDir : "desc";
     const arrow = isActive ? (state.sortDir === "asc" ? " ▲" : " ▼") : "";
-    return `<th data-key="${key}" class="${isActive ? "active" : ""}" aria-sort="${dir}">${label}${arrow}</th>`;
+    return `<th data-key="${key}" class="${isActive ? "active" : ""}">${label}${arrow}</th>`;
   }
 
   function render() {
@@ -308,10 +291,9 @@
       </div>
     `;
 
-    // header sorting
-    root.querySelectorAll("th[data-key]").forEach((thEl) => {
-      thEl.addEventListener("click", () => {
-        const k = thEl.getAttribute("data-key");
+    root.querySelectorAll("th[data-key]").forEach((el) => {
+      el.addEventListener("click", () => {
+        const k = el.getAttribute("data-key");
         if (state.sortKey === k) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
         else {
           state.sortKey = k;
@@ -333,73 +315,34 @@
     root.innerHTML = `<div class="stats-loading">Loading stats…</div>`;
 
     const csv = await fetchCsv(url);
-    state.raw = csv;
     state.rows = csv.map(toModel);
 
-    // Populate dropdowns if we actually have those columns
+    // Fill dropdowns if data exists
     const seasons = uniqSorted(state.rows.map((r) => r.season));
     const weeks   = uniqSorted(state.rows.map((r) => r.week));
     const teams   = uniqSorted(state.rows.map((r) => r.team));
 
-    if (seasonEl) {
-      fillSelect(seasonEl, seasons, "All");
-      seasonEl.value = state.season;
-      seasonEl.disabled = seasons.length === 0;
-    }
-    if (weekEl) {
-      fillSelect(weekEl, weeks, "All");
-      weekEl.value = state.week;
-      weekEl.disabled = weeks.length === 0;
-    }
-    if (teamEl) {
-      fillSelect(teamEl, teams, "All Teams");
-      teamEl.value = state.team;
-      teamEl.disabled = teams.length === 0;
-    }
+    if (seasonEl) { fillSelect(seasonEl, seasons, "All"); seasonEl.disabled = seasons.length === 0; }
+    if (weekEl)   { fillSelect(weekEl, weeks, "All");     weekEl.disabled = weeks.length === 0; }
+    if (teamEl)   { fillSelect(teamEl, teams, "All Teams"); teamEl.disabled = teams.length === 0; }
 
     render();
   }
 
   async function init() {
     try {
-      // confirm scripts are loading
       console.log("RLOL Stats loaded:", document.currentScript?.src || "(inline)");
 
-      // read view mode default
-      if (viewModeEl) state.viewMode = viewModeEl.value || "season_totals";
-
-      // wire controls
       if (viewModeEl) {
         viewModeEl.addEventListener("change", async () => {
-          state.viewMode = viewModeEl.value;
+          state.viewMode = viewModeEl.value || "season_totals";
           await loadAndBuild();
         });
       }
-
-      if (seasonEl) {
-        seasonEl.addEventListener("change", () => {
-          state.season = seasonEl.value || "all";
-          render();
-        });
-      }
-      if (weekEl) {
-        weekEl.addEventListener("change", () => {
-          state.week = weekEl.value || "all";
-          render();
-        });
-      }
-      if (teamEl) {
-        teamEl.addEventListener("change", () => {
-          state.team = teamEl.value || "all";
-          render();
-        });
-      }
-      if (searchEl) {
-        searchEl.addEventListener("input", () => {
-          state.query = searchEl.value || "";
-          render();
-        });
-      }
+      if (seasonEl) seasonEl.addEventListener("change", () => { state.season = seasonEl.value || "all"; render(); });
+      if (weekEl)   weekEl.addEventListener("change", () => { state.week = weekEl.value || "all"; render(); });
+      if (teamEl)   teamEl.addEventListener("change", () => { state.team = teamEl.value || "all"; render(); });
+      if (searchEl) searchEl.addEventListener("input", () => { state.query = searchEl.value || ""; render(); });
 
       await loadAndBuild();
     } catch (err) {
