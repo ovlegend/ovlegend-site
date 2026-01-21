@@ -1230,3 +1230,63 @@ body.rlol-stats td img{
     justify-content: center;
   }
 }
+
+/* =========================
+   RLOL HUB — final polish
+   ========================= */
+
+body.rlol-hub .hub-grid{
+  gap: 18px !important;
+}
+
+/* Equal-height cards */
+body.rlol-hub .hub-grid > .panel{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Keep headings/snippets consistent */
+body.rlol-hub .hub-grid > .panel h2{
+  margin: 2px 0 10px;
+}
+body.rlol-hub .hub-grid > .panel .small,
+body.rlol-hub .hub-grid > .panel .sub{
+  margin: 0 0 10px;
+  opacity: .82;
+}
+
+/* Push “full standings/stats” links to bottom */
+body.rlol-hub .hub-grid > .panel .tiny{
+  margin-top: auto !important;
+}
+
+/* Smooth match list scroll + subtle scrollbar */
+body.rlol-hub .match-list{
+  max-height: 430px;     /* tweak if you want */
+  overflow: auto;
+  padding-right: 8px;
+  margin-top: 8px;
+}
+
+body.rlol-hub .match-list::-webkit-scrollbar{ width: 10px; }
+body.rlol-hub .match-list::-webkit-scrollbar-track{ background: rgba(255,255,255,.06); border-radius: 999px; }
+body.rlol-hub .match-list::-webkit-scrollbar-thumb{ background: rgba(255,138,0,.22); border-radius: 999px; }
+body.rlol-hub .match-list::-webkit-scrollbar-thumb:hover{ background: rgba(255,138,0,.32); }
+
+body.rlol-hub .champ-callout{
+  background: linear-gradient(180deg, rgba(255,138,0,.10), rgba(0,0,0,.10));
+  border: 1px solid rgba(255,138,0,.20);
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin: 18px 0 14px;
+}
+
+body.rlol-hub .champ-callout h2{
+  margin: 0 0 6px;
+}
+
+body.rlol-hub .champ-callout p{
+  margin: 0;
+  opacity: .90;
+}
