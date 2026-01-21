@@ -11,7 +11,6 @@
 
   const statusEl = $("#statsStatus");
   const root = $("#statsRoot");
-
   if (!root) return;
 
   // ---- CSV parsing (quoted commas safe) ----
@@ -60,15 +59,11 @@
 
   async function fetchCsv(url) {
     if (!url) throw new Error("CSV URL missing");
-
     const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
     const res = await fetch(busted, { cache: "no-store" });
-
     if (!res.ok) throw new Error(`HTTP ${res.status} while fetching CSV`);
-
     const text = await res.text();
     if (/^\s*</.test(text)) throw new Error("CSV fetch returned HTML (not a published CSV link)");
-
     return parseCSV(text);
   }
 
@@ -80,7 +75,8 @@
     return Number.isFinite(n) ? n : fallback;
   }
 
-  function norm(s) { return String(s || "").trim().toLowerCase(); }
+  function normLower(s) { return String(s || "").trim().toLowerCase(); }
+  function norm(s) { return String(s || "").trim(); }
 
   function uniqSorted(list) {
     return Array.from(new Set(list.filter((x) => String(x).trim() !== "")))
@@ -88,6 +84,7 @@
   }
 
   function fillSelect(sel, values, allLabel) {
+    if (!sel) return;
     sel.innerHTML = "";
     const all = document.createElement("option");
     all.value = "all";
@@ -105,31 +102,54 @@
     sel.disabled = values.length === 0;
   }
 
+  // URL detection + safe image html
+  function isImageUrl(v) {
+    const s = norm(v);
+    return /^https?:\/\/.+\.(png|jpg|jpeg|webp|gif)(\?.*)?$/i.test(s);
+  }
+  function imgHTML(url, alt) {
+    const u = norm(url);
+    if (!isImageUrl(u)) return "";
+    return `<img class="logo" src="${u}" alt="${alt || ""}" loading="lazy" />`;
+  }
+
+  // Read a value by trying multiple possible headers (case sensitive + insensitive)
+  function getAny(row, keys) {
+    for (const k of keys) {
+      if (row[k] != null && String(row[k]).trim() !== "") return row[k];
+      // case-insensitive fallback
+      const want = String(k).trim().toLowerCase();
+      for (const realKey of Object.keys(row)) {
+        if (String(realKey).trim().toLowerCase() === want) {
+          const v = row[realKey];
+          if (v != null && String(v).trim() !== "") return v;
+        }
+      }
+    }
+    return "";
+  }
+
   // ---- URLs from config (supports BOTH key styles) ----
   function getUrls() {
     const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
     if (!cfg) throw new Error("OV_CONFIG.rlol missing (config.js not loaded?)");
 
-    const seasonUrl =
-      String(
-        cfg.playerSeasonStatsCsv ||
-        cfg.statsSeasonCsv ||
-        cfg.playerStatsSeasonCsv ||
-        cfg.statsCsv ||
-        cfg.playerStatsCsv ||
-        ""
-      ).trim();
+    const seasonUrl = String(
+      cfg.playerSeasonStatsCsv ||
+      cfg.statsSeasonCsv ||
+      cfg.playerStatsSeasonCsv ||
+      cfg.statsCsv ||
+      cfg.playerStatsCsv ||
+      ""
+    ).trim();
 
-    const perGameUrl =
-      String(
-        cfg.playerGameStatsCsv ||
-        cfg.statsGameCsv ||
-        ""
-      ).trim();
+    const perGameUrl = String(
+      cfg.playerGameStatsCsv ||
+      cfg.statsGameCsv ||
+      ""
+    ).trim();
 
     if (!seasonUrl) throw new Error("Stats CSV URL missing in OV_CONFIG.rlol (need playerSeasonStatsCsv or statsSeasonCsv)");
-
-    // perGame is optional; if missing we reuse seasonUrl
     return { seasonUrl, perGameUrl: perGameUrl || seasonUrl };
   }
 
@@ -146,29 +166,47 @@
     viewMode: (viewModeEl && viewModeEl.value) ? viewModeEl.value : "season_totals"
   };
 
-  // ---- model (matches YOUR CSV headers) ----
+  // ---- model (strong header mapping) ----
   function toModel(row) {
-    const player = row.player_name || row.Player || row.player || row.name || "Unknown";
-    const team = row.team_name || row.Team || row.team || "";
-    const logo = row.logo_url || row.logo || "";
+    const player = norm(getAny(row, ["player_name", "Player", "player", "name", "Player Name"]));
+    const team = norm(getAny(row, ["team_name", "Team", "team", "Team Name"]));
+
+    // support both player + team logos if you have them
+    const playerLogo = norm(getAny(row, ["player_logo", "Player Logo", "PlayerLogo", "player_logo_url", "Player Logo URL", "player_pfp", "PFP", "Avatar", "player_avatar"]));
+    const teamLogo = norm(getAny(row, ["team_logo", "Team Logo", "TeamLogo", "team_logo_url", "Team Logo URL", "logo_url", "Logo", "logo"]));
 
     // season/week are optional but supported
-    const season = row.season || row.Season || "";
-    const week = row.week || row.Week || row.match_week || row.MatchWeek || "";
+    const season = norm(getAny(row, ["season", "Season"]));
+    const week = norm(getAny(row, ["week", "Week", "match_week", "MatchWeek", "Match Week"]));
 
-    const gp = num(row.GP ?? row.gp ?? row.Games ?? row.games, 0);
-    const goals = num(row.Goals ?? row.goals ?? row.G ?? row.g, 0);
-    const assists = num(row.Assists ?? row.assists ?? row.A ?? row.a, 0);
-    const saves = num(row.Saves ?? row.saves, 0);
-    const shots = num(row.Shots ?? row.shots, 0);
-    const score = num(row.Score ?? row.score ?? row.Points ?? row.points, 0);
-    const ping = num(row["Avg Ping"] ?? row.avg_ping ?? row.Ping ?? row.ping, 0);
+    const gp = num(getAny(row, ["GP", "gp", "Games", "games"]), 0);
+    const goals = num(getAny(row, ["Goals", "goals", "G", "g"]), 0);
+    const assists = num(getAny(row, ["Assists", "assists", "A", "a"]), 0);
+    const saves = num(getAny(row, ["Saves", "saves"]), 0);
+    const shots = num(getAny(row, ["Shots", "shots"]), 0);
+    const score = num(getAny(row, ["Score", "score", "Points", "points"]), 0);
+    const ping = num(getAny(row, ["Avg Ping", "avg_ping", "Ping", "ping"]), 0);
 
-    return { player, team, logo, season, week, gp, goals, assists, saves, shots, score, ping, _raw: row };
+    return {
+      player: player || "Unknown",
+      team: team || "",
+      playerLogo,
+      teamLogo,
+      season,
+      week,
+      gp,
+      goals,
+      assists,
+      saves,
+      shots,
+      score,
+      ping,
+      _raw: row
+    };
   }
 
   function applyFilters() {
-    const q = norm(state.query);
+    const q = normLower(state.query);
 
     state.filtered = state.rows.filter((r) => {
       if (state.season !== "all" && r.season !== state.season) return false;
@@ -176,7 +214,7 @@
       if (state.team !== "all" && r.team !== state.team) return false;
 
       if (!q) return true;
-      return norm(`${r.player} ${r.team}`).includes(q);
+      return normLower(`${r.player} ${r.team}`).includes(q);
     });
   }
 
@@ -192,8 +230,8 @@
 
     const getVal = (r) => {
       switch (key) {
-        case "player": return norm(r.player);
-        case "team": return norm(r.team);
+        case "player": return normLower(r.player);
+        case "team": return normLower(r.team);
         case "gp": return r.gp;
         case "goals": return r.goals;
         case "assists": return r.assists;
@@ -223,7 +261,7 @@
     sortRows();
 
     root.innerHTML = `
-      <div class="stats-card">
+      <div class="stats-card ov-card">
         <table class="stats-table">
           <thead>
             <tr>
@@ -240,15 +278,25 @@
           </thead>
           <tbody>
             ${state.filtered.map((r) => `
-              <tr>
-                <td class="teamCell">
-                  ${r.logo ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />` : `<div class="logo ph"></div>`}
-                  <div class="teamText">
-                    <div class="teamName">${r.player}</div>
-                    <div class="teamAbbr">${r.team || ""}</div>
+              <tr class="ov-row">
+                <td class="playerCell">
+                  <div class="cellFlex">
+                    ${r.playerLogo ? imgHTML(r.playerLogo, r.player) : `<div class="logo ph"></div>`}
+                    <div class="cellText">
+                      <div class="cellMain">${r.player}</div>
+                    </div>
                   </div>
                 </td>
-                <td>${r.team || ""}</td>
+
+                <td class="teamCell">
+                  <div class="cellFlex">
+                    ${r.teamLogo ? imgHTML(r.teamLogo, r.team) : `<div class="logo ph"></div>`}
+                    <div class="cellText">
+                      <div class="cellMain">${r.team || ""}</div>
+                    </div>
+                  </div>
+                </td>
+
                 <td class="num">${r.gp}</td>
                 <td class="num">${r.score}</td>
                 <td class="num">${r.goals}</td>
@@ -289,7 +337,6 @@
     const csv = await fetchCsv(url);
     state.rows = csv.map(toModel);
 
-    // Dropdowns (season/week may be blank -> disables)
     fillSelect(seasonEl, uniqSorted(state.rows.map((r) => r.season)), "All");
     fillSelect(weekEl, uniqSorted(state.rows.map((r) => r.week)), "All");
     fillSelect(teamEl, uniqSorted(state.rows.map((r) => r.team)), "All Teams");
@@ -303,7 +350,6 @@
 
   async function init() {
     try {
-      // Wire controls
       if (viewModeEl) {
         viewModeEl.addEventListener("change", async () => {
           state.viewMode = viewModeEl.value || "season_totals";
