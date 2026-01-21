@@ -6,20 +6,21 @@
   <title>OV Legend</title>
 
   <!-- Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet" />
 
-  <!-- Main CSS (GitHub Pages base path) -->
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
 
   <!-- Page-only layout: Hero left + HQ right (desktop), stacked (mobile) -->
   <style>
-    /* Keep nav spacing consistent */
     .home-top-wrap{
       max-width: 1100px;
       margin: 0 auto;
       padding: 28px 16px 12px;
+      position: relative;
+      z-index: 1; /* keeps content above lightning */
     }
 
     .home-top{
@@ -29,7 +30,6 @@
       align-items: start;
     }
 
-    /* Make the hero behave nicely inside the grid */
     .home-top .hero{
       padding: 0 !important;
       margin: 0 !important;
@@ -38,23 +38,19 @@
       padding: 0 !important;
     }
 
-    /* Right-side hub sizing */
     .hq-side{
       justify-self: end;
       width: min(560px, 100%);
     }
 
-    /* Tighten HQ header a bit so it fits above the fold more often */
     .hq-side .section-head{
       margin-bottom: 14px;
     }
 
-    /* Give the cards a touch more density on desktop */
     .hq-side .feature-grid{
       gap: 14px;
     }
 
-    /* HQ brand mark (under hub on the right) */
     .hq-mark-wrap{
       margin-top: 22px;
       display: flex;
@@ -67,7 +63,6 @@
       filter: drop-shadow(0 0 14px rgba(255,86,0,.35));
     }
 
-    /* Mobile: stack */
     @media (max-width: 980px){
       .home-top{
         grid-template-columns: 1fr;
@@ -88,19 +83,22 @@
 </head>
 
 <body>
+  <!-- Lightning overlay goes RIGHT after body -->
+  <div class="fx-lightning" aria-hidden="true"></div>
 
   <!-- NAV -->
   <header class="nav">
     <div class="nav-inner">
-      <a class="logo" href="/">
-<img class="nav-logo" src="/assets/img/brand/ov-mark.png" alt="OV Legend" />
+      <a class="logo" href="/" aria-label="OV Legend Home">
+        <img class="nav-logo" src="/assets/img/brand/ov-mark.png" alt="OV Legend" />
+      </a>
 
-<a class="active" href="/">Home</a>
-<a href="/rlol/">RLOL</a>
-<a href="/stats/">Rank</a>
-<a href="/lvb/">Legends v Bozos</a>
-<a href="/builds/">Builds</a>
-
+      <nav class="nav-links">
+        <a class="active" href="/">Home</a>
+        <a href="/rlol/">RLOL</a>
+        <a href="/stats/">Rank</a>
+        <a href="/lvb/">Legends v Bozos</a>
+        <a href="/builds/">Builds</a>
       </nav>
     </div>
   </header>
@@ -114,7 +112,9 @@
         <div class="hero-v2-inner">
           <div class="hero-left">
 
-            <img src="/assets/img/brand/ov-wordmark.png" />
+            <!-- FIXED wordmark image (single valid tag) -->
+            <img
+              src="/assets/img/brand/ov-wordmark.png"
               alt="What's Up Twitches"
               class="hero-wordmark"
             />
@@ -126,14 +126,12 @@
               and a community league that turns matches into events.
             </p>
 
-            <!-- Primary site CTAs -->
             <div class="hero-actions">
               <a href="/builds/">Browse Builds</a>
-<a href="/lvb/">Legends V Bozos</a>
-<a href="/rlol/">RLOL Hub</a>
+              <a href="/lvb/">Legends V Bozos</a>
+              <a href="/rlol/">RLOL Hub</a>
             </div>
 
-            <!-- Social links (working) -->
             <div class="hero-socials">
               <a class="btn ghost" href="https://discord.gg/sGXgUNAtDp" target="_blank" rel="noopener noreferrer">Discord</a>
               <a class="btn ghost" href="https://twitch.tv/the_ov_legend" target="_blank" rel="noopener noreferrer">Twitch</a>
@@ -189,22 +187,18 @@
           </a>
         </div>
 
-       <a class="feature-card cotw" href="/cotw/">
-  <div class="hq-panel">
-    <div class="panel-tag">COTW</div>
-    <h3>CLIP OF<br>THE WEEK</h3>
-    <p>
-      Weekly community highlight.
-      Cast your vote and crown the Legend.
-    </p>
-    <span class="panel-link">View Clips →</span>
-  </div>
-</a>
+        <a class="feature-card cotw" href="/cotw/">
+          <div class="hq-panel">
+            <div class="panel-tag">COTW</div>
+            <h3>CLIP OF<br />THE WEEK</h3>
+            <p>Weekly community highlight. Cast your vote and crown the Legend.</p>
+            <span class="panel-link">View Clips →</span>
+          </div>
+        </a>
 
-        <!-- OV logo under the hub (right column) -->
         <div class="hq-mark-wrap">
           <img
-            src="/ovlegend-site/assets/img/brand/ov-mark.png"
+            src="/assets/img/brand/ov-mark.png"
             alt="OV Legend"
             class="hq-mark"
           />
@@ -214,12 +208,8 @@
     </div>
   </div>
 
-  <!-- CONTENT (Optional: keep for future sections below fold) -->
-  <main class="container home-v2">
-    <!-- Leave empty for now or add sections later -->
-  </main>
+  <main class="container home-v2"></main>
 
-  <!-- FOOTER -->
   <footer class="footer">
     © <span id="year"></span> OV Legend
   </footer>
@@ -227,6 +217,5 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
-
 </body>
 </html>
