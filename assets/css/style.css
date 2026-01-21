@@ -1425,3 +1425,30 @@ body.rlol-hub .match-list::-webkit-scrollbar-thumb:hover{ background: rgba(255,1
     grid-template-columns: 1fr !important;
   }
 }
+
+body.rlol-stats .stats-table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+body.rlol-stats .stats-table th{
+  background: rgba(10,10,12,.92);
+  position: sticky; top: 0;
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  text-transform: uppercase;
+  letter-spacing: .10em;
+  font-size: 11px;
+}
+body.rlol-stats .stats-table td{
+  padding: 12px 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+body.rlol-stats .logo{
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  margin-right: 8px;
+  vertical-align: middle;
+  border: 1px solid rgba(255,255,255,.10);
+}
+body.rlol-stats tr:hover td{ background: rgba(255,255,255,.03); }
