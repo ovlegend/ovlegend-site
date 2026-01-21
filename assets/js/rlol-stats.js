@@ -12,10 +12,7 @@
   const statusEl = $("#statsStatus");
   const root = $("#statsRoot");
 
-  if (!root) {
-    console.error("RLOL Stats: #statsRoot not found.");
-    return;
-  }
+  if (!root) return;
 
   // ---- CSV parsing (quoted commas safe) ----
   function parseCSV(text) {
@@ -76,14 +73,6 @@
   }
 
   // ---- helpers ----
-  function pick(row, keys, fallback = "") {
-    for (const k of keys) {
-      const v = row[k];
-      if (v !== undefined && v !== null && String(v).trim() !== "") return String(v).trim();
-    }
-    return fallback;
-  }
-
   function num(v, fallback = 0) {
     const s = String(v ?? "").trim();
     if (s === "") return fallback;
@@ -94,7 +83,8 @@
   function norm(s) { return String(s || "").trim().toLowerCase(); }
 
   function uniqSorted(list) {
-    return Array.from(new Set(list.filter(Boolean))).sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
+    return Array.from(new Set(list.filter((x) => String(x).trim() !== "")))
+      .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
   }
 
   function fillSelect(sel, values, allLabel) {
@@ -115,37 +105,32 @@
     sel.disabled = values.length === 0;
   }
 
-  // ---- column mapping (handles common names) ----
-  const COL = {
-    player: ["Player", "player", "Name", "name", "Epic", "epic"],
-    team: ["Team", "team", "Team Name", "team_name"],
-    season: ["Season", "season"],
-    week: ["Week", "week", "Match Week", "match_week"],
-    gp: ["GP", "gp", "Games", "games", "Played", "played"],
-    score: ["Score", "score", "Points", "points"],
-    goals: ["G", "g", "Goals", "goals"],
-    assists: ["A", "a", "Assists", "assists"],
-    saves: ["Saves", "saves"],
-    shots: ["Shots", "shots"],
-    ping: ["Ping", "ping", "Avg Ping", "avg_ping"]
-  };
-
-  // ---- config urls (YOUR KEYS) ----
+  // ---- URLs from config (supports BOTH key styles) ----
   function getUrls() {
     const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
     if (!cfg) throw new Error("OV_CONFIG.rlol missing (config.js not loaded?)");
 
-    const seasonUrl = String(cfg.playerSeasonStatsCsv || "").trim();
-    const perGameUrl = String(cfg.playerGameStatsCsv || "").trim();
+    const seasonUrl =
+      String(
+        cfg.playerSeasonStatsCsv ||
+        cfg.statsSeasonCsv ||
+        cfg.playerStatsSeasonCsv ||
+        cfg.statsCsv ||
+        cfg.playerStatsCsv ||
+        ""
+      ).trim();
 
-    if (!seasonUrl && !perGameUrl) {
-      throw new Error("Missing playerSeasonStatsCsv / playerGameStatsCsv in OV_CONFIG.rlol");
-    }
+    const perGameUrl =
+      String(
+        cfg.playerGameStatsCsv ||
+        cfg.statsGameCsv ||
+        ""
+      ).trim();
 
-    return {
-      seasonUrl: seasonUrl || perGameUrl,
-      perGameUrl: perGameUrl || seasonUrl
-    };
+    if (!seasonUrl) throw new Error("Stats CSV URL missing in OV_CONFIG.rlol (need playerSeasonStatsCsv or statsSeasonCsv)");
+
+    // perGame is optional; if missing we reuse seasonUrl
+    return { seasonUrl, perGameUrl: perGameUrl || seasonUrl };
   }
 
   // ---- state ----
@@ -161,21 +146,25 @@
     viewMode: (viewModeEl && viewModeEl.value) ? viewModeEl.value : "season_totals"
   };
 
+  // ---- model (matches YOUR CSV headers) ----
   function toModel(row) {
-    return {
-      player: pick(row, COL.player, "Unknown"),
-      team: pick(row, COL.team, ""),
-      season: pick(row, COL.season, ""),
-      week: pick(row, COL.week, ""),
-      gp: num(pick(row, COL.gp, "0")),
-      score: num(pick(row, COL.score, "0")),
-      g: num(pick(row, COL.goals, "0")),
-      a: num(pick(row, COL.assists, "0")),
-      saves: num(pick(row, COL.saves, "0")),
-      shots: num(pick(row, COL.shots, "0")),
-      ping: num(pick(row, COL.ping, "")),
-      _raw: row
-    };
+    const player = row.player_name || row.Player || row.player || row.name || "Unknown";
+    const team = row.team_name || row.Team || row.team || "";
+    const logo = row.logo_url || row.logo || "";
+
+    // season/week are optional but supported
+    const season = row.season || row.Season || "";
+    const week = row.week || row.Week || row.match_week || row.MatchWeek || "";
+
+    const gp = num(row.GP ?? row.gp ?? row.Games ?? row.games, 0);
+    const goals = num(row.Goals ?? row.goals ?? row.G ?? row.g, 0);
+    const assists = num(row.Assists ?? row.assists ?? row.A ?? row.a, 0);
+    const saves = num(row.Saves ?? row.saves, 0);
+    const shots = num(row.Shots ?? row.shots, 0);
+    const score = num(row.Score ?? row.score ?? row.Points ?? row.points, 0);
+    const ping = num(row["Avg Ping"] ?? row.avg_ping ?? row.Ping ?? row.ping, 0);
+
+    return { player, team, logo, season, week, gp, goals, assists, saves, shots, score, ping, _raw: row };
   }
 
   function applyFilters() {
@@ -206,12 +195,12 @@
         case "player": return norm(r.player);
         case "team": return norm(r.team);
         case "gp": return r.gp;
-        case "score": return r.score;
-        case "g": return r.g;
-        case "a": return r.a;
+        case "goals": return r.goals;
+        case "assists": return r.assists;
         case "saves": return r.saves;
         case "shots": return r.shots;
         case "ping": return r.ping;
+        case "score":
         default: return r.score;
       }
     };
@@ -242,8 +231,8 @@
               ${th("Team", "team")}
               ${th("GP", "gp")}
               ${th("Score", "score")}
-              ${th("G", "g")}
-              ${th("A", "a")}
+              ${th("G", "goals")}
+              ${th("A", "assists")}
               ${th("Saves", "saves")}
               ${th("Shots", "shots")}
               ${th("Ping", "ping")}
@@ -252,12 +241,18 @@
           <tbody>
             ${state.filtered.map((r) => `
               <tr>
-                <td><strong>${r.player}</strong></td>
+                <td class="teamCell">
+                  ${r.logo ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />` : `<div class="logo ph"></div>`}
+                  <div class="teamText">
+                    <div class="teamName">${r.player}</div>
+                    <div class="teamAbbr">${r.team || ""}</div>
+                  </div>
+                </td>
                 <td>${r.team || ""}</td>
                 <td class="num">${r.gp}</td>
                 <td class="num">${r.score}</td>
-                <td class="num">${r.g}</td>
-                <td class="num">${r.a}</td>
+                <td class="num">${r.goals}</td>
+                <td class="num">${r.assists}</td>
                 <td class="num">${r.saves}</td>
                 <td class="num">${r.shots}</td>
                 <td class="num">${r.ping || ""}</td>
@@ -294,12 +289,11 @@
     const csv = await fetchCsv(url);
     state.rows = csv.map(toModel);
 
-    // Dropdowns
+    // Dropdowns (season/week may be blank -> disables)
     fillSelect(seasonEl, uniqSorted(state.rows.map((r) => r.season)), "All");
     fillSelect(weekEl, uniqSorted(state.rows.map((r) => r.week)), "All");
     fillSelect(teamEl, uniqSorted(state.rows.map((r) => r.team)), "All Teams");
 
-    // reset filters
     state.season = "all";
     state.week = "all";
     state.team = "all";
@@ -309,22 +303,24 @@
 
   async function init() {
     try {
-      console.log("RLOL Stats running:", document.currentScript?.src || "(inline)");
-
       // Wire controls
-      viewModeEl.addEventListener("change", async () => {
-        state.viewMode = viewModeEl.value || "season_totals";
-        await loadAndBuild();
-      });
+      if (viewModeEl) {
+        viewModeEl.addEventListener("change", async () => {
+          state.viewMode = viewModeEl.value || "season_totals";
+          await loadAndBuild();
+        });
+      }
 
-      seasonEl.addEventListener("change", () => { state.season = seasonEl.value || "all"; render(); });
-      weekEl.addEventListener("change", () => { state.week = weekEl.value || "all"; render(); });
-      teamEl.addEventListener("change", () => { state.team = teamEl.value || "all"; render(); });
+      if (seasonEl) seasonEl.addEventListener("change", () => { state.season = seasonEl.value || "all"; render(); });
+      if (weekEl) weekEl.addEventListener("change", () => { state.week = weekEl.value || "all"; render(); });
+      if (teamEl) teamEl.addEventListener("change", () => { state.team = teamEl.value || "all"; render(); });
 
-      searchEl.addEventListener("input", () => {
-        state.query = searchEl.value || "";
-        render();
-      });
+      if (searchEl) {
+        searchEl.addEventListener("input", () => {
+          state.query = searchEl.value || "";
+          render();
+        });
+      }
 
       await loadAndBuild();
     } catch (err) {
