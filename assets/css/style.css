@@ -1453,6 +1453,9 @@ body.rlol-stats .logo{
 }
 body.rlol-stats tr:hover td{ background: rgba(255,255,255,.03); }
 
+/* ===============================
+   RLOL Stats – OV Polish
+   =============================== */
 /* clean cell layout */
 .cellFlex{ display:flex; align-items:center; gap:10px; }
 .cellText .cellMain{ font-weight:800; }
