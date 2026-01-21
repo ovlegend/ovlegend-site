@@ -1521,3 +1521,57 @@ body.rlol-stats tr:hover td{ background: rgba(255,255,255,.03); }
 .cellMain{
   min-width: 0;
 }
+
+/* ===============================
+   RLOL Stats — Full-width table (keep column integrity)
+   =============================== */
+
+#statsRoot,
+#statsRoot .stats-card{
+  width: 100%;
+  max-width: 100%;
+}
+
+#statsRoot .stats-card{
+  border-radius: 18px; /* optional, matches your vibe */
+}
+
+/* Make the TABLE actually fill the card */
+#statsRoot table.stats-table{
+  width: 100%;
+  table-layout: fixed;          /* keeps columns aligned */
+  border-collapse: collapse;
+}
+
+/* Prevent long names from breaking columns */
+#statsRoot .stats-table th,
+#statsRoot .stats-table td{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Column sizing: give Player/Team room, keep stats tight */
+#statsRoot .stats-table th:nth-child(1),
+#statsRoot .stats-table td:nth-child(1){
+  width: 220px;                 /* Player */
+}
+
+#statsRoot .stats-table th:nth-child(2),
+#statsRoot .stats-table td:nth-child(2){
+  width: 140px;                 /* Team (logo only right now) */
+  text-align: left;
+}
+
+#statsRoot .stats-table th:nth-child(n+3),
+#statsRoot .stats-table td:nth-child(n+3){
+  width: 76px;                  /* GP, Score, G, A, Saves, Shots, Ping */
+  text-align: right;
+}
+
+/* If you’re using flex inside cells, allow ellipsis to work */
+#statsRoot .cellFlex,
+#statsRoot .cellText,
+#statsRoot .cellMain{
+  min-width: 0;
+}
