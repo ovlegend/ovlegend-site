@@ -1290,3 +1290,138 @@ body.rlol-hub .champ-callout p{
   margin: 0;
   opacity: .90;
 }
+
+/* =========================================================
+   RLOL HUB — bring back glow, inner boxes, match cards, equal heights
+   Paste at END of style.css
+   ========================================================= */
+
+/* 1) Make the 3 hub panels equal height + proper column behavior */
+body.rlol-hub .hub-grid{
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+  align-items: stretch !important;
+}
+
+body.rlol-hub .hub-grid > .panel{
+  height: 100%;
+  min-height: 520px;              /* keeps columns visually even */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Let the “Full standings/stats” line sit at the bottom */
+body.rlol-hub .hub-grid > .panel .tiny{
+  margin-top: auto !important;
+}
+
+/* 2) Stronger card glow (outer ring) */
+body.rlol-hub .panel{
+  box-shadow:
+    0 16px 60px rgba(0,0,0,.55),
+    0 0 0 1px rgba(255,86,0,.14),
+    0 0 40px rgba(255,138,0,.10) !important;
+}
+
+body.rlol-hub .panel::before{
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,.26),
+    0 0 26px rgba(255,138,0,.12),
+    inset 0 0 0 1px rgba(255,255,255,.06) !important;
+}
+
+/* 3) KPI “boxes” (Stream Start / Format / Tiebreaker) */
+body.rlol-hub .kpi-row{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0 12px;
+}
+
+/* Make the 3rd KPI span full width like your old design */
+body.rlol-hub .kpi-row .kpi:nth-child(3){
+  grid-column: 1 / -1;
+}
+
+body.rlol-hub .kpi{
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.22);
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: inset 0 0 22px rgba(0,0,0,.35);
+}
+
+body.rlol-hub .kpi .label{
+  font-size: 11px;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  opacity: .72;
+  margin-bottom: 6px;
+}
+
+body.rlol-hub .kpi .value{
+  font-weight: 900;
+  font-size: 16px;
+}
+
+/* 4) Match cards inside Next Match Night (the missing “boxed” look) */
+body.rlol-hub .match-list{
+  margin-top: 10px;
+  max-height: 520px;     /* prevents the panel from becoming 5 miles tall */
+  overflow: auto;
+  padding-right: 8px;
+}
+
+/* If your JS renders .match items */
+body.rlol-hub .match{
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.22);
+  border-radius: 16px;
+  padding: 12px 12px;
+  margin: 10px 0;
+  box-shadow: inset 0 0 22px rgba(0,0,0,.35);
+}
+
+/* Highlight the first match (optional, matches your old glow vibe) */
+body.rlol-hub .match:first-child{
+  border-color: rgba(255,138,0,.55);
+  box-shadow:
+    inset 0 0 22px rgba(0,0,0,.35),
+    0 0 0 2px rgba(255,138,0,.18);
+}
+
+/* Status pill if present */
+body.rlol-hub .pill,
+body.rlol-hub .status,
+body.rlol-hub .badge{
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,138,0,.35);
+  background: rgba(0,0,0,.25);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Scrollbar (nice but optional) */
+body.rlol-hub .match-list::-webkit-scrollbar{ width: 10px; }
+body.rlol-hub .match-list::-webkit-scrollbar-track{ background: rgba(255,255,255,.06); border-radius: 999px; }
+body.rlol-hub .match-list::-webkit-scrollbar-thumb{ background: rgba(255,138,0,.22); border-radius: 999px; }
+body.rlol-hub .match-list::-webkit-scrollbar-thumb:hover{ background: rgba(255,138,0,.32); }
+
+/* Responsive */
+@media (max-width: 1050px){
+  body.rlol-hub .hub-grid{
+    grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  }
+  body.rlol-hub .hub-grid > .panel{
+    min-height: 0;
+  }
+}
+@media (max-width: 720px){
+  body.rlol-hub .hub-grid{
+    grid-template-columns: 1fr !important;
+  }
+}
