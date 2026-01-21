@@ -12,24 +12,27 @@
   <meta property="og:type" content="website" />
   <meta name="theme-color" content="#ff8a00" />
 
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
 
 <body class="rlol rlol-hub">
   <div class="overlay">
+
+    <!-- NAV -->
     <header class="nav">
       <div class="nav-inner">
-        <div class="logo">OV <span>Legend</span></div>
-        <nav>
-          <a href="/ovlegend-site/">Home</a>
-          <a href="/ovlegend-site/rlol/">RLOL</a>
-          <a href="/ovlegend-site/stats/">Stats</a>
-          <a href="/ovlegend-site/lvb/">Legends Vs. Bozos</a>
-          <a href="/ovlegend-site/builds/">Builds</a>
+        <a class="logo" href="/" aria-label="OV Legend Home">OV <span>Legend</span></a>
+        <nav class="nav-links" aria-label="Site">
+          <a href="/">Home</a>
+          <a class="active" href="/rlol/">RLOL</a>
+          <a href="/stats/">Rank</a>
+          <a href="/lvb/">Legends v Bozos</a>
+          <a href="/builds/">Builds</a>
         </nav>
       </div>
     </header>
 
+    <!-- HEADER -->
     <header class="rlol-header">
       <h1>Rocket League of Legends</h1>
       <p class="tagline">
@@ -37,6 +40,7 @@
       </p>
     </header>
 
+    <!-- CHAMP CALLOUT -->
     <section class="champ-callout" role="note" aria-label="Season 1 Champions">
       <img src="https://i.imgur.com/WQrBDOv.png" alt="Alpha 80 logo" />
       <div>
@@ -45,16 +49,20 @@
       </div>
     </section>
 
+    <!-- CTAs -->
     <nav class="cta-row" aria-label="Primary">
-      <a class="btn primary" href="/ovlegend-site/rlol/schedule/">Schedule</a>
-      <a class="btn" href="/ovlegend-site/rlol/standings/">Standings</a>
-      <a class="btn" href="/ovlegend-site/rlol/stats/">Stats</a>
+      <a class="btn primary" href="/rlol/schedule/">Schedule</a>
+      <a class="btn" href="/rlol/standings/">Standings</a>
+      <a class="btn" href="/rlol/stats/">Stats</a>
       <a class="btn" href="https://twitch.tv/The_OV_Legend" target="_blank" rel="noopener">Twitch</a>
       <a class="btn" href="https://discord.gg/sGXgUNAtDp" target="_blank" rel="noopener">Discord</a>
-      <a class="btn" href="/ovlegend-site/rlol/teams/">Teams</a>
+      <a class="btn" href="/rlol/teams/">Teams</a>
     </nav>
 
+    <!-- HUB GRID -->
     <section class="hub-grid" aria-label="League Hub">
+
+      <!-- Next Match Night -->
       <section class="panel" aria-labelledby="next-night">
         <h2 id="next-night">Next Match Night</h2>
         <p class="small" id="nextMeta">Loading next match night…</p>
@@ -75,11 +83,13 @@
         </div>
 
         <div class="match-list" id="nextMatches"></div>
+
         <p class="tiny" style="margin-top:10px;">
-          Full schedule: <a class="soft-link" href="/ovlegend-site/rlol/schedule/">/rlol/schedule/</a>
+          Full schedule: <a class="soft-link" href="/rlol/schedule/">/rlol/schedule/</a>
         </p>
       </section>
 
+      <!-- Standings Snapshot -->
       <section class="panel" aria-labelledby="snapshot">
         <h2 id="snapshot">Standings Snapshot</h2>
         <p class="small" id="standMeta">Loading standings…</p>
@@ -99,27 +109,31 @@
         </div>
 
         <p class="tiny" style="margin-top:10px;">
-          Full standings: <a class="soft-link" href="/ovlegend-site/rlol/standings/">/rlol/standings/</a>
+          Full standings: <a class="soft-link" href="/rlol/standings/">/rlol/standings/</a>
         </p>
       </section>
 
+      <!-- Stats Preview -->
       <section class="panel" aria-labelledby="stats-preview">
-  <h2 id="stats-preview">Stats Preview</h2>
+        <h2 id="stats-preview">Stats Preview</h2>
 
-  <p class="sub">
-    Top performers • auto-updates from Google Sheets
-  </p>
+        <p class="sub">
+          Top performers • auto-updates from Google Sheets
+        </p>
 
-  <div id="statsPreview" class="stats-preview">
-    <div class="stats-preview__loading">Loading stats…</div>
-  </div>
+        <div id="statsPreview" class="stats-preview">
+          <div class="stats-preview__loading">Loading stats…</div>
+        </div>
 
-  <p class="tiny" style="margin-top:10px;">
-    Full player stats:
-    <a class="soft-link" href="/ovlegend-site/rlol/stats/">/rlol/stats/</a>
-  </p>
-</section>
+        <p class="tiny" style="margin-top:10px;">
+          Full player stats:
+          <a class="soft-link" href="/rlol/stats/">/rlol/stats/</a>
+        </p>
+      </section>
 
+    </section><!-- /hub-grid -->
+
+    <!-- BELOW GRID CONTENT -->
     <main class="content">
       <section class="panel" aria-labelledby="about">
         <h2 id="about">About the League</h2>
@@ -146,10 +160,11 @@
     <footer class="footer">
       © <span id="year"></span> OV Legend • RLOL • All rights reserved
     </footer>
-  </div>
 
-  <!-- Config + Hub logic -->
-<script src="/ovlegend-site/assets/js/config.js"></script>
-<script src="/ovlegend-site/assets/js/rlol-hub.js"></script>
+  </div><!-- /overlay -->
+
+  <!-- Config + Hub logic (ABSOLUTE PATHS) -->
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/rlol-hub.js"></script>
 </body>
 </html>
