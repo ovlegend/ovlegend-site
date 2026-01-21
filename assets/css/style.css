@@ -2909,3 +2909,9 @@ body::after{
     animation: none !important;
   }
 }
+.hero-wordmark,
+.hero-mark {
+  height: auto;
+  display: block;
+}
+
