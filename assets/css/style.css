@@ -1943,3 +1943,118 @@ section.lvb-hero .lvb-grid .streak-card{
 @media (max-width: 520px){
   section.lvb-hero .lvb-grid{ grid-template-columns: 1fr !important; }
 }
+
+/* =========================================================
+   LVB FINAL PATCH — grid panels + glow + clean pulse + hover
+   Paste at VERY BOTTOM of /assets/css/style.css
+   ========================================================= */
+
+/* --- Title glow (old-site energy) --- */
+section.lvb-hero h1.lvb-title{
+  color: #ff8a00 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.2px !important;
+  text-shadow:
+    0 0 10px rgba(255,86,0,.65),
+    0 0 26px rgba(255,86,0,.45),
+    0 0 52px rgba(255,86,0,.30) !important;
+}
+
+/* --- Layout: force 4-card grid + streak full width --- */
+section.lvb-hero .lvb-grid{
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  margin-top: 18px !important;
+  align-items: stretch !important;
+}
+section.lvb-hero .lvb-grid .streak-card{
+  grid-column: 1 / -1 !important;
+}
+@media (max-width: 900px){
+  section.lvb-hero .lvb-grid{ grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+}
+@media (max-width: 520px){
+  section.lvb-hero .lvb-grid{ grid-template-columns: 1fr !important; }
+}
+
+/* --- Cards: rounder + slightly stronger glow --- */
+section.lvb-hero .stat-card,
+section.lvb-hero .streak-card{
+  border-radius: 22px !important;               /* softer than before */
+  border: 1px solid rgba(255,255,255,.10) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)) !important;
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.55),
+    0 0 20px rgba(255,86,0,.14) !important;     /* touch stronger */
+}
+
+/* Stat labels/values: keep that clean “panel” look */
+section.lvb-hero .stat-label{
+  font-size: 12px !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+  opacity: .75 !important;
+  margin-bottom: 10px !important;
+}
+section.lvb-hero .stat-value{
+  font-size: 44px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+/* --- Clean pulse (NO filter -> no scanline banding) --- */
+@keyframes lvbTextPulseClean{
+  0%, 100% { opacity: .78; text-shadow: none; }
+  50%      { opacity: 1;   text-shadow: 0 0 14px rgba(255,86,0,.35); }
+}
+section.lvb-hero p.lvb-sub{
+  animation: lvbTextPulseClean 2.6s ease-in-out infinite !important;
+}
+
+@keyframes lvbStreakPulseClean{
+  0%, 100% {
+    box-shadow: 0 12px 30px rgba(0,0,0,.55),
+                0 0 14px rgba(255,86,0,.18);
+  }
+  50% {
+    box-shadow: 0 12px 30px rgba(0,0,0,.55),
+                0 0 26px rgba(255,86,0,.38);
+  }
+}
+section.lvb-hero .streak-card{
+  animation: lvbStreakPulseClean 2.0s ease-in-out infinite !important;
+}
+
+/* Win/Loss tuning (your JS already toggles these classes) */
+section.lvb-hero .streak-card.is-win{
+  border-color: rgba(120,255,180,.35) !important;
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.55),
+    0 0 28px rgba(120,255,180,.35) !important;
+}
+section.lvb-hero .streak-card.is-loss{
+  border-color: rgba(255,86,0,.45) !important;
+}
+
+/* --- Hover lift (desktop only) --- */
+@media (hover: hover) and (pointer: fine){
+  section.lvb-hero .stat-card{
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  section.lvb-hero .stat-card:hover{
+    transform: translateY(-3px);
+    border-color: rgba(255,86,0,.28) !important;
+    box-shadow:
+      0 16px 36px rgba(0,0,0,.62),
+      0 0 26px rgba(255,86,0,.20) !important;
+  }
+}
+
+/* --- Reduced motion safety --- */
+@media (prefers-reduced-motion: reduce){
+  section.lvb-hero p.lvb-sub,
+  section.lvb-hero .streak-card{
+    animation: none !important;
+  }
+}
