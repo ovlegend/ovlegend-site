@@ -1925,3 +1925,21 @@ section.lvb-hero div.streak-card.is-loss{
     animation: none !important;
   }
 }
+
+section.lvb-hero .lvb-grid{
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  margin-top: 18px !important;
+}
+
+section.lvb-hero .lvb-grid .streak-card{
+  grid-column: 1 / -1 !important;
+}
+
+@media (max-width: 900px){
+  section.lvb-hero .lvb-grid{ grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+}
+@media (max-width: 520px){
+  section.lvb-hero .lvb-grid{ grid-template-columns: 1fr !important; }
+}
