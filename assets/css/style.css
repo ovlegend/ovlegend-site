@@ -1742,3 +1742,49 @@ body.lvb .lvb-btn:hover{
   border-color: rgba(255,86,0,.45);
   box-shadow: 0 0 0 4px rgba(255,86,0,.12);
 }
+
+/* =========================
+   LVB PATCH — fix nav + layout sizing
+   ========================= */
+
+/* Ensure page uses the same base layout */
+body {
+  min-height: 100vh;
+}
+
+/* If your global CSS expects .nav-inner to be flex, force it here */
+header.nav .nav-inner{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+/* Keep the nav links in a row (instead of a tiny vertical stack) */
+header.nav nav{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Make sure the logo doesn't shrink weird */
+header.nav .logo img{
+  display: block;
+  height: 34px;      /* adjust if you want bigger */
+  width: auto;
+}
+
+/* Container should center and not collapse */
+main.container{
+  width: 100%;
+  max-width: 1100px;     /* match your site width */
+  margin: 0 auto;
+  padding: 28px 16px 60px;
+}
+
+/* LVB panel should sit near the top, not down in the void */
+.lvb-hero{
+  margin-top: 18px;
+}
