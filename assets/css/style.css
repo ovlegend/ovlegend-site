@@ -1865,3 +1865,63 @@ main.container{
     animation: none;
   }
 }
+
+/* =========================================================
+   LVB — FORCE GLOW + PULSE (wins against existing CSS)
+   ========================================================= */
+
+/* TITLE GLOW (force) */
+section.lvb-hero h1.lvb-title{
+  color: #ff8a00 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.2px !important;
+  text-shadow:
+    0 0 10px rgba(255,86,0,.65),
+    0 0 26px rgba(255,86,0,.45),
+    0 0 52px rgba(255,86,0,.30) !important;
+}
+
+/* TEXT PULSE (force) */
+@keyframes lvbTextPulseForce{
+  0%, 100% { opacity: .75; filter: drop-shadow(0 0 0 rgba(255,86,0,0)); }
+  50%      { opacity: 1;   filter: drop-shadow(0 0 14px rgba(255,86,0,.35)); }
+}
+section.lvb-hero p.lvb-sub{
+  animation: lvbTextPulseForce 2.6s ease-in-out infinite !important;
+}
+
+/* STREAK PULSE (force) */
+@keyframes lvbStreakPulseForce{
+  0%, 100% {
+    box-shadow: 0 12px 30px rgba(0,0,0,.55), 0 0 14px rgba(255,86,0,.18);
+  }
+  50% {
+    box-shadow: 0 12px 30px rgba(0,0,0,.55), 0 0 28px rgba(255,86,0,.40);
+  }
+}
+section.lvb-hero div.streak-card{
+  animation: lvbStreakPulseForce 2.0s ease-in-out infinite !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,.55), 0 0 18px rgba(255,86,0,.16) !important;
+}
+
+/* Cards subtle glow */
+section.lvb-hero div.stat-card{
+  box-shadow: 0 12px 30px rgba(0,0,0,.55), 0 0 16px rgba(255,86,0,.12) !important;
+}
+
+/* Win/Loss tuning (your JS already toggles these classes) */
+section.lvb-hero div.streak-card.is-win{
+  border-color: rgba(120,255,180,.35) !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,.55), 0 0 28px rgba(120,255,180,.35) !important;
+}
+section.lvb-hero div.streak-card.is-loss{
+  border-color: rgba(255,86,0,.45) !important;
+}
+
+/* Reduced motion safety */
+@media (prefers-reduced-motion: reduce){
+  section.lvb-hero p.lvb-sub,
+  section.lvb-hero div.streak-card{
+    animation: none !important;
+  }
+}
