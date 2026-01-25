@@ -85,11 +85,52 @@ body::after{
 @media (min-width: 980px){
   .v2-grid.hero{
     grid-template-columns: 1fr 1fr; /* balanced */
-    align-items:center;
+    align-items: stretch;
     gap: 56px;
   }
 }
 
+/* ===== Left stack: logo above hero panel ===== */
+
+.left-stack{
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 14px;
+  align-content: start;
+}
+
+.seal-wrap{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding: 6px 0;
+}
+
+.seal{
+  width: clamp(96px, 9vw, 150px);
+  height: auto;
+  filter: drop-shadow(0 0 22px rgba(255,86,0,.25));
+  opacity: .98;
+}
+
+/* Make hero panel stretch to match right column height */
+.hero-panel{
+  height: 100%;
+}
+
+.hero-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+
+/* This is what aligns bottoms with COTW */
+@media (min-width: 980px){
+  .v2-grid.hero{
+    align-items: stretch;
+  }
+}
 /* --------- Headings / Text --------- */
 .kicker{
   color: var(--ov);
