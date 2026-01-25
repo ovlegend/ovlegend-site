@@ -45,7 +45,7 @@
   /* Type */
   --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
   /* We'll swap these to Feast of Flesh once we link the font */
-  --display: var(--sans);
+  --display: "FeastOfFlesh", var(--sans);
 }
 
 /* --------- Global Reset --------- */
