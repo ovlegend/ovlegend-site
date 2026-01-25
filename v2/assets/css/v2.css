@@ -202,16 +202,21 @@ body::after{
   letter-spacing: .02em;
 }
 
-/* PSD-style gradient fill (TOP = white, BOTTOM = OV orange) */
+/* ===== Feast of Flesh — FINAL PSD MATCH ===== */
 h1,
 h2,
 .card-title{
+  font-family: "FeastOfFlesh", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+
+  /* BRIGHT gradient: white (top) → OV orange (bottom) */
   background-image: linear-gradient(
     to bottom,
     #ffffff 0%,
-    #ffffff 55%,
-    #ffd2b0 72%,
-    #ff8a3a 86%,
+    #ffffff 45%,
+    #ffd6b0 65%,
+    #ff8a3a 82%,
     #ff5600 100%
   );
 
@@ -220,8 +225,15 @@ h2,
   color: transparent;
   -webkit-text-fill-color: transparent;
 
-  /* OPTIONAL: very light crisp edge (safe) */
-  -webkit-text-stroke: 0.3px rgba(0,0,0,.35);
+  /* NO stroke (this is key) */
+  -webkit-text-stroke: 0;
+
+  /* CLEAN glow only */
+  text-shadow:
+    0 2px 0 rgba(0,0,0,.25),
+    0 0 8px rgba(255,255,255,.45),
+    0 0 18px rgba(255,86,0,.55),
+    0 0 36px rgba(255,86,0,.35);
 }
 
 /* ===== Feast of Flesh Gradient Fill (PSD style) ===== */
