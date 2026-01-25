@@ -219,13 +219,13 @@ body::after{
 
   /* Glow + depth (tune if needed) */
   text-shadow:
-    0 2px 0 rgba(0,0,0,.65),
-    0 0 10px rgba(255,86,0,.55),
-    0 0 24px rgba(255,86,0,.35),
-    0 0 44px rgba(255,86,0,.20);
+  0 2px 0 rgba(0,0,0,.35),          /* less black base */
+  0 0 6px rgba(255,255,255,.35),    /* white highlight glow */
+  0 0 14px rgba(255,86,0,.35),
+  0 0 30px rgba(255,86,0,.20);
 
   /* Crisp dark outline like PSD */
-  -webkit-text-stroke: 1.2px rgba(0,0,0,.78);
+  -webkit-text-stroke: 0.8px rgba(0,0,0,.55);
   paint-order: stroke fill;
 }
 
