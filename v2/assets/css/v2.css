@@ -194,8 +194,7 @@ body::after{
 .h1,
 .h2,
 .card-title{
-  font-family: "FeastOfFlesh", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-  text-transform: uppercase;
+    text-transform: uppercase;
   letter-spacing: .02em;
 
   /* BRIGHT gradient: white (top) → OV orange (bottom) */
