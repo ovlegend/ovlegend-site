@@ -213,6 +213,24 @@ h2,
   -webkit-text-stroke: 1.2px rgba(0,0,0,.72);
   paint-order: stroke fill;
 }
+/* ===== Feast of Flesh Gradient Fill (PSD style) ===== */
+
+h1,
+h2,
+.card-title{
+  background: linear-gradient(
+    to top,
+    #ff5600 0%,
+    #ff7a1f 30%,
+    #ffd2b0 60%,
+    #ffffff 90%
+  );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 /* ===== Apply Feast font to your key titles ===== */
 .h1,
 .h2,
