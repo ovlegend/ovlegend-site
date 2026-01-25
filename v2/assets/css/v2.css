@@ -205,13 +205,13 @@ body::after{
 /* PSD-style gradient fill (TOP = white, BOTTOM = OV orange) */
 .h1, .h2, .card-title{
   background-image: linear-gradient(
-    to bottom,
-    #ffffff 0%,
-    #ffffff 28%,
-    #ffd2b0 60%,
-    #ff8a3a 78%,
-    #ff5600 100%
-  );
+  to bottom,
+  #ffffff 0%,
+  #ffffff 55%,
+  #ffd2b0 72%,
+  #ff8a3a 86%,
+  #ff5600 100%
+);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
