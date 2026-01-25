@@ -276,3 +276,57 @@ body.rlol .card.edge{
     0 0 28px rgba(255,138,0,.10),
     var(--shadow);
 }
+
+/* =========================
+   Hover Glow + Lift (premium)
+   ========================= */
+.panel, .card{
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease,
+    filter .18s ease;
+  will-change: transform, box-shadow;
+}
+
+.panel:hover, .card:hover{
+  transform: translateY(-3px);
+  border-color: rgba(255,255,255,.14);
+  box-shadow:
+    0 0 0 1px rgba(255,86,0,.22) inset,
+    0 0 42px rgba(255,86,0,.18),
+    0 18px 55px rgba(0,0,0,.65);
+}
+
+/* Extra punch for the ones you already marked as edge */
+.panel.edge:hover, .card.edge:hover{
+  border-color: rgba(255,86,0,.40);
+  box-shadow:
+    0 0 0 1px rgba(255,86,0,.30) inset,
+    0 0 55px rgba(255,86,0,.22),
+    0 22px 70px rgba(0,0,0,.70);
+}
+
+/* RLOL pages use RLOL orange on hover */
+body.rlol .panel:hover,
+body.rlol .card:hover{
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,.22) inset,
+    0 0 42px rgba(255,138,0,.18),
+    0 18px 55px rgba(0,0,0,.65);
+}
+
+body.rlol .panel.edge:hover,
+body.rlol .card.edge:hover{
+  border-color: rgba(255,138,0,.40);
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,.30) inset,
+    0 0 55px rgba(255,138,0,.22),
+    0 22px 70px rgba(0,0,0,.70);
+}
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .panel, .card{ transition: none; }
+  .panel:hover, .card:hover{ transform: none; }
+}
