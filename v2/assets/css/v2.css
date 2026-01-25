@@ -194,8 +194,14 @@ body::after{
 .h1,
 .h2,
 .card-title{
-    text-transform: uppercase;
+  text-transform: uppercase;
   letter-spacing: .02em;
+
+  /* Fix Feast of Flesh clipping */
+  line-height: 1.15;
+  padding-top: .08em;
+  padding-bottom: .08em;
+}
 
   /* BRIGHT gradient: white (top) → OV orange (bottom) */
   background-image: linear-gradient(
