@@ -190,46 +190,42 @@ body::after{
     0 0 55px rgba(255,86,0,.10);
 }
 
-/* ===== Apply Feast of Flesh font to main titles + panels ===== */
-h1,
-h2,
-.card-title{
-  font-family: "FeastOfFlesh", system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+/* ===== Feast of Flesh: apply to main titles + panel titles ===== */
+:root{
+  --display: "FeastOfFlesh", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+/* Use the font */
+.h1, .h2, .card-title{
+  font-family: var(--display);
   text-transform: uppercase;
   letter-spacing: .02em;
 }
 
-/* ===== Feast of Flesh titles + PSD gradient glow ===== */
-
-h1,
-h2,
-.card-title{
-  font-family: "FeastOfFlesh", system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-  text-transform: uppercase;
-  letter-spacing: .02em;
-
-  /* PSD-style gradient fill */
-  background: linear-gradient(
-    to top,
-    #ff5600 0%,
-    #ff7a1f 30%,
+/* PSD-style gradient fill (TOP = white, BOTTOM = OV orange) */
+.h1, .h2, .card-title{
+  background-image: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #ffffff 28%,
     #ffd2b0 60%,
-    #ffffff 90%
+    #ff8a3a 78%,
+    #ff5600 100%
   );
-
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  -webkit-text-fill-color: transparent; /* important for Chrome */
 
-  /* Glow + depth */
+  /* Glow + depth (tune if needed) */
   text-shadow:
     0 2px 0 rgba(0,0,0,.65),
     0 0 10px rgba(255,86,0,.55),
-    0 0 22px rgba(255,86,0,.45),
-    0 0 42px rgba(255,86,0,.25);
+    0 0 24px rgba(255,86,0,.35),
+    0 0 44px rgba(255,86,0,.20);
 
-  /* Stroke for crispy edges */
-  -webkit-text-stroke: 1.2px rgba(0,0,0,.72);
+  /* Crisp dark outline like PSD */
+  -webkit-text-stroke: 1.2px rgba(0,0,0,.78);
   paint-order: stroke fill;
 }
 
