@@ -13,22 +13,35 @@
     <section class="v2-grid hero">
 
       <!-- LEFT: placeholder for circular logo -->
-      <div class="panel edge">
-        <div class="in">
-          <div class="kicker">Rocket League • Content • Community</div>
-          <h1 class="h1 glow-title">OV LEGEND</h1>
-          <p class="sub">
-            Built around high-energy streams, legendary queue nights, custom builds,
-            and a community league that turns matches into events.
-          </p>
+      <!-- LEFT COLUMN: logo + hero panel -->
+<div class="left-stack">
 
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
-            <a class="btn" href="/v2/builds/">Browse Builds</a>
-            <a class="btn" href="/v2/lvb/">Legends v Bozos</a>
-            <a class="btn" href="/v2/rlol/">RLOL Hub</a>
-          </div>
-        </div>
+  <!-- Logo / Seal -->
+  <div class="seal-wrap">
+    <!-- Replace src with your circular logo path -->
+    <img class="seal" src="/assets/img/brand/ov-seal.png" alt="OV Legend Seal">
+  </div>
+
+  <!-- HERO PANEL -->
+  <div class="panel edge hero-panel">
+    <div class="in">
+      <div class="kicker">Rocket League • Content • Community</div>
+      <h1 class="h1 glow-title">OV LEGEND</h1>
+      <p class="sub">
+        Built around high-energy streams, legendary queue nights, custom builds,
+        and a community league that turns matches into events.
+      </p>
+
+      <div class="hero-actions">
+        <a class="btn" href="/v2/builds/">Browse Builds</a>
+        <a class="btn" href="/v2/lvb/">Legends v Bozos</a>
+        <a class="btn" href="/v2/rlol/">RLOL Hub</a>
       </div>
+    </div>
+  </div>
+
+</div> <!-- 👈 THIS closes .left-stack -->
+
 
       <!-- RIGHT: OV Headquarters -->
       <div>
