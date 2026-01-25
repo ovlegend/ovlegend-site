@@ -74,7 +74,7 @@ body::after{
 .v2-wrap{
   max-width: var(--container);
   margin: 0 auto;
-  padding: calc(var(--pad) + 18px) var(--pad) 72px;
+  padding: 28px clamp(14px, 2vw, 22px) 72px;
 }
 
 .v2-grid{
