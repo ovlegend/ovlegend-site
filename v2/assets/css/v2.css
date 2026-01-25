@@ -236,33 +236,6 @@ h2,
     0 0 36px rgba(255,86,0,.35);
 }
 
-/* ===== Feast of Flesh Gradient Fill (PSD style) ===== */
-
-h1,
-h2,
-.card-title{
-  background: linear-gradient(
-    to top,
-    #ff5600 0%,
-    #ff7a1f 30%,
-    #ffd2b0 60%,
-    #ffffff 90%
-  );
-
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* ===== Apply Feast font to your key titles ===== */
-.h1,
-.h2,
-.card-title{
-  font-family: "FeastOfFlesh", system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-  text-transform: uppercase;
-  letter-spacing: .02em;
-}
-
 /* Give them the PSD glow */
 .h1,
 .h2,
