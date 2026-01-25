@@ -190,21 +190,9 @@ body::after{
     0 0 55px rgba(255,86,0,.10);
 }
 
-/* ===== Feast of Flesh: apply to main titles + panel titles ===== */
-:root{
-  --display: "FeastOfFlesh", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-}
-
-/* Use the font */
-.h1, .h2, .card-title{
-  font-family: var(--display);
-  text-transform: uppercase;
-  letter-spacing: .02em;
-}
-
 /* ===== Feast of Flesh — FINAL PSD MATCH ===== */
-h1,
-h2,
+.h1,
+.h2,
 .card-title{
   font-family: "FeastOfFlesh", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   text-transform: uppercase;
@@ -230,25 +218,12 @@ h2,
 
   /* CLEAN glow only */
   text-shadow:
-    0 2px 0 rgba(0,0,0,.25),
+   0 1px 0 rgba(0,0,0,.12),
     0 0 8px rgba(255,255,255,.45),
     0 0 18px rgba(255,86,0,.55),
     0 0 36px rgba(255,86,0,.35);
 }
 
-/* Give them the PSD glow */
-.h1,
-.h2,
-.card-title{
-  color: #f3f3f3;
-  text-shadow:
-    0 2px 0 rgba(0,0,0,.65),
-    0 0 10px rgba(255,86,0,.55),
-    0 0 22px rgba(255,86,0,.45),
-    0 0 42px rgba(255,86,0,.25);
-  -webkit-text-stroke: 1.2px rgba(0,0,0,.72);
-  paint-order: stroke fill;
-}
 /* --------- Panels / Cards --------- */
 .panel{
   position:relative;
@@ -471,35 +446,4 @@ body.rlol .card.edge:hover{
       drop-shadow(0 0 14px rgba(255,86,0,.45))
       drop-shadow(0 0 40px rgba(255,86,0,.22));
   }
-}
-
-/* ===== FORCE Feast gradient titles (place at bottom of file) ===== */
-h1, h2, .card-title{
-  font-family: "FeastOfFlesh", system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
-  text-transform: uppercase;
-  letter-spacing: .02em;
-
-  background-image: linear-gradient(
-    to top,
-    #ff5600 0%,
-    #ff7a1f 30%,
-    #ffd2b0 60%,
-    #ffffff 90%
-  ) !important;
-
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-
-  /* THIS is the missing piece in Chrome */
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
-
-  text-shadow:
-    0 2px 0 rgba(0,0,0,.65),
-    0 0 10px rgba(255,86,0,.55),
-    0 0 22px rgba(255,86,0,.45),
-    0 0 42px rgba(255,86,0,.25);
-
-  -webkit-text-stroke: 1.2px rgba(0,0,0,.72);
-  paint-order: stroke fill;
 }
