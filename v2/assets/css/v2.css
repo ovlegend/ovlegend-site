@@ -103,16 +103,18 @@ body::after{
   display:flex;
   justify-content:center;
   align-items:center;
-  padding: 6px 0;
+  padding: 0 0 12px;
 }
 
 .seal{
-  width: clamp(96px, 9vw, 150px);
+  width: clamp(120px, 9vw, 180px);
   height: auto;
-  filter: drop-shadow(0 0 22px rgba(255,86,0,.25));
+  display:block;
+  filter:
+    drop-shadow(0 0 14px rgba(255,86,0,.35))
+    drop-shadow(0 0 34px rgba(255,86,0,.18));
   opacity: .98;
 }
-
 /* Make hero panel stretch to match right column height */
 .hero-panel{
   height: 100%;
