@@ -1,7 +1,278 @@
-/* OV Legend v2 Theme - foundation */
-body {
+/* =========================================================
+   OV LEGEND — V2 THEME FOUNDATION
+   Streamer (default) + RLOL Esports (body.rlol)
+   Safe: lives only under /v2/
+   ========================================================= */
+
+/* --------- Brand Tokens --------- */
+:root{
+  /* Colors */
+  --ov: #FF5600;        /* OV Orange */
+  --rlol: #FF8A00;      /* RLOL Orange */
+  --bg0: #050506;       /* darkest */
+  --bg1: #0b0b0e;       /* base */
+  --panel: rgba(22, 22, 26, 0.78);
+  --panel2: rgba(18, 18, 22, 0.62);
+  --text: #eaeaea;
+  --muted: rgba(234,234,234,.72);
+
+  /* Glow + lines */
+  --edge: rgba(255, 86, 0, .35);
+  --edge2: rgba(255, 86, 0, .18);
+  --shadow: 0 18px 50px rgba(0,0,0,.55);
+
+  /* Layout */
+  --container: 1320px;            /* widen to reduce empty sides */
+  --pad: clamp(18px, 2.2vw, 28px);
+  --radius: 22px;
+  --radius-sm: 16px;
+
+  /* Type */
+  --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  /* We'll swap these to Feast of Flesh once we link the font */
+  --display: var(--sans);
+}
+
+/* --------- Global Reset --------- */
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  color:var(--text);
+  font-family:var(--sans);
+  background: radial-gradient(1200px 800px at 65% 20%, rgba(255,86,0,.10), transparent 60%),
+              radial-gradient(900px 700px at 20% 75%, rgba(255,86,0,.06), transparent 55%),
+              linear-gradient(180deg, var(--bg0), var(--bg1) 45%, #070708 100%);
+  overflow-x:hidden;
+}
+
+/* subtle texture (no image needed) */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,.03), transparent 35%),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,.02), transparent 40%);
+  mix-blend-mode: overlay;
+  opacity:.35;
+  z-index:-2;
+}
+
+/* optional “vignette” depth */
+body::after{
+  content:"";
+  position:fixed;
+  inset:-40px;
+  pointer-events:none;
+  background: radial-gradient(circle at 50% 35%, transparent 35%, rgba(0,0,0,.55) 80%);
+  z-index:-1;
+}
+
+/* --------- Layout Helpers --------- */
+.v2-wrap{
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: calc(var(--pad) + 18px) var(--pad) 72px;
+}
+
+.v2-grid{
+  display:grid;
+  gap: 18px;
+}
+
+@media (min-width: 980px){
+  .v2-grid.hero{
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items:center;
+    gap: 26px;
+  }
+}
+
+/* --------- Headings / Text --------- */
+.kicker{
+  color: var(--ov);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 12px;
+  opacity: .95;
+}
+
+.h1{
+  margin: 10px 0 10px;
+  font-size: clamp(42px, 4.8vw, 82px);
+  line-height: .95;
+  font-family: var(--display);
+  letter-spacing: .02em;
+}
+
+.h2{
+  margin: 0 0 10px;
+  font-size: clamp(28px, 2.8vw, 44px);
+  line-height: 1.05;
+  font-family: var(--display);
+}
+
+.sub{
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 62ch;
+}
+
+/* Glow style you like (for Feast of Flesh headers later) */
+.glow-title{
+  text-shadow:
+    0 0 18px rgba(255,86,0,.25),
+    0 0 34px rgba(255,86,0,.18),
+    0 0 55px rgba(255,86,0,.10);
+}
+
+/* --------- Panels / Cards --------- */
+.panel{
+  position:relative;
+  background: linear-gradient(180deg, var(--panel), var(--panel2));
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+
+.panel.edge{
+  border-color: var(--edge2);
+  box-shadow:
+    0 0 0 1px rgba(255,86,0,.12) inset,
+    0 0 34px rgba(255,86,0,.10),
+    var(--shadow);
+}
+
+.panel .in{
+  padding: 20px 20px 18px;
+}
+
+@media (min-width: 980px){
+  .panel .in{ padding: 22px 22px 20px; }
+}
+
+.card{
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,.10);
+  background: linear-gradient(180deg, rgba(16,16,18,.75), rgba(10,10,12,.55));
+  box-shadow: 0 14px 38px rgba(0,0,0,.45);
+  overflow:hidden;
+}
+
+.card.edge{
+  border-color: rgba(255,86,0,.22);
+  box-shadow:
+    0 0 0 1px rgba(255,86,0,.14) inset,
+    0 0 28px rgba(255,86,0,.10),
+    0 14px 38px rgba(0,0,0,.45);
+}
+
+.card .in{
+  padding: 18px 18px 16px;
+}
+
+/* Card title row (title + small pill) */
+.card-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.card-title{
+  font-family: var(--display);
+  font-size: 26px;
+  letter-spacing: .03em;
+  line-height: 1.05;
   margin: 0;
-  background: #050505;
-  color: #eaeaea;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+}
+
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.85);
+  border: 1px solid rgba(255,86,0,.28);
+  background: rgba(0,0,0,.35);
+}
+
+/* Links / CTAs */
+a{ color: inherit; text-decoration:none; }
+.cta{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--ov);
+  font-weight: 800;
+}
+.cta:hover{ filter: brightness(1.15); }
+
+/* Buttons (for footer/nav later) */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.35);
+  color: rgba(255,255,255,.92);
+  font-weight: 700;
+}
+.btn:hover{ border-color: rgba(255,86,0,.22); }
+
+/* --------- Simple “HQ cards” grid --------- */
+.hq-grid{
+  display:grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 600px){
+  .hq-grid{ grid-template-columns: 1fr 1fr; }
+}
+
+.feature{
+  min-height: 170px;
+}
+
+/* --------- RLOL Esports Skin (cleaner + sharper) --------- */
+body.rlol{
+  /* Slightly cooler + sharper accent usage */
+  --edge: rgba(255,138,0,.35);
+  --edge2: rgba(255,138,0,.18);
+}
+
+body.rlol .kicker,
+body.rlol .cta{
+  color: var(--rlol);
+}
+
+body.rlol .glow-title{
+  text-shadow:
+    0 0 14px rgba(255,138,0,.22),
+    0 0 28px rgba(255,138,0,.14),
+    0 0 44px rgba(255,138,0,.10);
+}
+
+body.rlol .panel.edge,
+body.rlol .card.edge{
+  border-color: rgba(255,138,0,.22);
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,.12) inset,
+    0 0 28px rgba(255,138,0,.10),
+    var(--shadow);
 }
