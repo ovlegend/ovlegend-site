@@ -1,3 +1,18 @@
+/* ===== Fonts: Feast of Flesh (from /assets/fonts/) ===== */
+@font-face{
+  font-family: "FeastOfFlesh";
+  src: url("/assets/fonts/FEASFBIT.TTF") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: "FeastOfFlesh";
+  src: url("/assets/fonts/FEASFBRG.TTF") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 /* =========================================================
    OV LEGEND — V2 THEME FOUNDATION
    Streamer (default) + RLOL Esports (body.rlol)
@@ -175,6 +190,28 @@ body::after{
     0 0 55px rgba(255,86,0,.10);
 }
 
+/* ===== Apply Feast font to your key titles ===== */
+.h1,
+.h2,
+.card-title{
+  font-family: "FeastOfFlesh", system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+
+/* Give them the PSD glow */
+.h1,
+.h2,
+.card-title{
+  color: #f3f3f3;
+  text-shadow:
+    0 2px 0 rgba(0,0,0,.65),
+    0 0 10px rgba(255,86,0,.55),
+    0 0 22px rgba(255,86,0,.45),
+    0 0 42px rgba(255,86,0,.25);
+  -webkit-text-stroke: 1.2px rgba(0,0,0,.72);
+  paint-order: stroke fill;
+}
 /* --------- Panels / Cards --------- */
 .panel{
   position:relative;
