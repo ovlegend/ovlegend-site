@@ -107,13 +107,15 @@ body::after{
 }
 
 .seal{
-  width: clamp(120px, 9vw, 180px);
+  width: clamp(220px, 16vw, 340px);  /* much larger */
   height: auto;
-  display:block;
+  display: block;
+
   filter:
-    drop-shadow(0 0 14px rgba(255,86,0,.35))
-    drop-shadow(0 0 34px rgba(255,86,0,.18));
-  opacity: .98;
+    drop-shadow(0 0 14px rgba(255,86,0,.55))
+    drop-shadow(0 0 40px rgba(255,86,0,.28));
+
+  animation: sealPulse 4s ease-in-out infinite;
 }
 /* Make hero panel stretch to match right column height */
 .hero-panel{
