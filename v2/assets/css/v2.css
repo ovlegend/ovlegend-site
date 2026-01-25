@@ -203,30 +203,25 @@ body::after{
 }
 
 /* PSD-style gradient fill (TOP = white, BOTTOM = OV orange) */
-.h1, .h2, .card-title{
+h1,
+h2,
+.card-title{
   background-image: linear-gradient(
-  to bottom,
-  #ffffff 0%,
-  #ffffff 55%,
-  #ffd2b0 72%,
-  #ff8a3a 86%,
-  #ff5600 100%
-);
+    to bottom,
+    #ffffff 0%,
+    #ffffff 55%,
+    #ffd2b0 72%,
+    #ff8a3a 86%,
+    #ff5600 100%
+  );
+
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  -webkit-text-fill-color: transparent; /* important for Chrome */
+  -webkit-text-fill-color: transparent;
 
-  /* Glow + depth (tune if needed) */
-  text-shadow:
-  0 2px 0 rgba(0,0,0,.35),          /* less black base */
-  0 0 6px rgba(255,255,255,.35),    /* white highlight glow */
-  0 0 14px rgba(255,86,0,.35),
-  0 0 30px rgba(255,86,0,.20);
-
-  /* Crisp dark outline like PSD */
-  -webkit-text-stroke: 0.8px rgba(0,0,0,.55);
-  paint-order: stroke fill;
+  /* OPTIONAL: very light crisp edge (safe) */
+  -webkit-text-stroke: 0.3px rgba(0,0,0,.35);
 }
 
 /* ===== Feast of Flesh Gradient Fill (PSD style) ===== */
