@@ -190,6 +190,29 @@ body::after{
     0 0 55px rgba(255,86,0,.10);
 }
 
+/* ===== Apply Feast of Flesh font to main titles + panels ===== */
+h1,
+h2,
+.card-title{
+  font-family: "FeastOfFlesh", system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+
+/* ===== Feast of Flesh glow styling (PSD-style punch) ===== */
+h1,
+h2,
+.card-title{
+  color: #f3f3f3;
+  text-shadow:
+    0 2px 0 rgba(0,0,0,.65),
+    0 0 10px rgba(255,86,0,.55),
+    0 0 22px rgba(255,86,0,.45),
+    0 0 42px rgba(255,86,0,.25);
+  
+  -webkit-text-stroke: 1.2px rgba(0,0,0,.72);
+  paint-order: stroke fill;
+}
 /* ===== Apply Feast font to your key titles ===== */
 .h1,
 .h2,
