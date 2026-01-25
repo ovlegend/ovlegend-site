@@ -86,7 +86,7 @@ body::after{
   .v2-grid.hero{
     grid-template-columns: 1.05fr 0.95fr;
     align-items:center;
-    gap: 26px;
+    gap: 44px;
   }
 }
 
