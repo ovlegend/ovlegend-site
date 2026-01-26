@@ -17,18 +17,19 @@
     $("#leaderName") ||
     $("[data-leader-name]") ||
     $(".leader-name") ||
-    $("#leaderTitle"); // fallback if you used id="leaderTitle" as the big name
+    $("#leaderTitle");
 
   const leaderMetaEl =
     $("#leaderMeta") ||
     $("[data-leader-meta]") ||
-    $(".leader-meta");
+    $(".leader-meta") ||
+    $("#leaderMeta"); // ok if duplicated
 
   const leaderBadgeEl =
     $("#leaderBadge") ||
     $("[data-leader-badge]") ||
     $(".leader-badge") ||
-    $("#leaderChip"); // your chip in V2
+    $("#leaderChip");
 
   const leaderBtnsWrap =
     $("#leaderBtns") ||
@@ -50,7 +51,9 @@
       const c = text[i];
       const next = text[i + 1];
 
-      if (c === '"' && inQuotes && next === '"') { cur += '"'; i++; continue; }
+      if (c === '"' && inQuotes && next === '"') {
+        cur += '"'; i++; continue;
+      }
       if (c === '"') { inQuotes = !inQuotes; continue; }
       if (c === "," && !inQuotes) { row.push(cur); cur = ""; continue; }
 
@@ -201,43 +204,77 @@
     viewMode: (viewModeEl && viewModeEl.value) ? viewModeEl.value : "season_totals"
   };
 
- // ===== Leaders Buttons (V2-safe) =====
-function ensureLeaderButtons() {
-  const wrap = document.querySelector("#leaderBtns");
-  if (!wrap) return; // V2 page missing container? Don't crash.
+  // ---- Leaders metrics (REQUIRED) ----
+  const LEADER_METRICS = [
+    { key: "score",   label: "TOP PTS",   badge: "#1 SCORE", valueLabel: "Score" },
+    { key: "goals",   label: "TOP GOALS", badge: "#1 GOALS", valueLabel: "Goals" },
+    { key: "assists", label: "TOP AST",   badge: "#1 AST",   valueLabel: "Assists" },
+    { key: "saves",   label: "TOP SAVES", badge: "#1 SAVES", valueLabel: "Saves" },
+    { key: "shots",   label: "TOP SHOTS", badge: "#1 SHOTS", valueLabel: "Shots" },
+    { key: "gp",      label: "MOST GP",   badge: "#1 GP",    valueLabel: "GP" }
+  ];
 
-  // build once
-  if (wrap.dataset.built === "1") return;
-  wrap.dataset.built = "1";
-  wrap.innerHTML = "";
+  function metricInfo(key) {
+    return LEADER_METRICS.find(m => m.key === key) || LEADER_METRICS[0];
+  }
 
-  const mk = (label, metric, extraClass = "btn ghost") => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = extraClass;
-    b.textContent = label;
-    b.dataset.metric = metric || "";
-    return b;
-  };
+  // ---- Leaders (dynamic buttons) ----
+  function syncLeaderButtonsActive() {
+    if (!leaderBtnsWrap) return;
+    leaderBtnsWrap.querySelectorAll("button[data-metric]").forEach(btn => {
+      const k = btn.dataset.metric;
+      btn.classList.toggle("active", k === state.leaderKey);
+    });
+  }
 
-  // Reset
-  const reset = mk("RESET", "score", "btn ghost");
-  reset.addEventListener("click", () => setLeaderMetric("score"));
-  wrap.appendChild(reset);
+  function setLeaderMetric(key) {
+    state.leaderKey = key;
 
-  // One per metric (no ping)
-  LEADER_METRICS.forEach((m) => {
-    const b = mk(m.label, m.key, "btn pill");
-    b.addEventListener("click", () => setLeaderMetric(m.key));
-    wrap.appendChild(b);
-  });
+    // also sort table by that metric (desc); never force ping
+    state.sortKey = key;
+    state.sortDir = (key === "player" || key === "team") ? "asc" : "desc";
 
-  syncLeaderButtonsActive();
-}
+    render();
+  }
+
+  // ✅ SINGLE, SAFE ensureLeaderButtons (build once; no null addEventListener)
+  function ensureLeaderButtons() {
+    if (!leaderBtnsWrap) return;
+
+    // build once (avoid re-binding clicks every render)
+    if (leaderBtnsWrap.dataset.built === "1") {
+      syncLeaderButtonsActive();
+      return;
+    }
+    leaderBtnsWrap.dataset.built = "1";
+    leaderBtnsWrap.innerHTML = "";
+
+    const mkBtn = (txt, metric, cls) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = txt;
+      b.className = cls || "btn";
+      b.dataset.metric = metric || "";
+      return b;
+    };
+
+    // Reset
+    const resetBtn = mkBtn("RESET", "score", "btn ghost");
+    resetBtn.addEventListener("click", () => setLeaderMetric("score"));
+    leaderBtnsWrap.appendChild(resetBtn);
+
+    // One per metric (no ping)
+    LEADER_METRICS.forEach((m) => {
+      const b = mkBtn(m.label, m.key, "btn pill");
+      b.addEventListener("click", () => setLeaderMetric(m.key));
+      leaderBtnsWrap.appendChild(b);
+    });
+
+    syncLeaderButtonsActive();
+  }
 
   // ---- model (strong header mapping for your sheet) ----
   function toModel(row) {
-    // Your sheet headers: player_id, team_id, score, goals, assists, saves, shots, ping, season, week, game_id...
     const player =
       firstNonUrl(row, ["player_name", "player_id", "Player", "player", "name", "Player Name"]) ||
       "Unknown";
@@ -369,55 +406,6 @@ function ensureLeaderButtons() {
     return `<td class="${cls}">${val}</td>`;
   }
 
-  // ---- Leaders (dynamic buttons) ----
-  function syncLeaderButtonsActive() {
-    if (!leaderBtnsWrap) return;
-    leaderBtnsWrap.querySelectorAll("button[data-metric]").forEach(btn => {
-      const k = btn.dataset.metric;
-      const active = (k === state.leaderKey);
-      btn.classList.toggle("active", active && k !== "reset");
-    });
-  }
-
-  function setLeaderMetric(key) {
-    state.leaderKey = key;
-
-    // also sort table by that metric (desc); never force ping
-    state.sortKey = key;
-    state.sortDir = (key === "player" || key === "team") ? "asc" : "desc";
-
-    render();
-  }
-
-  function ensureLeaderButtons() {
-    if (!leaderBtnsWrap) return;
-
-    leaderBtnsWrap.innerHTML = "";
-
-    const mkBtn = (txt, key, extraClass) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.textContent = txt;
-      b.className = extraClass || "";
-      b.dataset.metric = key || "";
-      return b;
-    };
-
-    // Reset button
-    const resetBtn = mkBtn("Reset", "reset", "btn ghost");
-    resetBtn.addEventListener("click", () => setLeaderMetric("score"));
-    leaderBtnsWrap.appendChild(resetBtn);
-
-    // One per metric (no ping)
-    LEADER_METRICS.forEach(m => {
-      const b = mkBtn(m.label, m.key, "btn");
-      b.addEventListener("click", () => setLeaderMetric(m.key));
-      leaderBtnsWrap.appendChild(b);
-    });
-
-    syncLeaderButtonsActive();
-  }
-
   function updateLeaderCard() {
     if (!leaderNameEl && !leaderMetaEl && !leaderBadgeEl) return;
 
@@ -441,6 +429,7 @@ function ensureLeaderButtons() {
     const top = sorted[0];
     const val = top[key] ?? 0;
 
+    // if leaderTitle is used as "Top Performer" header, don't uppercase it weirdly
     if (leaderNameEl) leaderNameEl.textContent = String(top.player || "Unknown").toUpperCase();
 
     if (leaderMetaEl) {
