@@ -186,6 +186,13 @@ body::after{
   padding-top: .10em;
   padding-bottom: .10em;
 
+  /* ==== FIX: FeastOfFlesh “O” clipping (give glyph room to breathe) ==== */
+.h1, .h2, .card-title{
+  display: inline-block;   /* ensures padding affects the paint box */
+  overflow: visible;       /* just in case a parent tries to clip */
+  padding-left: .14em;     /* key: prevents left-side crop on “O” */
+  padding-right: .08em;    /* small right buffer for shadows/edges */
+}
   /* bright gradient: white top → OV orange bottom */
   background-image: linear-gradient(
     to bottom,
