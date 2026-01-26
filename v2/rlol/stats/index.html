@@ -1,132 +1,32 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RLOL Stats | OV Legend</title>
-  <meta name="theme-color" content="#ff8a00" />
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <!-- V2 CSS -->
-  <link rel="stylesheet" href="../../assets/css/rlol-v2.css" />
-</head>
-
-<body class="rlol rlol-stats-v2">
-  <main class="rlol-wrap">
-
-    <!-- Hero -->
-    <header class="rlol-hero">
-      <div class="rlol-hero-inner">
-        <div class="rlol-hero-left">
-          <div class="kicker">Rocket League of Legends</div>
-          <h1 class="title">Stats</h1>
-          <p class="sub">Auto-updates from Google Sheets • Click headers to sort • Search players/teams</p>
-
-          <nav class="nav-pills" aria-label="RLOL navigation">
-            <a class="pill" href="/v2/rlol/">Home</a>
-            <a class="pill" href="/v2/rlol/">Hub</a>
-            <a class="pill" href="/v2/rlol/schedule/">Schedule</a>
-            <a class="pill" href="/v2/rlol/standings/">Standings</a>
-            <a class="pill is-active" href="/v2/rlol/stats/">Stats</a>
-          </nav>
-        </div>
-
-        <div class="rlol-hero-right">
-          <div class="badge-card">
-            <div class="badge-top">
-              <span class="badge-label">Leaders</span>
-              <span class="badge-chip" id="leaderChip">Loading…</span>
-            </div>
-            <div class="badge-title" id="leaderTitle">Top Performer</div>
-            <div class="badge-meta" id="leaderMeta">Fetching latest stats…</div>
-
-            <div id="leaderBtns" class="badge-actions"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Stats Card -->
-    <section class="grid">
-      <article class="card wide">
-        <div class="card-head">
-          <h2 class="card-title">Player Stats</h2>
-          <div class="card-tools">
-            <span class="hint" id="loadedHint">Loading…</span>
-          </div>
-        </div>
-
-        <!-- Toolbar -->
-        <div class="toolbar">
-          <input id="q" class="field" type="search" placeholder="Search player or team…" autocomplete="off" />
-
-          <select id="teamFilter" class="field select">
-            <option value="">All teams</option>
-          </select>
-
-          <select id="viewFilter" class="field select">
-            <option value="all">All players</option>
-            <option value="top">Top 10</option>
-          </select>
-
-          <div class="toolbar-right">
-            <button class="btn ghost" id="btnCSV">Reload</button>
-          </div>
-        </div>
-
-        <!-- Table -->
-        <div class="table-wrap">
-          <table class="stats-table" id="statsTable">
-            <thead>
-              <tr>
-                <th data-key="Player">Player</th>
-                <th data-key="Team">Team</th>
-                <th class="num" data-key="GP">GP</th>
-                <th class="num" data-key="Score">Score</th>
-                <th class="num" data-key="Goals">G</th>
-                <th class="num" data-key="Assists">A</th>
-                <th class="num" data-key="Saves">S</th>
-                <th class="num" data-key="Shots">Sh</th>
-                <th class="num" data-key="Ping">Ping</th>
-              </tr>
-            </thead>
-            <tbody id="statsBody">
-              <tr><td colspan="9" class="loading">Loading stats…</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="foot-note">
-          Tip: Sort by Goals/Assists/Saves. Search supports partial names and team abbreviations.
-        </div>
-      </article>
-    </section>
-
-  </main>
-
 <script>
 /* =========================
    RLOL Stats V2 (CSV → table)
    - click headers to sort
    - search + team filter + top 10 filter
+   - V2-safe leaders buttons (no hardcoded btn ids)
    ========================= */
 
 const CSV_URL = window.RLOL_STATS_CSV || ""; // optional override
-// If you don't set window.RLOL_STATS_CSV, it will use the fallback below:
 const FALLBACK_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCQnxfwBylnd5H8jHc_g9Gtv7wyhzelCLixlK3-Bi_Uw0pVJga8MPtgYf5740Csm7hbfLTJhHGdWzh/pub?gid=1283136814&single=true&output=csv";
 
 const $ = (s) => document.querySelector(s);
+const on = (el, ev, fn) => { if (el) el.addEventListener(ev, fn); };
+
 const tbody = $("#statsBody");
 const table = $("#statsTable");
-const hint = $("#loadedHint");
+const hint  = $("#loadedHint");
 
 let rows = [];
 let view = { key: "Score", dir: "desc", q: "", team: "", top: "all" };
+
+const LEADER_METRICS = [
+  { key: "Score",   label: "TOP PTS"   },
+  { key: "Goals",   label: "TOP GOALS" },
+  { key: "Assists", label: "TOP AST"   },
+  { key: "Saves",   label: "TOP SAVES" },
+  { key: "Shots",   label: "TOP SHOTS" },
+  { key: "GP",      label: "MOST GP"   },
+];
 
 function parseCSV(text){
   const out = [];
@@ -150,9 +50,7 @@ function parseCSV(text){
   return out;
 }
 
-function normalizeKey(k){
-  return (k||"").toString().trim();
-}
+function normalizeKey(k){ return (k||"").toString().trim(); }
 
 function num(v){
   const x = Number((v ?? "").toString().replace(/[^\d.-]/g,""));
@@ -163,12 +61,6 @@ function setLoading(msg){
   tbody.innerHTML = `<tr><td colspan="9" class="loading">${msg}</td></tr>`;
 }
 
-function hydrateTeamFilter(){
-  const teams = Array.from(new Set(rows.map(r => r.Team).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
-  const sel = $("#teamFilter");
-  sel.innerHTML = `<option value="">All teams</option>` + teams.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
-}
-
 function escapeHtml(s){
   return (s ?? "").toString()
     .replaceAll("&","&amp;")
@@ -176,6 +68,15 @@ function escapeHtml(s){
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
+}
+
+function hydrateTeamFilter(){
+  const teams = Array.from(new Set(rows.map(r => r.Team).filter(Boolean)))
+    .sort((a,b)=>a.localeCompare(b));
+  const sel = $("#teamFilter");
+  if(!sel) return;
+  sel.innerHTML = `<option value="">All teams</option>` +
+    teams.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
 }
 
 function applyFilters(data){
@@ -200,7 +101,6 @@ function applyFilters(data){
 function sortData(data){
   const key = view.key;
   const dir = view.dir === "asc" ? 1 : -1;
-
   const isNumeric = ["GP","Score","Goals","Assists","Saves","Shots","Ping"].includes(key);
 
   return [...data].sort((a,b)=>{
@@ -211,9 +111,33 @@ function sortData(data){
   });
 }
 
+function paintSortIndicators(){
+  table?.querySelectorAll("thead th").forEach(th=>{
+    th.classList.remove("sort-asc","sort-desc");
+    const key = th.getAttribute("data-key");
+    if(key && key === view.key){
+      th.classList.add(view.dir === "asc" ? "sort-asc" : "sort-desc");
+    }
+  });
+}
+
+function updateLeaderCard(data){
+  const key = view.key;
+  const top = data[0];
+  if(!top) return;
+
+  const chip  = $("#leaderChip");
+  const title = $("#leaderTitle");
+  const meta  = $("#leaderMeta");
+
+  if(chip)  chip.textContent  = `#1 ${key}`;
+  if(title) title.textContent = top.Player || "Top Performer";
+  if(meta)  meta.textContent  = `${top.Team || "—"} • ${key}: ${top[key] ?? "—"}`;
+}
+
 function render(){
   const filtered = applyFilters(sortData(rows));
-  hint.textContent = `${rows.length} loaded • Showing ${filtered.length}`;
+  if(hint) hint.textContent = `${rows.length} loaded • Showing ${filtered.length}`;
 
   if(!filtered.length){
     tbody.innerHTML = `<tr><td colspan="9" class="loading">No results.</td></tr>`;
@@ -237,19 +161,8 @@ function render(){
   updateLeaderCard(filtered);
 }
 
-function updateLeaderCard(data){
-  // default to current sort key leader
-  const key = view.key;
-  const top = data[0];
-  if(!top) return;
-
-  $("#leaderChip").textContent = `#1 ${key}`;
-  $("#leaderTitle").textContent = top.Player || "Top Performer";
-  $("#leaderMeta").textContent = `${top.Team || "—"} • ${key}: ${top[key] ?? "—"}`;
-}
-
 function attachSorting(){
-  table.querySelectorAll("thead th[data-key]").forEach(th=>{
+  table?.querySelectorAll("thead th[data-key]").forEach(th=>{
     th.addEventListener("click", ()=>{
       const key = th.getAttribute("data-key");
       if(view.key === key){
@@ -258,137 +171,161 @@ function attachSorting(){
         view.key = key;
         view.dir = ["Player","Team"].includes(key) ? "asc" : "desc";
       }
-      render();
       paintSortIndicators();
+      render();
+      // keep leaders in sync with sort key
+      buildLeaderButtons();
     });
   });
 }
 
-function paintSortIndicators(){
-  table.querySelectorAll("thead th").forEach(th=>{
-    th.classList.remove("sort-asc","sort-desc");
-    const key = th.getAttribute("data-key");
-    if(key && key === view.key){
-      th.classList.add(view.dir === "asc" ? "sort-asc" : "sort-desc");
-    }
+function buildLeaderButtons(){
+  const wrap = $("#leaderBtns");
+  if(!wrap) return;
+
+  // Build once, then just update active states
+  if(wrap.dataset.built !== "1"){
+    wrap.dataset.built = "1";
+    wrap.innerHTML = "";
+
+    const mk = (label, key, cls) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = cls;
+      b.textContent = label;
+      b.dataset.metric = key;
+      b.addEventListener("click", ()=>{
+        view.key = key;
+        view.dir = ["Player","Team"].includes(key) ? "asc" : "desc";
+        paintSortIndicators();
+        render();
+        syncLeaderButtonsActive();
+      });
+      return b;
+    };
+
+    // RESET
+    const reset = document.createElement("button");
+    reset.type = "button";
+    reset.className = "btn ghost";
+    reset.textContent = "RESET";
+    reset.dataset.metric = "Score";
+    reset.addEventListener("click", ()=>{
+      view = { key:"Score", dir:"desc", q:"", team:"", top:"all" };
+      const q = $("#q"), t = $("#teamFilter"), v = $("#viewFilter");
+      if(q) q.value = "";
+      if(t) t.value = "";
+      if(v) v.value = "all";
+      paintSortIndicators();
+      render();
+      syncLeaderButtonsActive();
+    });
+    wrap.appendChild(reset);
+
+    // Metrics
+    LEADER_METRICS.forEach(m=>{
+      wrap.appendChild(mk(m.label, m.key, "btn pill"));
+    });
+  }
+
+  syncLeaderButtonsActive();
+}
+
+function syncLeaderButtonsActive(){
+  const wrap = $("#leaderBtns");
+  if(!wrap) return;
+  wrap.querySelectorAll("button[data-metric]").forEach(b=>{
+    const k = b.dataset.metric;
+    b.classList.toggle("active", k === view.key);
   });
 }
 
 async function load(){
   try{
     setLoading("Loading stats…");
-    hint.textContent = "Loading…";
+    if(hint) hint.textContent = "Loading…";
 
     const url = CSV_URL || FALLBACK_CSV_URL;
-
-if(!url || url.includes("https://docs.google.com/spreadsheets/...your link...")){
-   setLoading("https://docs.google.com/spreadsheets/d/e/2PACX-1vQCQnxfwBylnd5H8jHc_g9Gtv7wyhzelCLixlK3-Bi_Uw0pVJga8MPtgYf5740Csm7hbfLTJhHGdWzh/pub?gid=1283136814&single=true&output=csv");
-   hint.textContent = "Missing CSV link";
-   return;
-}
+    if(!url){
+      setLoading("Missing CSV link");
+      if(hint) hint.textContent = "Missing CSV link";
+      return;
+    }
 
     const res = await fetch(url, { cache: "no-store" });
     if(!res.ok) throw new Error("CSV fetch failed: " + res.status);
     const text = await res.text();
 
     const grid = parseCSV(text);
-    const headers = grid.shift().map(normalizeKey);
-    console.log("CSV headers:", headers);
+    const headers = (grid.shift() || []).map(normalizeKey);
 
-    // ---- build raw rows from CSV ----
-const raw = grid.map(cols=>{
-  const o = {};
-  headers.forEach((h, i)=> o[h] = (cols[i] ?? "").trim());
-  return o;
-});
+    // build raw rows
+    const raw = grid.map(cols=>{
+      const o = {};
+      headers.forEach((h, i)=> o[h] = (cols[i] ?? "").trim());
+      return o;
+    });
 
-// ---- aggregate per player ----
-const map = {};
+    // aggregate per player_id
+    const map = {};
+    raw.forEach(r=>{
+      const p = r.player_id;
+      if(!p) return;
 
-raw.forEach(r=>{
-  const p = r.player_id;
-  if(!p) return;
+      if(!map[p]){
+        map[p] = {
+          Player: p,
+          Team: r.team_id,
+          GP: 0, Score: 0, Goals: 0, Assists: 0, Saves: 0, Shots: 0, PingTotal: 0
+        };
+      }
 
-  if(!map[p]){
-    map[p] = {
-      Player: p,
-      Team: r.team_id,
-      GP: 0,
-      Score: 0,
-      Goals: 0,
-      Assists: 0,
-      Saves: 0,
-      Shots: 0,
-      PingTotal: 0
-    };
-  }
+      map[p].GP++;
+      map[p].Score     += Number(r.score   || 0);
+      map[p].Goals     += Number(r.goals   || 0);
+      map[p].Assists   += Number(r.assists || 0);
+      map[p].Saves     += Number(r.saves   || 0);
+      map[p].Shots     += Number(r.shots   || 0);
+      map[p].PingTotal += Number(r.ping    || 0);
+    });
 
-  map[p].GP++;
-  map[p].Score   += Number(r.score || 0);
-  map[p].Goals   += Number(r.goals || 0);
-  map[p].Assists += Number(r.assists || 0);
-  map[p].Saves   += Number(r.saves || 0);
-  map[p].Shots   += Number(r.shots || 0);
-  map[p].PingTotal += Number(r.ping || 0);
-});
+    rows = Object.values(map).map(r=>({
+      Player: r.Player,
+      Team: r.Team,
+      GP: r.GP,
+      Score: r.Score,
+      Goals: r.Goals,
+      Assists: r.Assists,
+      Saves: r.Saves,
+      Shots: r.Shots,
+      Ping: r.GP ? Math.round(r.PingTotal / r.GP) : 0
+    }));
 
-// ---- finalize rows ----
-rows = Object.values(map).map(r=>({
-  Player: r.Player,
-  Team: r.Team,
-  GP: r.GP,
-  Score: r.Score,
-  Goals: r.Goals,
-  Assists: r.Assists,
-  Saves: r.Saves,
-  Shots: r.Shots,
-  Ping: Math.round(r.PingTotal / r.GP)
-}));
-
-    // Default sort: Score desc
+    // default sort
     view.key = "Score";
     view.dir = "desc";
 
     hydrateTeamFilter();
     paintSortIndicators();
+    buildLeaderButtons();
     render();
 
   }catch(err){
     console.error(err);
     setLoading("Could not load stats. Check CSV link + console.");
-    hint.textContent = "Load error";
+    if(hint) hint.textContent = "Load error";
   }
 }
 
 function wireUI(){
-  $("#q").addEventListener("input", (e)=>{ view.q = e.target.value; render(); });
-  $("#teamFilter").addEventListener("change", (e)=>{ view.team = e.target.value; render(); });
-  $("#viewFilter").addEventListener("change", (e)=>{ view.top = e.target.value; render(); });
-
-  $("#btnCSV").addEventListener("click", load);
-
-  $("#btnReset").addEventListener("click", ()=>{
-    view = { key:"Score", dir:"desc", q:"", team:"", top:"all" };
-    $("#q").value = "";
-    $("#teamFilter").value = "";
-    $("#viewFilter").value = "all";
-    paintSortIndicators();
-    render();
-  });
-
-  $("#btnTopPts").addEventListener("click", ()=>{
-    view.key="Score"; view.dir="desc"; paintSortIndicators(); render();
-  });
-
-  $("#btnTopGoals").addEventListener("click", ()=>{
-    view.key="Goals"; view.dir="desc"; paintSortIndicators(); render();
-  });
+  on($("#q"), "input", (e)=>{ view.q = e.target.value; render(); });
+  on($("#teamFilter"), "change", (e)=>{ view.team = e.target.value; render(); });
+  on($("#viewFilter"), "change", (e)=>{ view.top = e.target.value; render(); });
+  on($("#btnCSV"), "click", load);
 }
 
 attachSorting();
 wireUI();
+buildLeaderButtons();
 load();
 </script>
-
-</body>
-</html>
