@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -8,19 +7,19 @@
   <meta name="theme-color" content="#ff8a00" />
 
   <!-- Fonts: Anton (headers) + Montserrat (body) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet" />
 
-  <!-- Site CSS (if you want) -->
-  <link rel="stylesheet" href="../assets/css/style.css" />
+  <!-- Site CSS (optional) -->
+  <!-- Keep this ONLY if you still want global shared styles from v1 -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
 
-  <!-- RLOL V2 -->
-  <link rel="stylesheet" href="../assets/css/rlol-v2.css" />
+  <!-- RLOL V2 CSS -->
+  <link rel="stylesheet" href="/assets/css/rlol-v2.css" />
 </head>
 
 <body class="rlol rlol-hub-v2">
-
   <main class="rlol-wrap">
 
     <!-- Top header -->
@@ -40,7 +39,7 @@
           </nav>
         </div>
 
-        <!-- Right badge block (optional) -->
+        <!-- Right badge block -->
         <div class="rlol-hero-right">
           <div class="badge-card">
             <div class="badge-top">
@@ -72,9 +71,8 @@
           </div>
         </div>
 
-        <div class="list">
-
-          <!-- V2 mock rows (swap with your JS render later) -->
+        <div class="list" id="nextMatches">
+          <!-- Placeholder rows (swap with JS render later) -->
           <div class="match-row playoff-glow">
             <div class="match-left">
               <div class="match-time">
@@ -128,7 +126,6 @@
             </div>
             <span class="mini-link muted">TBD</span>
           </div>
-
         </div>
       </article>
 
@@ -141,11 +138,13 @@
           </div>
         </div>
 
-        <div class="table">
+        <div class="table" id="standingsPreview">
+          <!-- Header -->
           <div class="trow thead">
             <div>#</div><div>Team</div><div class="num">W</div><div class="num">L</div><div class="num">PTS</div>
           </div>
 
+          <!-- Placeholder rows (swap with JS later) -->
           <div class="trow playoff-glow">
             <div>1</div><div class="teamcell"><span class="dot"></span>WLW</div><div class="num">2</div><div class="num">0</div><div class="num">6</div>
           </div>
@@ -162,7 +161,6 @@
             <div>5</div><div class="teamcell"><span class="dot"></span>Prismen Esports</div><div class="num">1</div><div class="num">1</div><div class="num">3</div>
           </div>
         </div>
-
       </article>
 
       <!-- Stats Preview -->
@@ -174,7 +172,39 @@
           </div>
         </div>
 
-        <div class="leaders">
+        <div class="leaders" id="statsLeaders">
+          <!-- Placeholder rows -->
           <div class="leader-row playoff-glow">
             <div class="leader-main">
-              <div class="leader-name">Player Name
+              <div class="leader-name">Player Name</div>
+              <div class="leader-sub">Team • Category</div>
+            </div>
+            <div class="leader-val">99</div>
+          </div>
+
+          <div class="leader-row">
+            <div class="leader-main">
+              <div class="leader-name">Player Name</div>
+              <div class="leader-sub">Team • Category</div>
+            </div>
+            <div class="leader-val">88</div>
+          </div>
+
+          <div class="leader-row dim">
+            <div class="leader-main">
+              <div class="leader-name">Player Name</div>
+              <div class="leader-sub">Team • Category</div>
+            </div>
+            <div class="leader-val">—</div>
+          </div>
+        </div>
+      </article>
+
+    </section>
+  </main>
+
+  <!-- Config + hub logic (ABSOLUTE PATHS) -->
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/rlol-hub.js"></script>
+</body>
+</html>
