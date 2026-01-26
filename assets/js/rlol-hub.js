@@ -1,310 +1,19 @@
+// /assets/js/rlol-hub.js
 (function () {
-  // ---------- small helpers ----------
-  function splitCSVLine(line) {
-    var out = [], cur = "", inQ = false;
-    for (var i = 0; i < line.length; i++) {
-      var ch = line[i];
-      if (ch === '"') {
-        if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
-        else inQ = !inQ;
-      } else if (ch === ',' && !inQ) {
-        out.push(cur); cur = "";
-      } else {
-        cur += ch;
-      }
-    }
-    out.push(cur);
-    return out;
+  const nextMatchesEl = document.getElementById("nextMatches");
+  const standingsEl = document.getElementById("standingsPreview");
+  const leadersEl = document.getElementById("statsLeaders");
+
+  if (!window.OV_CONFIG || !OV_CONFIG.rlol) {
+    console.error("Missing OV_CONFIG.rlol in /assets/js/config.js");
+    return;
   }
 
-  function parseCSV(text) {
-    text = String(text || "").replace(/\uFEFF/g, "");
-    var lines = text.trim().split(/\r?\n/).filter(function (x) { return x && x.trim(); });
-    if (!lines.length) return [];
+  const scheduleURL = OV_CONFIG.rlol.scheduleCsv;
+  const standingsURL = OV_CONFIG.rlol.standingsCsv || OV_CONFIG.rlol.standingsViewCsv;
+  const statsURL = OV_CONFIG.rlol.playerSeasonStatsCsv;
 
-    var headers = splitCSVLine(lines[0]).map(function (h) { return h.trim(); });
-    var rows = [];
-
-    for (var i = 1; i < lines.length; i++) {
-      var cols = splitCSVLine(lines[i]);
-      var row = {};
-      for (var j = 0; j < headers.length; j++) row[headers[j]] = (cols[j] || "").trim();
-      rows.push(row);
-    }
-    return rows;
-  }
-
-  function fetchCSV(url) {
-    return fetch(url, { cache: "no-store" })
-      .then(function (res) { if (!res.ok) throw new Error("Fetch failed: " + res.status); return res.text(); })
-      .then(parseCSV);
-  }
-
-  function normalizeStatus(s) { return String(s || "").toLowerCase().trim(); }
-
-  function toISODateKey(s) { return (s || "").slice(0, 10); }
-
-  function prettyDate(iso) {
-    if (!iso) return "";
-    var d = new Date(iso + "T00:00:00");
-    return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
-  }
-
-  function todayISO() {
-    var now = new Date();
-    var y = now.getFullYear();
-    var m = String(now.getMonth() + 1).padStart(2, "0");
-    var d = String(now.getDate()).padStart(2, "0");
-    return y + "-" + m + "-" + d;
-  }
-
-  function buildTeamMap(teamsRows) {
-    var map = new Map();
-    for (var i = 0; i < teamsRows.length; i++) {
-      var r = teamsRows[i];
-      var id = r.team_id || r.id || r.TeamID || r.team || "";
-      if (!id) continue;
-      var name = r.team_name || r.Team || r.team || id;
-      var logo = r.logo_url || r.logo || "";
-      map.set(id, { id: id, name: name, logo: logo });
-    }
-    return map;
-  }
-
-  function el(id) { return document.getElementById(id); }
-
-  function safeText(node, text) {
-    if (!node) return;
-    node.textContent = text;
-  }
-
-  // ---------- HUB: Next Match Night ----------
-  function findNextMatchDate(scheduleRows) {
-    // Choose earliest scheduled_date >= today where status is not played/cancelled (fallback: any future)
-    var today = todayISO();
-    var best = null;
-
-    for (var i = 0; i < scheduleRows.length; i++) {
-      var r = scheduleRows[i];
-      var dateKey = toISODateKey(r.scheduled_date || r.date || "");
-      if (!dateKey) continue;
-
-      var st = normalizeStatus(r.status);
-      if (dateKey < today) continue;
-
-      // Prefer rows that are scheduled/postponed (not played/cancelled)
-      var ok = (st !== "played" && st !== "cancelled");
-      if (!ok) continue;
-
-      if (best === null || dateKey < best) best = dateKey;
-    }
-
-    // Fallback: any future date
-    if (best === null) {
-      for (var j = 0; j < scheduleRows.length; j++) {
-        var rr = scheduleRows[j];
-        var dk = toISODateKey(rr.scheduled_date || rr.date || "");
-        if (!dk) continue;
-        if (dk < today) continue;
-        if (best === null || dk < best) best = dk;
-      }
-    }
-
-    return best;
-  }
-
-  function renderNextMatchNight(teamMap, scheduleRows) {
-    var nextMeta = el("nextMeta");
-    var nextMatches = el("nextMatches");
-    if (nextMatches) nextMatches.innerHTML = "";
-
-    if (!scheduleRows.length) {
-      safeText(nextMeta, "No schedule rows found.");
-      return;
-    }
-
-    var nextDate = findNextMatchDate(scheduleRows);
-    if (!nextDate) {
-      safeText(nextMeta, "No upcoming match night found.");
-      return;
-    }
-
-    // Matches for that date
-    var matches = scheduleRows.filter(function (r) {
-      return toISODateKey(r.scheduled_date || r.date || "") === nextDate;
-    });
-
-    // Sort by match_id (string)
-    matches.sort(function (a, b) {
-      return String(a.match_id || "").localeCompare(String(b.match_id || ""));
-    });
-
-    // meta line
-    var time = (matches[0] && (matches[0].scheduled_time || matches[0].time)) || "18:00";
-    var tz = (matches[0] && (matches[0].timezone || matches[0].tz)) || "ET";
-
-    safeText(
-      nextMeta,
-      "Next Match Night: " + prettyDate(nextDate) + " • stream starts " + time + " " + tz
-    );
-
-    if (!nextMatches) return;
-
-    // Render list
-    for (var i = 0; i < matches.length; i++) {
-      var m = matches[i];
-
-      var homeId = m.home_team_id || m.home || m.home_team || "";
-      var awayId = m.away_team_id || m.away || m.away_team || "";
-
-      var home = teamMap.get(homeId) || { name: homeId || "TBD", logo: "" };
-      var away = teamMap.get(awayId) || { name: awayId || "TBD", logo: "" };   
-      var series = (m.series_id || m.series || "").trim();
-      var status = normalizeStatus(m.status);
-
-      var item = document.createElement("div");
-      item.className = "match-item next-match";
-
-      item.innerHTML =
-        '<div class="match-left">' +
-          (home.logo ? ('<img class="team-logo" src="' + home.logo + '" alt="' + home.name + ' logo" loading="lazy">') : '<div class="team-logo ph"></div>') +
-          '<div class="match-names">' +
-            '<div class="match-team"><span class="team-name">' + home.name + '</span></div>' +
-            '<div class="match-vs">vs</div>' +
-            '<div class="match-team"><span class="team-name">' + away.name + '</span></div>' +
-          '</div>' +
-          (away.logo ? ('<img class="team-logo" src="' + away.logo + '" alt="' + away.name + ' logo" loading="lazy">') : '<div class="team-logo ph"></div>') +
-        '</div>' +
-        '<div class="match-right">' +
-          (series ? ('<div class="pill soft">Series ' + series + '</div>') : '') +
-          (status ? ('<div class="pill status">' + status + '</div>') : '') +
-        '</div>';
-
-      nextMatches.appendChild(item);
-    }
-  }
-
-  // ---------- HUB: Standings Snapshot (Top 4) ----------
-  function numberOrZero(x) {
-    var n = Number(String(x || "").replace(/[^\d\.\-]/g, ""));
-    return isFinite(n) ? n : 0;
-  }
-
-  function renderTop4(teamMap, standingsRows) {
-    var standMeta = el("standMeta");
-    var tbody = el("top4");
-    if (tbody) tbody.innerHTML = "";
-
-    if (!standingsRows.length) {
-      safeText(standMeta, "No standings rows found.");
-      return;
-    }
-
-    // Try to normalize common columns
-    // Accepts: W/L, wins/losses, GD/goal_diff
-    var normalized = standingsRows.map(function (r) {
-      var teamId = r.team_id || r.team || r.teamId || r.TeamID || "";
-      var teamName = r.team_name || r.Team || r.team || teamId;
-
-      var w = r.W || r.wins || r.win || r.w || 0;
-      var l = r.L || r.losses || r.loss || r.l || 0;
-
-      var gd = r.GD || r.goal_diff || r.goaldiff || r.gd || r["Goal Diff"] || 0;
-
-      return {
-        team_id: teamId,
-        team_name: teamName,
-        W: numberOrZero(w),
-        L: numberOrZero(l),
-        GD: numberOrZero(gd)
-      };
-    });
-
-    // Sort by W desc, then GD desc (fallback behavior)
-    normalized.sort(function (a, b) {
-      return (b.W - a.W) || (b.GD - a.GD) || String(a.team_name).localeCompare(String(b.team_name));
-    });
-
-    // meta updated
-    var now = new Date();
-    safeText(standMeta, "Auto-updates from match results • Updated " + now.toLocaleDateString(undefined, { month: "short", day: "numeric" }));
-
-    if (!tbody) return;
-
-    var top = normalized.slice(0, 4);
-    for (var i = 0; i < top.length; i++) {
-      var row = top[i];
-      var team = teamMap.get(row.team_id) || { name: row.team_name, logo: "" };
-
-      var tr = document.createElement("tr");
-      tr.innerHTML =
-        '<td class="rank">' + (i + 1) + '</td>' +
-        '<td>' +
-          '<div class="team-cell">' +
-            (team.logo ? ('<img class="mini-logo" src="' + team.logo + '" alt="' + (team.name || row.team_name) + ' logo" loading="lazy">') : '<span class="mini-logo ph"></span>') +
-            '<span class="team-label">' + (team.name || row.team_name) + '</span>' +
-          '</div>' +
-        '</td>' +
-        '<td class="right nowrap">' + row.W + '-' + row.L + '</td>' +
-        '<td class="right nowrap">' + row.GD + '</td>';
-
-      tbody.appendChild(tr);
-    }
-  }
-
-  // ---------- main ----------
-  function main() {
-    // year footer
-    var y = document.getElementById("year");
-    if (y) y.textContent = String(new Date().getFullYear());
-
-    if (!window.OV_CONFIG || !window.OV_CONFIG.rlol) {
-      console.error("OV_CONFIG not found");
-      safeText(el("nextMeta"), "Missing config.");
-      safeText(el("standMeta"), "Missing config.");
-      return;
-    }
-
-    var cfg = window.OV_CONFIG.rlol;
-
-    var teamsUrl = cfg.teamsCsv;
-    var scheduleUrl = cfg.scheduleCsv;
-    // For hub snapshot, prefer standingsViewCsv (usually has nicer view columns)
-    var standingsUrl = cfg.standingsViewCsv || cfg.standingsCsv;
-
-    Promise.all([fetchCSV(teamsUrl), fetchCSV(scheduleUrl), fetchCSV(standingsUrl)])
-      .then(function (res) {
-        var teamsRows = res[0];
-        var scheduleRows = res[1];
-        var standingsRows = res[2];
-
-        var teamMap = buildTeamMap(teamsRows);
-
-        // schedule sort: date asc, then match_id
-        scheduleRows.sort(function (a, b) {
-          var ad = toISODateKey(a.scheduled_date || a.date || "");
-          var bd = toISODateKey(b.scheduled_date || b.date || "");
-          return String(ad).localeCompare(String(bd)) ||
-                 String(a.match_id || "").localeCompare(String(b.match_id || ""));
-        });
-
-        renderNextMatchNight(teamMap, scheduleRows);
-        renderTop4(teamMap, standingsRows);
-      })
-      .catch(function (err) {
-        console.error(err);
-        safeText(el("nextMeta"), "Failed to load match night.");
-        safeText(el("standMeta"), "Failed to load standings.");
-      });
-  }
-
-  main();
-})();
-
-// /assets/js/rlol-hub-stats-preview.js
-(function () {
-  const $ = (sel) => document.querySelector(sel);
-
+  // ---------- CSV parsing (quoted commas safe) ----------
   function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -313,153 +22,284 @@
 
     for (let i = 0; i < text.length; i++) {
       const c = text[i];
-      const next = text[i + 1];
+      const n = text[i + 1];
 
-      if (c === '"' && inQuotes && next === '"') { cur += '"'; i++; continue; }
+      if (c === '"' && inQuotes && n === '"') { cur += '"'; i++; continue; }
       if (c === '"') { inQuotes = !inQuotes; continue; }
+
       if (c === "," && !inQuotes) { row.push(cur); cur = ""; continue; }
 
       if ((c === "\n" || c === "\r") && !inQuotes) {
-        if (c === "\r" && next === "\n") i++;
-        row.push(cur); cur = "";
-        if (row.some(x => String(x).trim() !== "")) rows.push(row);
+        if (c === "\r" && n === "\n") i++;
+        row.push(cur);
+        rows.push(row);
         row = [];
+        cur = "";
         continue;
       }
+
       cur += c;
     }
-    row.push(cur);
-    if (row.some(x => String(x).trim() !== "")) rows.push(row);
 
-    const header = rows[0] || [];
-    const data = [];
-    for (let r = 1; r < rows.length; r++) {
-      const obj = {};
-      for (let c = 0; c < header.length; c++) {
-        obj[String(header[c] || "").trim()] = (rows[r][c] ?? "").trim();
-      }
-      data.push(obj);
-    }
-    return data;
+    if (cur.length || row.length) { row.push(cur); rows.push(row); }
+    return rows;
   }
 
-  function num(v, fallback = 0) {
-    const s = String(v ?? "").trim();
-    if (!s) return fallback;
-    const n = Number(s.replace(/[^\d.-]/g, ""));
-    return Number.isFinite(n) ? n : fallback;
+  function normKey(s) {
+    return String(s || "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/[^a-z0-9]/g, "");
   }
 
-  function pick(row, keys, fb = "") {
+  function rowsToObjects(csvText) {
+    const rows = parseCSV(csvText);
+    const headers = (rows.shift() || []).map(normKey);
+
+    return rows
+      .filter(r => r.some(cell => String(cell || "").trim() !== ""))
+      .map(r => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = (r[i] || "").trim());
+        return obj;
+      });
+  }
+
+  function pick(obj, keys, fallback = "") {
     for (const k of keys) {
-      const val = row[k];
-      if (val !== undefined && val !== null && String(val).trim() !== "") return String(val).trim();
+      const v = obj[k];
+      if (v !== undefined && v !== null && String(v).trim() !== "") return String(v).trim();
     }
-    return fb;
+    return fallback;
   }
 
-  async function fetchCsv(url) {
-    if (!url) throw new Error("Stats CSV missing (OV_CONFIG.rlol.playerSeasonStatsCsv)");
-    const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
-    const res = await fetch(busted, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status} fetching stats CSV`);
-    return parseCSV(await res.text());
+  function toNum(v) {
+    const n = Number(String(v || "").replace(/[^0-9.-]/g, ""));
+    return Number.isFinite(n) ? n : 0;
   }
 
-  function bestBy(rows, valueKeyCandidates) {
-    let best = null;
-    let bestVal = -Infinity;
-    for (const r of rows) {
-      const v = num(pick(r, valueKeyCandidates, "0"), 0);
-      if (v > bestVal) { bestVal = v; best = r; }
+  // ---------- UI helpers ----------
+  function esc(s) {
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function statusClass(raw) {
+    const s = String(raw || "").toLowerCase();
+    if (s.includes("live")) return "live";
+    if (s.includes("played") || s.includes("final") || s.includes("done")) return "played";
+    return "scheduled";
+  }
+
+  function dayFromText(t) {
+    const s = String(t || "").toUpperCase();
+    // if you store "FRI" etc in a column, this will just pass it through
+    if (["MON","TUE","WED","THU","FRI","SAT","SUN"].includes(s)) return s;
+    return ""; // unknown
+  }
+
+  // ---------- Render: Next Matches ----------
+  function renderNextMatches(scheduleRows) {
+    if (!nextMatchesEl) return;
+
+    // Wipe placeholders
+    nextMatchesEl.innerHTML = "";
+
+    // Try to map schedule columns (flexible)
+    const mapped = scheduleRows.map(r => {
+      const week = pick(r, ["week", "wk"]);
+      const status = pick(r, ["status", "matchstatus", "state"], "scheduled");
+      const day = pick(r, ["day", "dow"]);
+      const time = pick(r, ["time", "start", "starttime"]);
+      const team1 = pick(r, ["team1", "home", "team", "blue", "team_a", "teama"]);
+      const team2 = pick(r, ["team2", "away", "opponent", "orange", "team_b", "teamb"]);
+      const note = pick(r, ["note", "notes", "comment", "meta"]);
+
+      return { week, status, day, time, team1, team2, note };
+    });
+
+    // Pick upcoming: scheduled/live first; ignore blank rows
+    const upcoming = mapped
+      .filter(m => (m.team1 || m.team2))
+      .filter(m => {
+        const s = String(m.status).toLowerCase();
+        return s.includes("scheduled") || s.includes("live") || s === "";
+      })
+      .slice(0, 6);
+
+    if (!upcoming.length) {
+      nextMatchesEl.innerHTML = `<div class="empty">No upcoming matches</div>`;
+      return;
     }
-    return { row: best, val: bestVal };
-  }
 
-function renderRow(label, whoName, teamName, value, avatarUrl) {
-  const img = avatarUrl
-    ? `<img class="avatar" src="${avatarUrl}" alt="" loading="lazy" />`
-    : "";
+    upcoming.forEach((m, idx) => {
+      const day = dayFromText(m.day) || (m.time ? "" : "TBD");
+      const clock = m.time || "—";
+      const meta = m.week ? `${m.week}${m.note ? " • " + m.note : ""}` : (m.note || "");
+      const t1 = m.team1 || "TBD";
+      const t2 = m.team2 || "TBD";
 
-  return `
-    <div class="stat-row">
-      <div>
-        <div class="label">${label}</div>
-        <div class="who">
-          ${img}
-          <div class="name">${whoName || teamName || "—"}</div>
+      const row = document.createElement("div");
+      row.className = `match-row ${idx === 0 ? "playoff-glow" : ""} ${(!m.time && (!m.team1 || !m.team2)) ? "dim" : ""}`;
+
+      row.innerHTML = `
+        <div class="match-left">
+          <div class="match-time">
+            <div class="day">${esc(day || "TBD")}</div>
+            <div class="clock">${esc(clock)}</div>
+          </div>
+          <div class="match-info">
+            <div class="match-teams">
+              <span class="team">${esc(t1)}</span>
+              <span class="vs">vs</span>
+              <span class="team">${esc(t2)}</span>
+            </div>
+            <div class="match-meta">${esc(meta)}</div>
+          </div>
         </div>
-      </div>
-      <div class="value">${Number.isFinite(value) ? value : ""}</div>
-    </div>
-  `;
-}
+        <a class="mini-link" href="/rlol/schedule/">Details</a>
+      `;
 
-  async function init() {
-    const mount = $("#statsPreview");
-    if (!mount) return;
-
-    try {
-      const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
-      const rows = await fetchCsv(cfg && cfg.playerSeasonStatsCsv);
-
-      // These column guesses cover most sheets:
-      const nameKey = ["player", "Player", "player_name", "Player Name", "name", "Name"];
-      const teamKey = ["team", "Team", "team_name", "Team Name"];
-      const avatarKey = ["avatar", "avatar_url", "pfp", "photo", "image", "img"];
-
-      const topScore = bestBy(rows, ["score", "Score", "pts", "PTS", "points", "Points"]);
-      const topGoals = bestBy(rows, ["g", "G", "goals", "Goals"]);
-      const topAssists = bestBy(rows, ["a", "A", "assists", "Assists"]);
-      const topSaves = bestBy(rows, ["saves", "Saves", "sv", "SV"]);
-
-      mount.innerHTML = [
-        (() => {
-          const r = topScore.row || {};
-          return renderRow(
-            "Top Score",
-            pick(r, nameKey, ""),
-            pick(r, teamKey, ""),
-            topScore.val,
-            pick(r, avatarKey, "")
-          );
-        })(),
-        (() => {
-          const r = topGoals.row || {};
-          return renderRow(
-            "Goals Leader",
-            pick(r, nameKey, ""),
-            pick(r, teamKey, ""),
-            topGoals.val,
-            pick(r, avatarKey, "")
-          );
-        })(),
-        (() => {
-          const r = topAssists.row || {};
-          return renderRow(
-            "Assists Leader",
-            pick(r, nameKey, ""),
-            pick(r, teamKey, ""),
-            topAssists.val,
-            pick(r, avatarKey, "")
-          );
-        })(),
-        (() => {
-          const r = topSaves.row || {};
-          return renderRow(
-            "Saves Leader",
-            pick(r, nameKey, ""),
-            pick(r, teamKey, ""),
-            topSaves.val,
-            pick(r, avatarKey, "")
-          );
-        })(),
-      ].join("");
-    } catch (err) {
-      console.error(err);
-      mount.innerHTML = `<div class="stats-preview__loading">Stats preview failed: ${String(err.message || err)}</div>`;
-    }
+      nextMatchesEl.appendChild(row);
+    });
   }
 
-  init();
+  // ---------- Render: Standings Preview ----------
+  function renderStandings(standingRows) {
+    if (!standingsEl) return;
+
+    // Keep the header row if your CSS expects it; easiest is to rebuild the whole block.
+    standingsEl.innerHTML = `
+      <div class="trow thead">
+        <div>#</div><div>Team</div><div class="num">W</div><div class="num">L</div><div class="num">PTS</div>
+      </div>
+    `;
+
+    const mapped = standingRows.map(r => {
+      const rank = pick(r, ["rank", "#", "pos", "position", "place"]);
+      const team = pick(r, ["team", "name", "teamname"]);
+      const w = pick(r, ["w", "wins"]);
+      const l = pick(r, ["l", "losses"]);
+      const pts = pick(r, ["pts", "points", "p"]);
+      return { rank, team, w, l, pts };
+    }).filter(x => x.team);
+
+    // Sort by pts desc then w desc (if your sheet isn’t already sorted)
+    mapped.sort((a, b) => (toNum(b.pts) - toNum(a.pts)) || (toNum(b.w) - toNum(a.w)));
+
+    const top = mapped.slice(0, 8);
+    const playoffCut = 4; // change if your league uses a different cut
+
+    top.forEach((t, i) => {
+      if (i === playoffCut) {
+        const line = document.createElement("div");
+        line.className = "playoff-line";
+        line.textContent = "PLAYOFF LINE";
+        standingsEl.appendChild(line);
+      }
+
+      const row = document.createElement("div");
+      row.className = `trow ${i < playoffCut ? "playoff-glow" : ""}`;
+
+      row.innerHTML = `
+        <div>${esc(String(i + 1))}</div>
+        <div class="teamcell"><span class="dot"></span>${esc(t.team)}</div>
+        <div class="num">${esc(t.w || "0")}</div>
+        <div class="num">${esc(t.l || "0")}</div>
+        <div class="num">${esc(t.pts || String((toNum(t.w) * 3) || 0))}</div>
+      `;
+
+      standingsEl.appendChild(row);
+    });
+  }
+
+  // ---------- Render: Stats Leaders ----------
+  function renderLeaders(statRows) {
+    if (!leadersEl) return;
+
+    leadersEl.innerHTML = "";
+
+    const mapped = statRows.map(r => {
+      const player = pick(r, ["player", "name", "playername", "username"]);
+      const team = pick(r, ["team", "teamname"]);
+      const goals = toNum(pick(r, ["g", "goals"]));
+      const assists = toNum(pick(r, ["a", "assists"]));
+      const saves = toNum(pick(r, ["saves", "sv"]));
+      const score = toNum(pick(r, ["score", "pts", "points"]));
+      return { player, team, goals, assists, saves, score };
+    }).filter(x => x.player);
+
+    // Build 4 leader tiles (top 1 each)
+    const cats = [
+      { key: "goals", label: "Goals" },
+      { key: "assists", label: "Assists" },
+      { key: "saves", label: "Saves" },
+      { key: "score", label: "Score" }
+    ];
+
+    cats.forEach((c, idx) => {
+      const best = mapped.slice().sort((a, b) => b[c.key] - a[c.key])[0];
+
+      const row = document.createElement("div");
+      row.className = `leader-row ${idx === 0 ? "playoff-glow" : ""}`;
+
+      if (!best || best[c.key] <= 0) {
+        row.classList.add("dim");
+        row.innerHTML = `
+          <div class="leader-main">
+            <div class="leader-name">—</div>
+            <div class="leader-sub">No data • ${esc(c.label)}</div>
+          </div>
+          <div class="leader-val">—</div>
+        `;
+      } else {
+        row.innerHTML = `
+          <div class="leader-main">
+            <div class="leader-name">${esc(best.player)}</div>
+            <div class="leader-sub">${esc(best.team || "Team")} • ${esc(c.label)}</div>
+          </div>
+          <div class="leader-val">${esc(best[c.key])}</div>
+        `;
+      }
+
+      leadersEl.appendChild(row);
+    });
+  }
+
+  // ---------- Fetch & hydrate ----------
+  async function fetchCSV(url) {
+    if (!url) throw new Error("Missing CSV url");
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Fetch failed ${res.status}: ${url}`);
+    return res.text();
+  }
+
+  (async function init() {
+    try {
+      const [schedText, standText, statText] = await Promise.all([
+        fetchCSV(scheduleURL),
+        fetchCSV(standingsURL),
+        fetchCSV(statsURL)
+      ]);
+
+      const schedRows = rowsToObjects(schedText);
+      const standRows = rowsToObjects(standText);
+      const statRows = rowsToObjects(statText);
+
+      renderNextMatches(schedRows);
+      renderStandings(standRows);
+      renderLeaders(statRows);
+
+    } catch (e) {
+      console.error(e);
+      // If something fails, at least wipe placeholders so it doesn't look "fake"
+      if (nextMatchesEl) nextMatchesEl.innerHTML = `<div class="empty">Unable to load schedule</div>`;
+      if (standingsEl) standingsEl.innerHTML = `<div class="empty">Unable to load standings</div>`;
+      if (leadersEl) leadersEl.innerHTML = `<div class="empty">Unable to load stats</div>`;
+    }
+  })();
+
 })();
