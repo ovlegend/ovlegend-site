@@ -298,21 +298,55 @@ if(!url || url.includes("https://docs.google.com/spreadsheets/...your link..."))
     const headers = grid.shift().map(normalizeKey);
     console.log("CSV headers:", headers);
 
-    rows = grid.map(cols=>{
-      const obj = {};
-      headers.forEach((h, i)=> obj[h] = (cols[i] ?? "").trim());
-      // Normalize common column names if your sheet differs
-      obj.Player  = obj.Player  || obj.Name || obj.PlayerName || "";
-      obj.Team    = obj.Team    || obj.TeamName || "";
-      obj.GP      = obj.GP      || obj.Games || obj.GamesPlayed || "0";
-      obj.Score   = obj.Score   || obj.Points || "0";
-      obj.Goals   = obj.Goals   || obj.G || "0";
-      obj.Assists = obj.Assists || obj.A || "0";
-      obj.Saves   = obj.Saves   || obj.S || "0";
-      obj.Shots   = obj.Shots   || obj.Sh || "0";
-      obj.Ping    = obj.Ping    || "0";
-      return obj;
-    });
+    // ---- build raw rows from CSV ----
+const raw = grid.map(cols=>{
+  const o = {};
+  headers.forEach((h, i)=> o[h] = (cols[i] ?? "").trim());
+  return o;
+});
+
+// ---- aggregate per player ----
+const map = {};
+
+raw.forEach(r=>{
+  const p = r.player_id;
+  if(!p) return;
+
+  if(!map[p]){
+    map[p] = {
+      Player: p,
+      Team: r.team_id,
+      GP: 0,
+      Score: 0,
+      Goals: 0,
+      Assists: 0,
+      Saves: 0,
+      Shots: 0,
+      PingTotal: 0
+    };
+  }
+
+  map[p].GP++;
+  map[p].Score   += Number(r.score || 0);
+  map[p].Goals   += Number(r.goals || 0);
+  map[p].Assists += Number(r.assists || 0);
+  map[p].Saves   += Number(r.saves || 0);
+  map[p].Shots   += Number(r.shots || 0);
+  map[p].PingTotal += Number(r.ping || 0);
+});
+
+// ---- finalize rows ----
+rows = Object.values(map).map(r=>({
+  Player: r.Player,
+  Team: r.Team,
+  GP: r.GP,
+  Score: r.Score,
+  Goals: r.Goals,
+  Assists: r.Assists,
+  Saves: r.Saves,
+  Shots: r.Shots,
+  Ping: Math.round(r.PingTotal / r.GP)
+}));
 
     // Default sort: Score desc
     view.key = "Score";
