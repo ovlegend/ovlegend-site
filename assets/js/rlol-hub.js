@@ -102,23 +102,80 @@
   }
 
   // ---------- Render: Next Matches ----------
-  function renderNextMatches(scheduleRows) {
-    if (!nextMatchesEl) return;
+function renderNextMatches(scheduleRows) {
+  if (!nextMatchesEl) return;
 
-    // Wipe placeholders
-    nextMatchesEl.innerHTML = "";
+  // wipe placeholders
+  nextMatchesEl.innerHTML = "";
 
-    // Try to map schedule columns (flexible)
-const mapped = scheduleRows.map(r => {
-  const week   = pick(r, ["week", "wk"]);
-  const status = pick(r, ["status", "matchstatus", "state"], "");
-  const day = pick(r, ["scheduled_date", "date", "match_date", "day", "dow"]);
-  const time = pick(r, ["scheduled_time", "time", "start", "starttime"]);
-  const team1 = pick(r, ["home_team_id", "home", "team1", "team", "blue", "team_a", "teama"]);
-  const team2 = pick(r, ["away_team_id", "away", "team2", "opponent", "orange", "team_b", "teamb"]);
-  const note   = pick(r, ["note", "notes", "comment", "meta"]);
-  return { week, status, day, time, team1, team2, note };
-});
+  // Map your EXACT schedule columns
+  const mapped = scheduleRows.map(r => {
+    const week   = pick(r, ["week", "wk"]);
+    const status = pick(r, ["status"], "");
+    const date   = pick(r, ["scheduled_date", "date"]);
+    const time   = pick(r, ["scheduled_time", "time"]);
+    const team1  = pick(r, ["home_team_id", "home"]);
+    const team2  = pick(r, ["away_team_id", "away"]);
+    const note   = pick(r, ["notes", "note", "meta"], "");
+    return { week, status, date, time, team1, team2, note };
+  });
+
+  // Parse YYYY-MM-DD + HH:MM for sorting
+  function toStamp(m) {
+    const d = String(m.date || "").trim();
+    const t = String(m.time || "").trim();
+    if (!d) return Number.MAX_SAFE_INTEGER;
+    // If time missing, sort to end of that date
+    const iso = t ? `${d}T${t}:00` : `${d}T23:59:59`;
+    const ms = Date.parse(iso);
+    return Number.isFinite(ms) ? ms : Number.MAX_SAFE_INTEGER;
+  }
+
+  // Upcoming = NOT played/final/done + must have both teams
+  const upcoming = mapped
+    .filter(m => m.team1 && m.team2)
+    .filter(m => {
+      const s = String(m.status || "").toLowerCase();
+      return !(s.includes("played") || s.includes("final") || s.includes("done"));
+    })
+    .sort((a, b) => toStamp(a) - toStamp(b))
+    .slice(0, 6);
+
+  if (!upcoming.length) {
+    nextMatchesEl.innerHTML = `<div class="empty">No upcoming matches</div>`;
+    return;
+  }
+
+  // Render
+  upcoming.forEach((m, idx) => {
+    const clock = m.time || "—";
+    const meta  = m.week ? `Week ${m.week}${m.note ? " • " + m.note : ""}` : (m.note || "");
+    const dayLabel = m.date || "TBD";
+
+    const row = document.createElement("div");
+    row.className = `match-row ${idx === 0 ? "playoff-glow" : ""}`;
+
+    row.innerHTML = `
+      <div class="match-left">
+        <div class="match-time">
+          <div class="day">${esc(dayLabel)}</div>
+          <div class="clock">${esc(clock)}</div>
+        </div>
+        <div class="match-info">
+          <div class="match-teams">
+            <span class="team">${esc(m.team1)}</span>
+            <span class="vs">vs</span>
+            <span class="team">${esc(m.team2)}</span>
+          </div>
+          <div class="match-meta">${esc(meta)}</div>
+        </div>
+      </div>
+      <a class="mini-link" href="/rlol/schedule/">Details</a>
+    `;
+
+    nextMatchesEl.appendChild(row);
+  });
+}
 
     // Pick upcoming: scheduled/live first; ignore blank rows
 const upcoming = mapped
