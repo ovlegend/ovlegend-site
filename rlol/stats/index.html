@@ -1,57 +1,142 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RLOL Stats | OV Legend</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#ff8a00" />
 
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <!-- V2 CSS -->
+  <link rel="stylesheet" href="../../assets/css/rlol-v2.css" />
+
+  <!-- Optional favicon (fix the 404 by pointing to a real file or remove this) -->
+  <!-- <link rel="icon" href="/assets/img/brand/favicon.png" type="image/png" /> -->
 </head>
 
-<body class="rlol rlol-stats">
+<body class="rlol rlol-stats-v2">
   <main class="rlol-wrap">
-    <div class="topbar">
-      <div>
-        <h1>RLOL Player Stats</h1>
-        <div class="sub">Auto-updates from Google Sheets • Season & Per-Game Stats</div>
+
+    <!-- Hero -->
+    <header class="rlol-hero">
+      <div class="rlol-hero-inner">
+
+        <div class="rlol-hero-left">
+          <div class="kicker">Rocket League of Legends</div>
+          <h1 class="title">Stats</h1>
+          <p class="sub">Auto-updates from Google Sheets • Click headers to sort • Search players/teams</p>
+
+          <nav class="nav-pills" aria-label="RLOL navigation">
+            <a class="pill" href="/v2/rlol/">Home</a>
+            <a class="pill" href="/v2/rlol/">Hub</a>
+            <a class="pill" href="/v2/rlol/schedule/">Schedule</a>
+            <a class="pill" href="/v2/rlol/standings/">Standings</a>
+            <a class="pill is-active" href="/v2/rlol/stats/">Stats</a>
+          </nav>
+        </div>
+
+        <div class="rlol-hero-right">
+          <div class="badge-card">
+            <div class="badge-top">
+              <span class="badge-label">Leaders</span>
+              <span class="badge-chip" id="leaderChip">Loading…</span>
+            </div>
+
+            <!-- Some JS versions expect leaderTitle/leaderMeta -->
+            <div class="badge-title" id="leaderTitle">Top Performer</div>
+            <div class="badge-meta" id="leaderMeta">Fetching latest stats…</div>
+
+            <!-- Leader buttons container (some JS versions build buttons in here) -->
+            <div id="leaderBtns" class="badge-actions">
+              <!-- Fallback buttons (prevents null addEventListener errors if your JS expects these IDs) -->
+              <button type="button" class="btn ghost" id="btnReset">RESET</button>
+              <button type="button" class="btn pill"  id="btnTopPts">TOP PTS</button>
+              <button type="button" class="btn pill"  id="btnTopGoals">TOP GOALS</button>
+              <button type="button" class="btn pill"  id="btnTopAssists">TOP AST</button>
+              <button type="button" class="btn pill"  id="btnTopSaves">TOP SAVES</button>
+              <button type="button" class="btn pill"  id="btnTopShots">TOP SHOTS</button>
+              <button type="button" class="btn pill"  id="btnTopGP">MOST GP</button>
+            </div>
+          </div>
+        </div>
+
       </div>
+    </header>
 
-      <div class="nav-btns" aria-label="RLOL navigation">
-        <a class="btn" href="/">Home</a>
-        <a class="btn" href="/rlol/">Hub</a>
-        <a class="btn" href="/rlol/schedule/">Schedule</a>
-        <a class="btn" href="/rlol/standings/">Standings</a>
-        <a class="btn" href="/rlol/teams/">Teams</a>
-      </div>
-    </div>
+    <!-- Stats -->
+    <section class="grid">
+      <article class="card wide">
+        <div class="card-head">
+          <h2 class="card-title">Player Stats</h2>
+          <div class="card-tools">
+            <!-- Your JS expects #statsStatus -->
+            <span class="hint" id="statsStatus">Loading…</span>
+          </div>
+        </div>
 
-    <div class="card">
-      <div class="controls">
-        <select id="viewMode" aria-label="View mode">
-          <option value="season_totals">Season Totals</option>
-          <option value="per_game">Per Game</option>
-        </select>
+        <!-- Toolbar: these IDs match your external rlol-stats.js -->
+        <div class="toolbar">
+          <input id="searchPlayer" class="field" type="search" placeholder="Search player or team…" autocomplete="off" />
 
-        <select id="seasonSel" aria-label="Season"></select>
-        <select id="weekSel" aria-label="Week"></select>
-        <select id="teamSel" aria-label="Team"></select>
+          <select id="teamSel" class="field select">
+            <option value="all">All Teams</option>
+          </select>
 
-        <input
-          id="searchPlayer"
-          type="text"
-          placeholder="Search player or team…"
-          aria-label="Search player or team"
-        />
-      </div>
+          <select id="seasonSel" class="field select">
+            <option value="all">All</option>
+          </select>
 
-      <div id="statsStatus" class="status">Loading stats…</div>
-      <div id="statsRoot"></div>
-    </div>
+          <select id="weekSel" class="field select">
+            <option value="all">All</option>
+          </select>
+
+          <select id="viewMode" class="field select">
+            <option value="season_totals">Season Totals</option>
+            <option value="per_game">Per Game</option>
+          </select>
+        </div>
+
+        <!-- IMPORTANT: keep BOTH #statsRoot AND a real table with #statsTable/#statsBody
+             so either JS style can render without throwing null errors. -->
+        <div id="statsRoot">
+          <div class="stats-card ov-card">
+            <table class="stats-table" id="statsTable">
+              <thead>
+                <tr>
+                  <th data-key="player">Player</th>
+                  <th data-key="team">Team</th>
+                  <th class="num" data-key="gp">GP</th>
+                  <th class="num" data-key="score">Score</th>
+                  <th class="num" data-key="goals">G</th>
+                  <th class="num" data-key="assists">A</th>
+                  <th class="num" data-key="saves">Saves</th>
+                  <th class="num" data-key="shots">Shots</th>
+                  <th class="num" data-key="ping">Ping</th>
+                </tr>
+              </thead>
+              <tbody id="statsBody">
+                <tr>
+                  <td colspan="9" class="loading">Loading stats…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="foot-note">
+          Tip: Click headers to sort. Search supports partial names and team abbreviations.
+        </div>
+      </article>
+    </section>
+
   </main>
 
-  <!-- Config + page logic (ABSOLUTE PATHS) -->
-  <script src="/assets/js/config.js"></script>
-  <script src="/assets/js/rlol-stats.js"></script>
+  <!-- IMPORTANT: load config BEFORE stats script -->
+  <script src="/assets/js/config.js" defer></script>
+  <script src="/assets/js/rlol-stats.js" defer></script>
 </body>
 </html>
