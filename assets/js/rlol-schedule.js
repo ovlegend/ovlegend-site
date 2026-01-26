@@ -1,7 +1,7 @@
 // /assets/js/rlol-schedule.js
 (function () {
 
-  const CSV_URL = OV_CONFIG.scheduleCSV;
+  OV_CONFIG.scheduleCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCQnxfwBylnd5H8jHc_g9Gtv7wyhzelCLixlK3-Bi_Uw0pVJga8MPtgYf5740Csm7hbfLTJhHGdWzh/pub?gid=907396704&single=true&output=csv";
 
   const root = document.getElementById("scheduleRoot");
   const weekFilter = document.getElementById("weekFilter");
