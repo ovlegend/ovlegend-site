@@ -323,6 +323,22 @@ a{ color:inherit; text-decoration:none; }
   .toolbar-right{ justify-self: stretch; }
 }
 
+/* ==== Stats table styles ==== */
+
+th.active-stat,
+td.active-stat {
+  color: #ff8a00;
+  text-shadow: 0 0 10px rgba(255,138,0,.6);
+}
+
+td.active-stat {
+  background: linear-gradient(
+    90deg,
+    rgba(255,138,0,.08),
+    rgba(255,138,0,.02)
+  );
+}
+  
   /* NEW shadow system */
   box-shadow:
     0 10px 30px rgba(0,0,0,.35),
