@@ -8,7 +8,13 @@
   const weekEl = $("#weekSel");
   const teamEl = $("#teamSel");
   const searchEl = $("#searchPlayer");
-
+  const btnReset     = $("#btnReset");
+  const btnTopPts    = $("#btnTopPts");
+  const btnTopGoals  = $("#btnTopGoals");
+  const btnTopAssists= $("#btnTopAssists");
+  const btnTopSaves  = $("#btnTopSaves");
+  const btnTopShots  = $("#btnTopShots");
+  const btnTopGP     = $("#btnTopGP");
   const statusEl = $("#statsStatus");
   const root = $("#statsRoot");
   if (!root) return;
