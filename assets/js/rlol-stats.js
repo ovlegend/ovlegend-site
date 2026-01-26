@@ -8,13 +8,6 @@
   const weekEl = $("#weekSel");
   const teamEl = $("#teamSel");
   const searchEl = $("#searchPlayer");
-  const btnReset     = $("#btnReset");
-  const btnTopPts    = $("#btnTopPts");
-  const btnTopGoals  = $("#btnTopGoals");
-  const btnTopAssists= $("#btnTopAssists");
-  const btnTopSaves  = $("#btnTopSaves");
-  const btnTopShots  = $("#btnTopShots");
-  const btnTopGP     = $("#btnTopGP");
   const statusEl = $("#statsStatus");
   const root = $("#statsRoot");
   if (!root) return;
@@ -23,7 +16,8 @@
   const leaderNameEl =
     $("#leaderName") ||
     $("[data-leader-name]") ||
-    $(".leader-name");
+    $(".leader-name") ||
+    $("#leaderTitle"); // fallback if you used id="leaderTitle" as the big name
 
   const leaderMetaEl =
     $("#leaderMeta") ||
@@ -33,7 +27,8 @@
   const leaderBadgeEl =
     $("#leaderBadge") ||
     $("[data-leader-badge]") ||
-    $(".leader-badge");
+    $(".leader-badge") ||
+    $("#leaderChip"); // your chip in V2
 
   const leaderBtnsWrap =
     $("#leaderBtns") ||
@@ -55,9 +50,7 @@
       const c = text[i];
       const next = text[i + 1];
 
-      if (c === '"' && inQuotes && next === '"') {
-        cur += '"'; i++; continue;
-      }
+      if (c === '"' && inQuotes && next === '"') { cur += '"'; i++; continue; }
       if (c === '"') { inQuotes = !inQuotes; continue; }
       if (c === "," && !inQuotes) { row.push(cur); cur = ""; continue; }
 
@@ -210,12 +203,12 @@
 
   // Leaders: one button per stat (no ping)
   const LEADER_METRICS = [
-    { key: "score",   label: "TOP PTS",     badge: "#1 SCORE",  valueLabel: "Score" },
-    { key: "goals",   label: "TOP GOALS",   badge: "#1 GOALS",  valueLabel: "Goals" },
-    { key: "assists", label: "TOP AST",     badge: "#1 AST",    valueLabel: "Assists" },
-    { key: "saves",   label: "TOP SAVES",   badge: "#1 SAVES",  valueLabel: "Saves" },
-    { key: "shots",   label: "TOP SHOTS",   badge: "#1 SHOTS",  valueLabel: "Shots" },
-    { key: "gp",      label: "MOST GP",     badge: "#1 GP",     valueLabel: "GP" }
+    { key: "score",   label: "TOP PTS",    badge: "#1 SCORE", valueLabel: "Score" },
+    { key: "goals",   label: "TOP GOALS",  badge: "#1 GOALS", valueLabel: "Goals" },
+    { key: "assists", label: "TOP AST",    badge: "#1 AST",   valueLabel: "Assists" },
+    { key: "saves",   label: "TOP SAVES",  badge: "#1 SAVES", valueLabel: "Saves" },
+    { key: "shots",   label: "TOP SHOTS",  badge: "#1 SHOTS", valueLabel: "Shots" },
+    { key: "gp",      label: "MOST GP",    badge: "#1 GP",    valueLabel: "GP" }
   ];
 
   function metricInfo(key) {
@@ -356,10 +349,29 @@
     return `<td class="${cls}">${val}</td>`;
   }
 
+  // ---- Leaders (dynamic buttons) ----
+  function syncLeaderButtonsActive() {
+    if (!leaderBtnsWrap) return;
+    leaderBtnsWrap.querySelectorAll("button[data-metric]").forEach(btn => {
+      const k = btn.dataset.metric;
+      const active = (k === state.leaderKey);
+      btn.classList.toggle("active", active && k !== "reset");
+    });
+  }
+
+  function setLeaderMetric(key) {
+    state.leaderKey = key;
+
+    // also sort table by that metric (desc); never force ping
+    state.sortKey = key;
+    state.sortDir = (key === "player" || key === "team") ? "asc" : "desc";
+
+    render();
+  }
+
   function ensureLeaderButtons() {
     if (!leaderBtnsWrap) return;
 
-    // Build once, then we just toggle .active
     leaderBtnsWrap.innerHTML = "";
 
     const mkBtn = (txt, key, extraClass) => {
@@ -371,32 +383,22 @@
       return b;
     };
 
-// --- safe bind helper ---
-const bindClick = (el, fn) => {
-  if (!el) return;
-  el.addEventListener("click", fn);
-};
+    // Reset button
+    const resetBtn = mkBtn("Reset", "reset", "btn ghost");
+    resetBtn.addEventListener("click", () => setLeaderMetric("score"));
+    leaderBtnsWrap.appendChild(resetBtn);
 
-// Leaders button wiring (safe even if some buttons don't exist)
-bindClick(btnReset,      () => setLeaderMetric("score"));
-bindClick(btnTopPts,     () => setLeaderMetric("score"));
-bindClick(btnTopGoals,   () => setLeaderMetric("goals"));
-bindClick(btnTopAssists, () => setLeaderMetric("assists"));
-bindClick(btnTopSaves,   () => setLeaderMetric("saves"));
-bindClick(btnTopShots,   () => setLeaderMetric("shots"));
-bindClick(btnTopGp,      () => setLeaderMetric("gp"));
-
-  function syncLeaderButtonsActive() {
-    if (!leaderBtnsWrap) return;
-    leaderBtnsWrap.querySelectorAll("button[data-metric]").forEach(btn => {
-      const k = btn.dataset.metric;
-      const active = (k === state.leaderKey) || (k === state.sortKey && k !== "reset");
-      btn.classList.toggle("active", active && k !== "reset");
+    // One per metric (no ping)
+    LEADER_METRICS.forEach(m => {
+      const b = mkBtn(m.label, m.key, "btn");
+      b.addEventListener("click", () => setLeaderMetric(m.key));
+      leaderBtnsWrap.appendChild(b);
     });
+
+    syncLeaderButtonsActive();
   }
 
   function updateLeaderCard() {
-    // Leaders are based on CURRENT filtered list
     if (!leaderNameEl && !leaderMetaEl && !leaderBadgeEl) return;
 
     if (!state.filtered.length) {
@@ -409,7 +411,6 @@ bindClick(btnTopGp,      () => setLeaderMetric("gp"));
     const m = metricInfo(state.leaderKey);
     const key = state.leaderKey;
 
-    // Copy + sort by selected metric desc; tie-break on score desc
     const sorted = [...state.filtered].sort((a, b) => {
       const va = a[key] ?? 0;
       const vb = b[key] ?? 0;
@@ -432,21 +433,11 @@ bindClick(btnTopGp,      () => setLeaderMetric("gp"));
     syncLeaderButtonsActive();
   }
 
-  function setLeaderMetric(key) {
-    state.leaderKey = key;
-
-    // Also sort table by that metric (desc), because that’s the vibe you’re building
-    state.sortKey = key;
-    state.sortDir = (key === "player" || key === "team") ? "asc" : "desc";
-
-    render();
-  }
-
   function render() {
     applyFilters();
     sortRows();
 
-    // build leaders UI (if present)
+    // leaders UI (if present)
     ensureLeaderButtons();
 
     root.innerHTML = `
@@ -503,13 +494,14 @@ bindClick(btnTopGp,      () => setLeaderMetric("gp"));
     root.querySelectorAll("th[data-key]").forEach((el) => {
       el.addEventListener("click", () => {
         const k = el.getAttribute("data-key");
+
         if (state.sortKey === k) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
         else {
           state.sortKey = k;
           state.sortDir = (k === "player" || k === "team") ? "asc" : "desc";
         }
 
-        // keep leaders in sync with what you’re highlighting (but do NOT force ping)
+        // keep leaders in sync (but do NOT force ping)
         if (k !== "ping") state.leaderKey = k;
 
         render();
@@ -519,7 +511,6 @@ bindClick(btnTopGp,      () => setLeaderMetric("gp"));
 
     if (statusEl) statusEl.textContent = `Loaded ${state.filtered.length} rows`;
 
-    // update leader card with current filtered rows
     updateLeaderCard();
   }
 
@@ -543,6 +534,8 @@ bindClick(btnTopGp,      () => setLeaderMetric("gp"));
     state.week = "all";
     state.team = "all";
 
+    // Set default leader metric and render
+    state.leaderKey = state.leaderKey || "score";
     render();
   }
 
@@ -556,7 +549,7 @@ bindClick(btnTopGp,      () => setLeaderMetric("gp"));
       }
 
       if (seasonEl) seasonEl.addEventListener("change", () => { state.season = seasonEl.value || "all"; render(); });
-      if (weekEl) seasonEl && weekEl.addEventListener("change", () => { state.week = weekEl.value || "all"; render(); });
+      if (weekEl) weekEl.addEventListener("change", () => { state.week = weekEl.value || "all"; render(); });
       if (teamEl) teamEl.addEventListener("change", () => { state.team = teamEl.value || "all"; render(); });
 
       if (searchEl) {
@@ -566,7 +559,7 @@ bindClick(btnTopGp,      () => setLeaderMetric("gp"));
         });
       }
 
-      // Build leader buttons on load (if the container exists)
+      // Build leader buttons early (safe even if container missing)
       ensureLeaderButtons();
 
       await loadAndBuild();
