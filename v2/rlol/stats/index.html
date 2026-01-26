@@ -296,6 +296,7 @@ if(!url || url.includes("https://docs.google.com/spreadsheets/...your link..."))
 
     const grid = parseCSV(text);
     const headers = grid.shift().map(normalizeKey);
+    console.log("CSV headers:", headers);
 
     rows = grid.map(cols=>{
       const obj = {};
