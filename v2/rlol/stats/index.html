@@ -283,11 +283,12 @@ async function load(){
     hint.textContent = "Loading…";
 
     const url = CSV_URL || FALLBACK_CSV_URL;
-    if(!url || url.includes("https://docs.google.com/spreadsheets/d/e/2PACX-1vQCQnxfwBylnd5H8jHc_g9Gtv7wyhzelCLixlK3-Bi_Uw0pVJga8MPtgYf5740Csm7hbfLTJhHGdWzh/pub?gid=1283136814&single=true&output=csv")){
-      setLoading("Paste your Stats CSV link into FALLBACK_CSV_URL in this file.");
-      hint.textContent = "Missing CSV link";
-      return;
-    }
+
+if(!url || url.includes("https://docs.google.com/spreadsheets/...your link...")){
+   setLoading("Paste your Stats CSV link...");
+   hint.textContent = "Missing CSV link";
+   return;
+}
 
     const res = await fetch(url, { cache: "no-store" });
     if(!res.ok) throw new Error("CSV fetch failed: " + res.status);
