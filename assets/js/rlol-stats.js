@@ -13,6 +13,19 @@
   const root = $("#statsRoot");
   if (!root) return;
 
+  // ---- Leaders DOM (optional; works only if present) ----
+  // Update these IDs if your HTML uses different ones.
+  const leaderNameEl = $("#leaderName");
+  const leaderMetaEl = $("#leaderMeta");
+  const leaderBadgeEl = $("#leaderBadge");
+
+  const leaderBtnReset = $("#leaderReset");
+  const leaderBtnScore = $("#leaderTopScore");   // "TOP PTS"
+  const leaderBtnGoals = $("#leaderTopGoals");   // "TOP GOALS"
+  const leaderBtnAssists = $("#leaderTopAssists"); // NEW
+  const leaderBtnSaves = $("#leaderTopSaves");     // NEW
+  const leaderBtnShots = $("#leaderTopShots");     // NEW
+
   // ---- CSV parsing (quoted commas safe) ----
   function parseCSV(text) {
     const rows = [];
@@ -103,29 +116,20 @@
   }
 
   // URL detection + safe image html
-function isImageUrl(v) {
-  const s = norm(v);
-  return /^https?:\/\/.+\.(png|jpg|jpeg|webp|gif)(\?.*)?$/i.test(s);
-}
-
-function imgHTML(url, alt) {
-  const u = norm(url);
-  if (!isImageUrl(u)) return "";
-  return `<img class="logo" src="${u}" alt="${alt || ""}" loading="lazy" />`;
-}
-
-function firstNonUrl(row, keys) {
-  for (const k of keys) {
-    const v = norm(getAny(row, [k]));
-    if (v && !isImageUrl(v)) return v;
+  function isImageUrl(v) {
+    const s = norm(v);
+    return /^https?:\/\/.+\.(png|jpg|jpeg|webp|gif)(\?.*)?$/i.test(s);
   }
-  return "";
-}
-  // Read a value by trying multiple possible headers (case sensitive + insensitive)
+
+  function imgHTML(url, alt) {
+    const u = norm(url);
+    if (!isImageUrl(u)) return "";
+    return `<img class="logo" src="${u}" alt="${alt || ""}" loading="lazy" />`;
+  }
+
   function getAny(row, keys) {
     for (const k of keys) {
       if (row[k] != null && String(row[k]).trim() !== "") return row[k];
-      // case-insensitive fallback
       const want = String(k).trim().toLowerCase();
       for (const realKey of Object.keys(row)) {
         if (String(realKey).trim().toLowerCase() === want) {
@@ -133,6 +137,14 @@ function firstNonUrl(row, keys) {
           if (v != null && String(v).trim() !== "") return v;
         }
       }
+    }
+    return "";
+  }
+
+  function firstNonUrl(row, keys) {
+    for (const k of keys) {
+      const v = norm(getAny(row, [k]));
+      if (v && !isImageUrl(v)) return v;
     }
     return "";
   }
@@ -167,6 +179,7 @@ function firstNonUrl(row, keys) {
     filtered: [],
     sortKey: "score",
     sortDir: "desc",
+    activeStatKey: "score", // orange highlight target
     query: "",
     season: "all",
     week: "all",
@@ -176,8 +189,8 @@ function firstNonUrl(row, keys) {
 
   // ---- model (strong header mapping) ----
   function toModel(row) {
-    const player = firstNonUrl(row, ["player_name", "Player", "player", "name", "Player Name"]) || "Unknown";
-const team   = firstNonUrl(row, ["team_name", "Team Name", "team", "Team"]) || "";
+    const player = firstNonUrl(row, ["player_name", "Player", "player", "name", "Player Name", "player_id"]) || "Unknown";
+    const team   = firstNonUrl(row, ["team_name", "Team Name", "team", "Team", "team_id"]) || "";
 
     // support both player + team logos if you have them
     const playerLogo = norm(getAny(row, ["player_logo", "Player Logo", "PlayerLogo", "player_logo_url", "Player Logo URL", "player_pfp", "PFP", "Avatar", "player_avatar"]));
@@ -187,11 +200,12 @@ const team   = firstNonUrl(row, ["team_name", "Team Name", "team", "Team"]) || "
     const season = norm(getAny(row, ["season", "Season"]));
     const week = norm(getAny(row, ["week", "Week", "match_week", "MatchWeek", "Match Week"]));
 
+    // Your sheet uses score/goals/assists/saves/shots/ping — these fallbacks keep it flexible
     const gp = num(getAny(row, ["GP", "gp", "Games", "games"]), 0);
     const goals = num(getAny(row, ["Goals", "goals", "G", "g"]), 0);
     const assists = num(getAny(row, ["Assists", "assists", "A", "a"]), 0);
-    const saves = num(getAny(row, ["Saves", "saves"]), 0);
-    const shots = num(getAny(row, ["Shots", "shots"]), 0);
+    const saves = num(getAny(row, ["Saves", "saves", "S", "s"]), 0);
+    const shots = num(getAny(row, ["Shots", "shots", "Sh", "sh"]), 0);
     const score = num(getAny(row, ["Score", "score", "Points", "points"]), 0);
     const ping = num(getAny(row, ["Avg Ping", "avg_ping", "Ping", "ping"]), 0);
 
@@ -232,36 +246,120 @@ const team   = firstNonUrl(row, ["team_name", "Team Name", "team", "Team"]) || "
       : (a < b ? 1 : a > b ? -1 : 0);
   }
 
+  function getValByKey(r, key) {
+    switch (key) {
+      case "player": return normLower(r.player);
+      case "team": return normLower(r.team);
+      case "gp": return r.gp;
+      case "goals": return r.goals;
+      case "assists": return r.assists;
+      case "saves": return r.saves;
+      case "shots": return r.shots;
+      case "ping": return r.ping;
+      case "score":
+      default: return r.score;
+    }
+  }
+
   function sortRows() {
     const key = state.sortKey;
     const dir = state.sortDir;
 
-    const getVal = (r) => {
-      switch (key) {
-        case "player": return normLower(r.player);
-        case "team": return normLower(r.team);
-        case "gp": return r.gp;
-        case "goals": return r.goals;
-        case "assists": return r.assists;
-        case "saves": return r.saves;
-        case "shots": return r.shots;
-        case "ping": return r.ping;
-        case "score":
-        default: return r.score;
-      }
-    };
-
     state.filtered.sort((a, b) => {
-      let res = compare(getVal(a), getVal(b), dir);
+      let res = compare(getValByKey(a, key), getValByKey(b, key), dir);
       if (res === 0 && key !== "score") res = compare(a.score, b.score, "desc");
       return res;
     });
   }
 
+  // ---- Highlight active column after each render ----
+  function applyActiveStatHighlight() {
+    const key = state.activeStatKey;
+    if (!key) return;
+
+    // clear any old highlight
+    root.querySelectorAll(".active-stat").forEach(el => el.classList.remove("active-stat"));
+
+    const ths = Array.from(root.querySelectorAll("thead th[data-key]"));
+    const idx = ths.findIndex(th => th.getAttribute("data-key") === key);
+    if (idx < 0) return;
+
+    // header
+    ths[idx].classList.add("active-stat");
+
+    // cells
+    root.querySelectorAll("tbody tr").forEach(tr => {
+      const cell = tr.children[idx];
+      if (cell) cell.classList.add("active-stat");
+    });
+  }
+
+  function scrollToTable() {
+    const card = root.querySelector(".stats-card");
+    if (card) card.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // ---- Leaders: compute leader + update UI ----
+  const LEADER_KEYS = ["score", "goals", "assists", "saves", "shots"]; // NO ping
+  const LEADER_LABELS = {
+    score: "SCORE",
+    goals: "GOALS",
+    assists: "ASSISTS",
+    saves: "SAVES",
+    shots: "SHOTS"
+  };
+
+  function findLeader(key) {
+    if (!state.rows.length) return null;
+    let best = null;
+    for (const r of state.rows) {
+      const v = getValByKey(r, key);
+      if (best == null || v > getValByKey(best, key)) best = r;
+    }
+    return best;
+  }
+
+  function setLeaderStat(key) {
+    if (!LEADER_KEYS.includes(key)) return;
+
+    // set active highlight + sorting
+    state.activeStatKey = key;
+    state.sortKey = key;
+    state.sortDir = (key === "player" || key === "team") ? "asc" : "desc";
+
+    // update leader card text if present
+    const leader = findLeader(key);
+    if (leaderNameEl && leader) leaderNameEl.textContent = (leader.player || "").toUpperCase();
+    if (leaderMetaEl && leader) {
+      const statLabel = LEADER_LABELS[key] || key.toUpperCase();
+      const value = getValByKey(leader, key);
+      leaderMetaEl.textContent = `${leader.team || ""} • ${statLabel}: ${value}`;
+    }
+    if (leaderBadgeEl) leaderBadgeEl.textContent = `#1 ${LEADER_LABELS[key] || key.toUpperCase()}`;
+
+    // toggle button active class if present
+    [
+      leaderBtnScore, leaderBtnGoals, leaderBtnAssists, leaderBtnSaves, leaderBtnShots
+    ].forEach(btn => btn && btn.classList.remove("active"));
+
+    const btnMap = {
+      score: leaderBtnScore,
+      goals: leaderBtnGoals,
+      assists: leaderBtnAssists,
+      saves: leaderBtnSaves,
+      shots: leaderBtnShots
+    };
+    const activeBtn = btnMap[key];
+    if (activeBtn) activeBtn.classList.add("active");
+
+    render();
+    scrollToTable();
+  }
+
   function th(label, key) {
-    const isActive = state.sortKey === key;
-    const arrow = isActive ? (state.sortDir === "asc" ? " ▲" : " ▼") : "";
-    return `<th data-key="${key}" class="${isActive ? "active" : ""}">${label}${arrow}</th>`;
+    const isSortActive = state.sortKey === key;
+    const arrow = isSortActive ? (state.sortDir === "asc" ? " ▲" : " ▼") : "";
+    return `<th data-key="${key}" class="${isSortActive ? "active" : ""}">${label}${arrow}</th>`;
   }
 
   function render() {
@@ -319,6 +417,7 @@ const team   = firstNonUrl(row, ["team_name", "Team Name", "team", "Team"]) || "
       </div>
     `;
 
+    // header sorting + set highlight key when clicking a header
     root.querySelectorAll("th[data-key]").forEach((el) => {
       el.addEventListener("click", () => {
         const k = el.getAttribute("data-key");
@@ -327,10 +426,13 @@ const team   = firstNonUrl(row, ["team_name", "Team Name", "team", "Team"]) || "
           state.sortKey = k;
           state.sortDir = (k === "player" || k === "team") ? "asc" : "desc";
         }
+        state.activeStatKey = k; // highlight follows header clicks too
         render();
         if (statusEl) statusEl.textContent = `Loaded ${state.filtered.length} rows`;
       });
     });
+
+    applyActiveStatHighlight();
 
     if (statusEl) statusEl.textContent = `Loaded ${state.filtered.length} rows`;
   }
@@ -353,11 +455,27 @@ const team   = firstNonUrl(row, ["team_name", "Team Name", "team", "Team"]) || "
     state.week = "all";
     state.team = "all";
 
-    render();
+    // set default leader/stat on first load
+    if (!state.activeStatKey) state.activeStatKey = "score";
+    setLeaderStat(state.activeStatKey || "score");
+  }
+
+  function wireLeaderButtons() {
+    // Only attach if the buttons exist (so this never breaks anything)
+    if (leaderBtnReset) {
+      leaderBtnReset.addEventListener("click", () => setLeaderStat("score"));
+    }
+    if (leaderBtnScore) leaderBtnScore.addEventListener("click", () => setLeaderStat("score"));
+    if (leaderBtnGoals) leaderBtnGoals.addEventListener("click", () => setLeaderStat("goals"));
+    if (leaderBtnAssists) leaderBtnAssists.addEventListener("click", () => setLeaderStat("assists"));
+    if (leaderBtnSaves) leaderBtnSaves.addEventListener("click", () => setLeaderStat("saves"));
+    if (leaderBtnShots) leaderBtnShots.addEventListener("click", () => setLeaderStat("shots"));
   }
 
   async function init() {
     try {
+      wireLeaderButtons();
+
       if (viewModeEl) {
         viewModeEl.addEventListener("change", async () => {
           state.viewMode = viewModeEl.value || "season_totals";
