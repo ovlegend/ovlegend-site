@@ -2,6 +2,21 @@
 (function () {
   const $ = (sel) => document.querySelector(sel);
 
+  const tbody = document.querySelector("#statsBody") || document.querySelector("#statsRoot tbody");
+const table = document.querySelector("#statsTable");
+const hint  = document.querySelector("#loadedHint");
+
+function setLoading(msg){
+  // last-resort: don't crash if tbody is missing
+  if (!tbody) {
+    console.error("Missing #statsBody (tbody is null). Can't render table rows.");
+    const root = document.querySelector("#statsRoot");
+    if (root) root.innerHTML = `<div class="error">${msg}</div>`;
+    return;
+  }
+  tbody.innerHTML = `<tr><td colspan="9" class="loading">${msg}</td></tr>`;
+}
+  
   // ---- DOM (existing ids used across your V2 pages) ----
   const viewModeEl = $("#viewMode");
   const seasonEl = $("#seasonSel");
