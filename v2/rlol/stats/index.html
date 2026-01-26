@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RLOL Stats | OV Legend</title>
+  <meta name="theme-color" content="#ff8a00" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <!-- V2 CSS -->
+  <link rel="stylesheet" href="../../assets/css/rlol-v2.css" />
+</head>
+
+<body class="rlol rlol-stats-v2">
+  <main class="rlol-wrap">
+
+    <!-- Hero -->
+    <header class="rlol-hero">
+      <div class="rlol-hero-inner">
+        <div class="rlol-hero-left">
+          <div class="kicker">Rocket League of Legends</div>
+          <h1 class="title">Stats</h1>
+          <p class="sub">Auto-updates from Google Sheets • Click headers to sort • Search players/teams</p>
+
+          <nav class="nav-pills" aria-label="RLOL navigation">
+            <a class="pill" href="/v2/rlol/">Home</a>
+            <a class="pill" href="/v2/rlol/">Hub</a>
+            <a class="pill" href="/v2/rlol/schedule/">Schedule</a>
+            <a class="pill" href="/v2/rlol/standings/">Standings</a>
+            <a class="pill is-active" href="/v2/rlol/stats/">Stats</a>
+          </nav>
+        </div>
+
+        <div class="rlol-hero-right">
+          <div class="badge-card">
+            <div class="badge-top">
+              <span class="badge-label">Leaders</span>
+              <span class="badge-chip" id="leaderChip">Loading…</span>
+            </div>
+            <div class="badge-title" id="leaderTitle">Top Performer</div>
+            <div class="badge-meta" id="leaderMeta">Fetching latest stats…</div>
+
+            <div class="badge-actions">
+              <button class="btn ghost" id="btnReset">Reset</button>
+              <button class="btn" id="btnTopPts">Top Pts</button>
+              <button class="btn ghost" id="btnTopGoals">Top Goals</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stats Card -->
+    <section class="grid">
+      <article class="card wide">
+        <div class="card-head">
+          <h2 class="card-title">Player Stats</h2>
+          <div class="card-tools">
+            <span class="hint" id="loadedHint">Loading…</span>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <input id="q" class="field" type="search" placeholder="Search player or team…" autocomplete="off" />
+
+          <select id="teamFilter" class="field select">
+            <option value="">All teams</option>
+          </select>
+
+          <select id="viewFilter" class="field select">
+            <option value="all">All players</option>
+            <option value="top">Top 10</option>
+          </select>
+
+          <div class="toolbar-right">
+            <button class="btn ghost" id="btnCSV">Reload</button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap">
+          <table class="stats-table" id="statsTable">
+            <thead>
+              <tr>
+                <th data-key="Player">Player</th>
+                <th data-key="Team">Team</th>
+                <th class="num" data-key="GP">GP</th>
+                <th class="num" data-key="Score">Score</th>
+                <th class="num" data-key="Goals">G</th>
+                <th class="num" data-key="Assists">A</th>
+                <th class="num" data-key="Saves">S</th>
+                <th class="num" data-key="Shots">Sh</th>
+                <th class="num" data-key="Ping">Ping</th>
+              </tr>
+            </thead>
+            <tbody id="statsBody">
+              <tr><td colspan="9" class="loading">Loading stats…</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="foot-note">
+          Tip: Sort by Goals/Assists/Saves. Search supports partial names and team abbreviations.
+        </div>
+      </article>
+    </section>
+
+  </main>
+
+<script>
+/* =========================
+   RLOL Stats V2 (CSV → table)
+   - click headers to sort
+   - search + team filter + top 10 filter
+   ========================= */
+
+const CSV_URL = window.RLOL_STATS_CSV || ""; // optional override
+// If you don't set window.RLOL_STATS_CSV, it will use the fallback below:
+const FALLBACK_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCQnxfwBylnd5H8jHc_g9Gtv7wyhzelCLixlK3-Bi_Uw0pVJga8MPtgYf5740Csm7hbfLTJhHGdWzh/pub?gid=1283136814&single=true&output=csv";
+
+const $ = (s) => document.querySelector(s);
+const tbody = $("#statsBody");
+const table = $("#statsTable");
+const hint = $("#loadedHint");
+
+let rows = [];
+let view = { key: "Score", dir: "desc", q: "", team: "", top: "all" };
+
+function parseCSV(text){
+  const out = [];
+  let row = [], cur = "", inQ = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i], n = text[i+1];
+    if(c === '"' && inQ && n === '"'){ cur+='"'; i++; continue; }
+    if(c === '"'){ inQ = !inQ; continue; }
+    if(c === "," && !inQ){ row.push(cur); cur=""; continue; }
+    if((c === "\n" || c === "\r") && !inQ){
+      if(c === "\r" && n === "\n") i++;
+      row.push(cur); cur="";
+      if(row.some(v => v.trim() !== "")) out.push(row);
+      row = [];
+      continue;
+    }
+    cur += c;
+  }
+  row.push(cur);
+  if(row.some(v => v.trim() !== "")) out.push(row);
+  return out;
+}
+
+function normalizeKey(k){
+  return (k||"").toString().trim();
+}
+
+function num(v){
+  const x = Number((v ?? "").toString().replace(/[^\d.-]/g,""));
+  return Number.isFinite(x) ? x : 0;
+}
+
+function setLoading(msg){
+  tbody.innerHTML = `<tr><td colspan="9" class="loading">${msg}</td></tr>`;
+}
+
+function hydrateTeamFilter(){
+  const teams = Array.from(new Set(rows.map(r => r.Team).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+  const sel = $("#teamFilter");
+  sel.innerHTML = `<option value="">All teams</option>` + teams.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+}
+
+function escapeHtml(s){
+  return (s ?? "").toString()
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function applyFilters(data){
+  const q = view.q.trim().toLowerCase();
+  let d = data;
+
+  if(view.team){
+    d = d.filter(r => (r.Team||"") === view.team);
+  }
+  if(q){
+    d = d.filter(r =>
+      (r.Player||"").toLowerCase().includes(q) ||
+      (r.Team||"").toLowerCase().includes(q)
+    );
+  }
+  if(view.top === "top"){
+    d = d.slice(0, 10);
+  }
+  return d;
+}
+
+function sortData(data){
+  const key = view.key;
+  const dir = view.dir === "asc" ? 1 : -1;
+
+  const isNumeric = ["GP","Score","Goals","Assists","Saves","Shots","Ping"].includes(key);
+
+  return [...data].sort((a,b)=>{
+    if(isNumeric){
+      return (num(a[key]) - num(b[key])) * dir;
+    }
+    return (String(a[key]||"").localeCompare(String(b[key]||""))) * dir;
+  });
+}
+
+function render(){
+  const filtered = applyFilters(sortData(rows));
+  hint.textContent = `${rows.length} loaded • Showing ${filtered.length}`;
+
+  if(!filtered.length){
+    tbody.innerHTML = `<tr><td colspan="9" class="loading">No results.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(r => `
+    <tr>
+      <td class="player">${escapeHtml(r.Player)}</td>
+      <td class="team">${escapeHtml(r.Team)}</td>
+      <td class="num">${escapeHtml(r.GP)}</td>
+      <td class="num">${escapeHtml(r.Score)}</td>
+      <td class="num">${escapeHtml(r.Goals)}</td>
+      <td class="num">${escapeHtml(r.Assists)}</td>
+      <td class="num">${escapeHtml(r.Saves)}</td>
+      <td class="num">${escapeHtml(r.Shots)}</td>
+      <td class="num">${escapeHtml(r.Ping)}</td>
+    </tr>
+  `).join("");
+
+  updateLeaderCard(filtered);
+}
+
+function updateLeaderCard(data){
+  // default to current sort key leader
+  const key = view.key;
+  const top = data[0];
+  if(!top) return;
+
+  $("#leaderChip").textContent = `#1 ${key}`;
+  $("#leaderTitle").textContent = top.Player || "Top Performer";
+  $("#leaderMeta").textContent = `${top.Team || "—"} • ${key}: ${top[key] ?? "—"}`;
+}
+
+function attachSorting(){
+  table.querySelectorAll("thead th[data-key]").forEach(th=>{
+    th.addEventListener("click", ()=>{
+      const key = th.getAttribute("data-key");
+      if(view.key === key){
+        view.dir = (view.dir === "asc") ? "desc" : "asc";
+      }else{
+        view.key = key;
+        view.dir = ["Player","Team"].includes(key) ? "asc" : "desc";
+      }
+      render();
+      paintSortIndicators();
+    });
+  });
+}
+
+function paintSortIndicators(){
+  table.querySelectorAll("thead th").forEach(th=>{
+    th.classList.remove("sort-asc","sort-desc");
+    const key = th.getAttribute("data-key");
+    if(key && key === view.key){
+      th.classList.add(view.dir === "asc" ? "sort-asc" : "sort-desc");
+    }
+  });
+}
+
+async function load(){
+  try{
+    setLoading("Loading stats…");
+    hint.textContent = "Loading…";
+
+    const url = CSV_URL || FALLBACK_CSV_URL;
+    if(!url || url.includes("https://docs.google.com/spreadsheets/d/e/2PACX-1vQCQnxfwBylnd5H8jHc_g9Gtv7wyhzelCLixlK3-Bi_Uw0pVJga8MPtgYf5740Csm7hbfLTJhHGdWzh/pub?gid=1283136814&single=true&output=csv")){
+      setLoading("Paste your Stats CSV link into FALLBACK_CSV_URL in this file.");
+      hint.textContent = "Missing CSV link";
+      return;
+    }
+
+    const res = await fetch(url, { cache: "no-store" });
+    if(!res.ok) throw new Error("CSV fetch failed: " + res.status);
+    const text = await res.text();
+
+    const grid = parseCSV(text);
+    const headers = grid.shift().map(normalizeKey);
+
+    rows = grid.map(cols=>{
+      const obj = {};
+      headers.forEach((h, i)=> obj[h] = (cols[i] ?? "").trim());
+      // Normalize common column names if your sheet differs
+      obj.Player  = obj.Player  || obj.Name || obj.PlayerName || "";
+      obj.Team    = obj.Team    || obj.TeamName || "";
+      obj.GP      = obj.GP      || obj.Games || obj.GamesPlayed || "0";
+      obj.Score   = obj.Score   || obj.Points || "0";
+      obj.Goals   = obj.Goals   || obj.G || "0";
+      obj.Assists = obj.Assists || obj.A || "0";
+      obj.Saves   = obj.Saves   || obj.S || "0";
+      obj.Shots   = obj.Shots   || obj.Sh || "0";
+      obj.Ping    = obj.Ping    || "0";
+      return obj;
+    });
+
+    // Default sort: Score desc
+    view.key = "Score";
+    view.dir = "desc";
+
+    hydrateTeamFilter();
+    paintSortIndicators();
+    render();
+
+  }catch(err){
+    console.error(err);
+    setLoading("Could not load stats. Check CSV link + console.");
+    hint.textContent = "Load error";
+  }
+}
+
+function wireUI(){
+  $("#q").addEventListener("input", (e)=>{ view.q = e.target.value; render(); });
+  $("#teamFilter").addEventListener("change", (e)=>{ view.team = e.target.value; render(); });
+  $("#viewFilter").addEventListener("change", (e)=>{ view.top = e.target.value; render(); });
+
+  $("#btnCSV").addEventListener("click", load);
+
+  $("#btnReset").addEventListener("click", ()=>{
+    view = { key:"Score", dir:"desc", q:"", team:"", top:"all" };
+    $("#q").value = "";
+    $("#teamFilter").value = "";
+    $("#viewFilter").value = "all";
+    paintSortIndicators();
+    render();
+  });
+
+  $("#btnTopPts").addEventListener("click", ()=>{
+    view.key="Score"; view.dir="desc"; paintSortIndicators(); render();
+  });
+
+  $("#btnTopGoals").addEventListener("click", ()=>{
+    view.key="Goals"; view.dir="desc"; paintSortIndicators(); render();
+  });
+}
+
+attachSorting();
+wireUI();
+load();
+</script>
+
+</body>
+</html>
