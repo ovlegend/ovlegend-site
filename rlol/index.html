@@ -1,114 +1,180 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>OV Legend v2</title>
-  <link rel="stylesheet" href="/v2/assets/css/v2.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RLOL Hub | OV Legend</title>
+  <meta name="theme-color" content="#ff8a00" />
+
+  <!-- Fonts: Anton (headers) + Montserrat (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <!-- Site CSS (if you want) -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
+
+  <!-- RLOL V2 -->
+  <link rel="stylesheet" href="../assets/css/rlol-v2.css" />
 </head>
 
-<body class="ov">
-  <main class="v2-wrap">
+<body class="rlol rlol-hub-v2">
 
-    <!-- HERO: left = logo/identity, right = HQ cards -->
-    <section class="v2-grid hero">
+  <main class="rlol-wrap">
 
-      <!-- LEFT: placeholder for circular logo -->
-      <!-- LEFT COLUMN: logo + hero panel -->
-<div class="left-stack">
+    <!-- Top header -->
+    <header class="rlol-hero">
+      <div class="rlol-hero-inner">
+        <div class="rlol-hero-left">
+          <div class="kicker">Rocket League of Legends</div>
+          <h1 class="title">RLOL Hub</h1>
+          <p class="sub">Auto-updates from Google Sheets • Clean broadcast styling • Season 2</p>
 
-  <!-- Logo / Seal -->
-  <div class="seal-wrap">
-    <!-- Replace src with your circular logo path -->
-    <img class="seal" src="/assets/img/brand/ov-mark.png" alt="OV Legend Mark">
-  </div>
+          <nav class="nav-pills" aria-label="RLOL navigation">
+            <a class="pill" href="/">Home</a>
+            <a class="pill is-active" href="/rlol/">Hub</a>
+            <a class="pill" href="/rlol/schedule/">Schedule</a>
+            <a class="pill" href="/rlol/standings/">Standings</a>
+            <a class="pill" href="/rlol/stats/">Stats</a>
+          </nav>
+        </div>
 
-  <!-- HERO PANEL -->
-  <div class="panel edge hero-panel">
-    <div class="in">
-      <div class="kicker">Rocket League • Content • Community</div>
-      <h1 class="h1 glow-title">OV LEGEND</h1>
-      <p class="sub">
-        Built around high-energy streams, legendary queue nights, custom builds,
-        and a community league that turns matches into events.
-      </p>
-
-      <div class="hero-actions">
-        <a class="btn" href="/v2/builds/">Browse Builds</a>
-        <a class="btn" href="/v2/lvb/">Legends v Bozos</a>
-        <a class="btn" href="/v2/rlol/">RLOL Hub</a>
-      </div>
-    </div>
-  </div>
-
-</div> <!-- 👈 THIS closes .left-stack -->
-
-
-      <!-- RIGHT: OV Headquarters -->
-      <div>
-        <h2 class="h2 glow-title" style="margin-bottom:10px;">OV HEADQUARTERS</h2>
-        <div class="sub" style="margin-bottom:14px;">Legendary Command Center.</div>
-
-        <div class="hq-grid">
-          <div class="card edge">
-            <div class="in">
-              <div class="card-top">
-                <h3 class="card-title glow-title">ALPHA</h3>
-                <span class="pill">BUILDS</span>
-              </div>
-              <div class="sub">AlphaConsole presets, car styles, and branded configs.</div>
-              <a class="cta" href="/v2/builds/">Open Builds →</a>
+        <!-- Right badge block (optional) -->
+        <div class="rlol-hero-right">
+          <div class="badge-card">
+            <div class="badge-top">
+              <span class="badge-label">This Week</span>
+              <span class="badge-chip">Friday Night</span>
             </div>
-          </div>
+            <div class="badge-title">Match Night</div>
+            <div class="badge-meta">Bo3 • 2v2 • Community League</div>
 
-          <div class="card edge">
-            <div class="in">
-              <div class="card-top">
-                <h3 class="card-title glow-title">LEGENDS VS. BOZOS</h3>
-                <span class="pill">TRACKER</span>
-              </div>
-              <div class="sub">Wins, losses, streaks, and the ongoing BOZO war.</div>
-              <a class="cta" href="/v2/lvb/">See Tracker →</a>
-            </div>
-          </div>
-
-          <div class="card edge">
-            <div class="in">
-              <div class="card-top">
-                <h3 class="card-title glow-title">RLOL</h3>
-                <span class="pill">LEAGUE HUB</span>
-              </div>
-              <div class="sub">Standings, schedule, teams — built like a mini-RLCS.</div>
-              <a class="cta" href="/v2/rlol/">Enter RLOL →</a>
-            </div>
-          </div>
-
-          <div class="card edge">
-            <div class="in">
-              <div class="card-top">
-                <h3 class="card-title glow-title">RANK</h3>
-                <span class="pill">STATS</span>
-              </div>
-              <div class="sub">See how OV is playing (tracker + trends).</div>
-              <a class="cta" href="/v2/stats/">View RL Tracker →</a>
-            </div>
-          </div>
-
-          <div class="card edge feature" style="grid-column: 1 / -1;">
-            <div class="in">
-              <div class="card-top">
-                <h3 class="card-title glow-title">CLIP OF THE WEEK</h3>
-                <span class="pill">COTW</span>
-              </div>
-              <div class="sub">Weekly community highlight. Cast your vote and crown the Legend.</div>
-              <a class="cta" href="/v2/cotw/">View Clips →</a>
+            <div class="badge-actions">
+              <a class="btn" href="/rlol/schedule/">View Schedule</a>
+              <a class="btn ghost" href="/rlol/standings/">Standings</a>
             </div>
           </div>
         </div>
 
       </div>
+    </header>
 
-    </section>
+    <!-- Grid -->
+    <section class="grid">
 
-  </main>
-</body>
-</html>
+      <!-- Next Matches -->
+      <article class="card">
+        <div class="card-head">
+          <h2 class="card-title">Next Matches</h2>
+          <div class="card-tools">
+            <span class="hint">Upcoming</span>
+          </div>
+        </div>
+
+        <div class="list">
+
+          <!-- V2 mock rows (swap with your JS render later) -->
+          <div class="match-row playoff-glow">
+            <div class="match-left">
+              <div class="match-time">
+                <div class="day">FRI</div>
+                <div class="clock">9:00 PM</div>
+              </div>
+              <div class="match-info">
+                <div class="match-teams">
+                  <span class="team">WLW</span>
+                  <span class="vs">vs</span>
+                  <span class="team">Prismen</span>
+                </div>
+                <div class="match-meta">Week 3 • Bo3</div>
+              </div>
+            </div>
+            <a class="mini-link" href="/rlol/schedule/">Details</a>
+          </div>
+
+          <div class="match-row">
+            <div class="match-left">
+              <div class="match-time">
+                <div class="day">FRI</div>
+                <div class="clock">9:40 PM</div>
+              </div>
+              <div class="match-info">
+                <div class="match-teams">
+                  <span class="team">Bread</span>
+                  <span class="vs">vs</span>
+                  <span class="team">Connection Baddies</span>
+                </div>
+                <div class="match-meta">Week 3 • Bo3</div>
+              </div>
+            </div>
+            <a class="mini-link" href="/rlol/schedule/">Details</a>
+          </div>
+
+          <div class="match-row dim">
+            <div class="match-left">
+              <div class="match-time">
+                <div class="day">TBD</div>
+                <div class="clock">—</div>
+              </div>
+              <div class="match-info">
+                <div class="match-teams">
+                  <span class="team">Bossy Bros</span>
+                  <span class="vs">vs</span>
+                  <span class="team">Washed Diamonds</span>
+                </div>
+                <div class="match-meta">Pending confirmation</div>
+              </div>
+            </div>
+            <span class="mini-link muted">TBD</span>
+          </div>
+
+        </div>
+      </article>
+
+      <!-- Standings Preview -->
+      <article class="card">
+        <div class="card-head">
+          <h2 class="card-title">Standings</h2>
+          <div class="card-tools">
+            <a class="mini-link" href="/rlol/standings/">Full standings</a>
+          </div>
+        </div>
+
+        <div class="table">
+          <div class="trow thead">
+            <div>#</div><div>Team</div><div class="num">W</div><div class="num">L</div><div class="num">PTS</div>
+          </div>
+
+          <div class="trow playoff-glow">
+            <div>1</div><div class="teamcell"><span class="dot"></span>WLW</div><div class="num">2</div><div class="num">0</div><div class="num">6</div>
+          </div>
+          <div class="trow playoff-glow">
+            <div>2</div><div class="teamcell"><span class="dot"></span>Connection Baddies</div><div class="num">2</div><div class="num">0</div><div class="num">6</div>
+          </div>
+          <div class="trow">
+            <div>3</div><div class="teamcell"><span class="dot"></span>Bread</div><div class="num">1</div><div class="num">1</div><div class="num">3</div>
+          </div>
+
+          <div class="playoff-line">PLAYOFF LINE</div>
+
+          <div class="trow dim">
+            <div>5</div><div class="teamcell"><span class="dot"></span>Prismen Esports</div><div class="num">1</div><div class="num">1</div><div class="num">3</div>
+          </div>
+        </div>
+
+      </article>
+
+      <!-- Stats Preview -->
+      <article class="card">
+        <div class="card-head">
+          <h2 class="card-title">Stats Leaders</h2>
+          <div class="card-tools">
+            <a class="mini-link" href="/rlol/stats/">Full stats</a>
+          </div>
+        </div>
+
+        <div class="leaders">
+          <div class="leader-row playoff-glow">
+            <div class="leader-main">
+              <div class="leader-name">Player Name
