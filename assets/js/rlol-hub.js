@@ -122,18 +122,30 @@
     });
 
     // Pick upcoming: scheduled/live first; ignore blank rows
-    const upcoming = mapped
-      .filter(m => (m.team1 || m.team2))
-      .filter(m => {
-        const s = String(m.status).toLowerCase();
-        return s.includes("scheduled") || s.includes("live") || s === "";
-      })
-      .slice(0, 6);
+const upcoming = mapped
+  .filter(m => (m.team1 || m.team2))
+  .filter(m => {
+    const s = String(m.status || "").toLowerCase();
 
-    if (!upcoming.length) {
-      nextMatchesEl.innerHTML = `<div class="empty">No upcoming matches</div>`;
-      return;
-    }
+    // count these as upcoming
+    const ok =
+      s === "" ||
+      s.includes("sched") ||
+      s.includes("upcoming") ||
+      s.includes("pending") ||
+      s.includes("confirm") ||
+      s.includes("tbd") ||
+      s.includes("live");
+
+    // exclude finished matches
+    const finished =
+      s.includes("played") ||
+      s.includes("final") ||
+      s.includes("done");
+
+    return ok && !finished;
+  })
+  .slice(0, 6);
 
     upcoming.forEach((m, idx) => {
       const day = dayFromText(m.day) || (m.time ? "" : "TBD");
