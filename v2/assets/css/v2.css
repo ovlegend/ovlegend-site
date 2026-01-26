@@ -13,6 +13,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 /* =========================================================
    OV LEGEND — V2 THEME FOUNDATION
    Streamer (default) + RLOL Esports (body.rlol)
@@ -37,14 +38,13 @@
   --shadow: 0 18px 50px rgba(0,0,0,.55);
 
   /* Layout */
-  --container: 1700px;   /* was ~1320/1480 — this is what pushes outward */
+  --container: 1700px;
   --pad: clamp(18px, 2.2vw, 28px);
   --radius: 22px;
   --radius-sm: 16px;
 
   /* Type */
   --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-  /* We'll swap these to Feast of Flesh once we link the font */
   --display: "FeastOfFlesh", var(--sans);
 }
 
@@ -55,9 +55,10 @@ body{
   margin:0;
   color:var(--text);
   font-family:var(--sans);
-  background: radial-gradient(1200px 800px at 65% 20%, rgba(255,86,0,.10), transparent 60%),
-              radial-gradient(900px 700px at 20% 75%, rgba(255,86,0,.06), transparent 55%),
-              linear-gradient(180deg, var(--bg0), var(--bg1) 45%, #070708 100%);
+  background:
+    radial-gradient(1200px 800px at 65% 20%, rgba(255,86,0,.10), transparent 60%),
+    radial-gradient(900px 700px at 20% 75%, rgba(255,86,0,.06), transparent 55%),
+    linear-gradient(180deg, var(--bg0), var(--bg1) 45%, #070708 100%);
   overflow-x:hidden;
 }
 
@@ -87,9 +88,9 @@ body::after{
 
 /* --------- Layout Helpers --------- */
 .v2-wrap{
-  max-width: min(var(--container), 98vw); /* use more of the screen */
+  max-width: min(var(--container), 98vw);
   margin: 0 auto;
-  padding: 28px clamp(10px, 1.2vw, 16px) 72px; /* smaller side padding */
+  padding: 28px clamp(10px, 1.2vw, 16px) 72px;
 }
 
 .v2-grid{
@@ -99,14 +100,13 @@ body::after{
 
 @media (min-width: 980px){
   .v2-grid.hero{
-    grid-template-columns: 1fr 1fr; /* balanced */
+    grid-template-columns: 1fr 1fr;
     align-items: stretch;
     gap: 56px;
   }
 }
 
 /* ===== Left stack: logo above hero panel ===== */
-
 .left-stack{
   display: grid;
   grid-template-rows: auto 1fr;
@@ -122,20 +122,17 @@ body::after{
 }
 
 .seal{
-  width: clamp(220px, 16vw, 340px);  /* much larger */
+  width: clamp(220px, 16vw, 340px);
   height: auto;
   display: block;
-
   filter:
     drop-shadow(0 0 14px rgba(255,86,0,.55))
     drop-shadow(0 0 40px rgba(255,86,0,.28));
-
   animation: sealPulse 4s ease-in-out infinite;
 }
+
 /* Make hero panel stretch to match right column height */
-.hero-panel{
-  height: 100%;
-}
+.hero-panel{ height: 100%; }
 
 .hero-actions{
   display:flex;
@@ -144,12 +141,6 @@ body::after{
   margin-top:14px;
 }
 
-/* This is what aligns bottoms with COTW */
-@media (min-width: 980px){
-  .v2-grid.hero{
-    align-items: stretch;
-  }
-}
 /* --------- Headings / Text --------- */
 .kicker{
   color: var(--ov);
@@ -163,7 +154,7 @@ body::after{
 .h1{
   margin: 10px 0 10px;
   font-size: clamp(42px, 4.8vw, 82px);
-  line-height: .95;
+  line-height: 1.05;              /* less aggressive than .95 */
   font-family: var(--display);
   letter-spacing: .02em;
 }
@@ -171,7 +162,7 @@ body::after{
 .h2{
   margin: 0 0 10px;
   font-size: clamp(28px, 2.8vw, 44px);
-  line-height: 1.05;
+  line-height: 1.08;
   font-family: var(--display);
 }
 
@@ -182,28 +173,20 @@ body::after{
   max-width: 62ch;
 }
 
-/* Glow style you like (for Feast of Flesh headers later) */
-.glow-title{
-  text-shadow:
-    0 0 18px rgba(255,86,0,.25),
-    0 0 34px rgba(255,86,0,.18),
-    0 0 55px rgba(255,86,0,.10);
-}
-
-/* ===== Feast of Flesh — FINAL PSD MATCH ===== */
+/* ===== Feast of Flesh — Gradient Titles (FINAL, clean + no fighting) ===== */
 .h1,
 .h2,
 .card-title{
+  font-family: var(--display);
   text-transform: uppercase;
   letter-spacing: .02em;
 
-  /* Fix Feast of Flesh clipping */
+  /* fixes the “O” clipping/cutoff */
   line-height: 1.15;
-  padding-top: .08em;
-  padding-bottom: .08em;
-}
+  padding-top: .10em;
+  padding-bottom: .10em;
 
-  /* BRIGHT gradient: white (top) → OV orange (bottom) */
+  /* bright gradient: white top → OV orange bottom */
   background-image: linear-gradient(
     to bottom,
     #ffffff 0%,
@@ -215,15 +198,17 @@ body::after{
 
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
 
-  /* NO stroke (this is key) */
+  /* Chrome key */
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+
+  /* no stroke (keeps it clean) */
   -webkit-text-stroke: 0;
 
-  /* CLEAN glow only */
+  /* glow that doesn't “muddy” the gradient */
   text-shadow:
-   0 1px 0 rgba(0,0,0,.12),
+    0 1px 0 rgba(0,0,0,.12),
     0 0 8px rgba(255,255,255,.45),
     0 0 18px rgba(255,86,0,.55),
     0 0 36px rgba(255,86,0,.35);
@@ -247,10 +232,7 @@ body::after{
     var(--shadow);
 }
 
-.panel .in{
-  padding: 20px 20px 18px;
-}
-
+.panel .in{ padding: 20px 20px 18px; }
 @media (min-width: 980px){
   .panel .in{ padding: 22px 22px 20px; }
 }
@@ -271,9 +253,7 @@ body::after{
     0 14px 38px rgba(0,0,0,.45);
 }
 
-.card .in{
-  padding: 18px 18px 16px;
-}
+.card .in{ padding: 18px 18px 16px; }
 
 /* Card title row (title + small pill) */
 .card-top{
@@ -285,12 +265,15 @@ body::after{
 }
 
 .card-title{
-  font-family: var(--display);
   font-size: 26px;
   letter-spacing: .03em;
-  line-height: 1.05;
+  line-height: 1.10;
   margin: 0;
 }
+
+/* Prevent title “left cut” if a parent ever hides overflow */
+.panel, .card{ overflow: visible; }
+.panel .in, .card .in{ overflow: visible; }
 
 .pill{
   display:inline-flex;
@@ -318,7 +301,7 @@ a{ color: inherit; text-decoration:none; }
 }
 .cta:hover{ filter: brightness(1.15); }
 
-/* Buttons (for footer/nav later) */
+/* Buttons */
 .btn{
   display:inline-flex;
   align-items:center;
@@ -339,42 +322,18 @@ a{ color: inherit; text-decoration:none; }
   gap: 14px;
   grid-template-columns: 1fr;
 }
-
 @media (min-width: 600px){
   .hq-grid{ grid-template-columns: 1fr 1fr; }
 }
+.feature{ min-height: 170px; }
 
-.feature{
-  min-height: 170px;
-}
-
-/* --------- RLOL Esports Skin (cleaner + sharper) --------- */
+/* --------- RLOL Esports Skin --------- */
 body.rlol{
-  /* Slightly cooler + sharper accent usage */
   --edge: rgba(255,138,0,.35);
   --edge2: rgba(255,138,0,.18);
 }
-
 body.rlol .kicker,
-body.rlol .cta{
-  color: var(--rlol);
-}
-
-body.rlol .glow-title{
-  text-shadow:
-    0 0 14px rgba(255,138,0,.22),
-    0 0 28px rgba(255,138,0,.14),
-    0 0 44px rgba(255,138,0,.10);
-}
-
-body.rlol .panel.edge,
-body.rlol .card.edge{
-  border-color: rgba(255,138,0,.22);
-  box-shadow:
-    0 0 0 1px rgba(255,138,0,.12) inset,
-    0 0 28px rgba(255,138,0,.10),
-    var(--shadow);
-}
+body.rlol .cta{ color: var(--rlol); }
 
 /* =========================
    Hover Glow + Lift (premium)
@@ -387,7 +346,6 @@ body.rlol .card.edge{
     filter .18s ease;
   will-change: transform, box-shadow;
 }
-
 .panel:hover, .card:hover{
   transform: translateY(-3px);
   border-color: rgba(255,255,255,.14);
@@ -396,8 +354,6 @@ body.rlol .card.edge{
     0 0 42px rgba(255,86,0,.18),
     0 18px 55px rgba(0,0,0,.65);
 }
-
-/* Extra punch for the ones you already marked as edge */
 .panel.edge:hover, .card.edge:hover{
   border-color: rgba(255,86,0,.40);
   box-shadow:
@@ -405,8 +361,6 @@ body.rlol .card.edge{
     0 0 55px rgba(255,86,0,.22),
     0 22px 70px rgba(0,0,0,.70);
 }
-
-/* RLOL pages use RLOL orange on hover */
 body.rlol .panel:hover,
 body.rlol .card:hover{
   box-shadow:
@@ -414,7 +368,6 @@ body.rlol .card:hover{
     0 0 42px rgba(255,138,0,.18),
     0 18px 55px rgba(0,0,0,.65);
 }
-
 body.rlol .panel.edge:hover,
 body.rlol .card.edge:hover{
   border-color: rgba(255,138,0,.40);
@@ -437,14 +390,12 @@ body.rlol .card.edge:hover{
       drop-shadow(0 0 14px rgba(255,86,0,.45))
       drop-shadow(0 0 40px rgba(255,86,0,.22));
   }
-
   50% {
     transform: scale(1.04);
     filter:
       drop-shadow(0 0 22px rgba(255,86,0,.75))
       drop-shadow(0 0 60px rgba(255,86,0,.4));
   }
-
   100% {
     transform: scale(1);
     filter:
