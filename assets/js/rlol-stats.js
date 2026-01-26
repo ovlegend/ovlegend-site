@@ -1,598 +1,324 @@
 // /assets/js/rlol-stats.js
 (function () {
-  const $ = (sel) => document.querySelector(sel);
+  "use strict";
 
-  const tbody = document.querySelector("#statsBody") || document.querySelector("#statsRoot tbody");
-const table = document.querySelector("#statsTable");
-const hint  = document.querySelector("#loadedHint");
+  const CSV_URL = window.RLOL_STATS_CSV || "";
+  const FALLBACK_CSV_URL =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCQnxfwBylnd5H8jHc_g9Gtv7wyhzelCLixlK3-Bi_Uw0pVJga8MPtgYf5740Csm7hbfLTJhHGdWzh/pub?gid=1283136814&single=true&output=csv";
 
-function setLoading(msg){
-  // last-resort: don't crash if tbody is missing
-  if (!tbody) {
-    console.error("Missing #statsBody (tbody is null). Can't render table rows.");
-    const root = document.querySelector("#statsRoot");
-    if (root) root.innerHTML = `<div class="error">${msg}</div>`;
-    return;
+  const $ = (s) => document.querySelector(s);
+  const on = (el, ev, fn) => { if (el) el.addEventListener(ev, fn); };
+
+  const tbody = $("#statsBody");
+  const table = $("#statsTable");
+  const hint  = $("#loadedHint");
+
+  // Leader UI
+  const chip  = $("#leaderChip");
+  const title = $("#leaderTitle");
+  const meta  = $("#leaderMeta");
+  const leaderBtns = $("#leaderBtns");
+
+  let rows = [];
+  let view = { key: "Score", dir: "desc", q: "", team: "", top: "all" };
+
+  const LEADER_METRICS = [
+    { key: "Score",   label: "TOP PTS"   },
+    { key: "Goals",   label: "TOP GOALS" },
+    { key: "Assists", label: "TOP AST"   },
+    { key: "Saves",   label: "TOP SAVES" },
+    { key: "Shots",   label: "TOP SHOTS" }
+  ];
+
+  function setLoading(msg) {
+    // Never crash if markup is missing
+    if (!tbody) {
+      console.error("Missing #statsBody. Can't render stats table.");
+      return;
+    }
+    tbody.innerHTML = `<tr><td colspan="9" class="loading">${escapeHtml(msg)}</td></tr>`;
   }
-  tbody.innerHTML = `<tr><td colspan="9" class="loading">${msg}</td></tr>`;
-}
-  
-  // ---- DOM (existing ids used across your V2 pages) ----
-  const viewModeEl = $("#viewMode");
-  const seasonEl = $("#seasonSel");
-  const weekEl = $("#weekSel");
-  const teamEl = $("#teamSel");
-  const searchEl = $("#searchPlayer");
-  const statusEl = $("#statsStatus");
-  const root = $("#statsRoot");
-  if (!root) return;
 
-  // ---- Optional "Leaders" UI hooks (won't break if missing) ----
-  const leaderNameEl =
-    $("#leaderName") ||
-    $("[data-leader-name]") ||
-    $(".leader-name") ||
-    $("#leaderTitle");
+  function escapeHtml(s) {
+    return (s ?? "").toString()
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
 
-  const leaderMetaEl =
-    $("#leaderMeta") ||
-    $("[data-leader-meta]") ||
-    $(".leader-meta") ||
-    $("#leaderMeta"); // ok if duplicated
-
-  const leaderBadgeEl =
-    $("#leaderBadge") ||
-    $("[data-leader-badge]") ||
-    $(".leader-badge") ||
-    $("#leaderChip");
-
-  const leaderBtnsWrap =
-    $("#leaderBtns") ||
-    $("#leaderButtons") ||
-    $("[data-leader-buttons]") ||
-    $(".leader-actions") ||
-    $(".leader-btns");
-
-  // ---- CSV parsing (quoted commas safe) ----
   function parseCSV(text) {
-    const rows = [];
-    let row = [];
-    let cur = "";
-    let inQuotes = false;
-
+    const out = [];
+    let row = [], cur = "", inQ = false;
     text = String(text || "").replace(/\uFEFF/g, "");
 
     for (let i = 0; i < text.length; i++) {
-      const c = text[i];
-      const next = text[i + 1];
-
-      if (c === '"' && inQuotes && next === '"') {
-        cur += '"'; i++; continue;
-      }
-      if (c === '"') { inQuotes = !inQuotes; continue; }
-      if (c === "," && !inQuotes) { row.push(cur); cur = ""; continue; }
-
-      if ((c === "\n" || c === "\r") && !inQuotes) {
-        if (c === "\r" && next === "\n") i++;
-        row.push(cur);
-        cur = "";
-        if (row.some((x) => String(x).trim() !== "")) rows.push(row);
+      const c = text[i], n = text[i + 1];
+      if (c === '"' && inQ && n === '"') { cur += '"'; i++; continue; }
+      if (c === '"') { inQ = !inQ; continue; }
+      if (c === "," && !inQ) { row.push(cur); cur = ""; continue; }
+      if ((c === "\n" || c === "\r") && !inQ) {
+        if (c === "\r" && n === "\n") i++;
+        row.push(cur); cur = "";
+        if (row.some(v => String(v).trim() !== "")) out.push(row);
         row = [];
         continue;
       }
-
       cur += c;
     }
-
     row.push(cur);
-    if (row.some((x) => String(x).trim() !== "")) rows.push(row);
-
-    const header = rows[0] || [];
-    const data = [];
-    for (let r = 1; r < rows.length; r++) {
-      const obj = {};
-      for (let c = 0; c < header.length; c++) {
-        obj[String(header[c] || "").trim()] = (rows[r][c] ?? "").trim();
-      }
-      data.push(obj);
-    }
-    return data;
+    if (row.some(v => String(v).trim() !== "")) out.push(row);
+    return out;
   }
 
-  async function fetchCsv(url) {
-    if (!url) throw new Error("CSV URL missing");
-    const busted = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
-    const res = await fetch(busted, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status} while fetching CSV`);
-    const text = await res.text();
-    if (/^\s*</.test(text)) throw new Error("CSV fetch returned HTML (not a published CSV link)");
-    return parseCSV(text);
+  function num(v) {
+    const x = Number((v ?? "").toString().replace(/[^\d.-]/g, ""));
+    return Number.isFinite(x) ? x : 0;
   }
 
-  // ---- helpers ----
-  function num(v, fallback = 0) {
-    const s = String(v ?? "").trim();
-    if (s === "") return fallback;
-    const n = Number(s.replace(/[^\d.-]/g, ""));
-    return Number.isFinite(n) ? n : fallback;
-  }
-
-  function normLower(s) { return String(s || "").trim().toLowerCase(); }
-  function norm(s) { return String(s || "").trim(); }
-
-  function uniqSorted(list) {
-    return Array.from(new Set(list.filter((x) => String(x).trim() !== "")))
-      .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
-  }
-
-  function fillSelect(sel, values, allLabel) {
+  function hydrateTeamFilter() {
+    const sel = $("#teamFilter");
     if (!sel) return;
-    sel.innerHTML = "";
 
-    const all = document.createElement("option");
-    all.value = "all";
-    all.textContent = allLabel;
-    sel.appendChild(all);
+    const teams = Array.from(new Set(rows.map(r => r.Team).filter(Boolean)))
+      .sort((a, b) => a.localeCompare(b));
 
-    values.forEach((v) => {
-      const opt = document.createElement("option");
-      opt.value = v;
-      opt.textContent = v;
-      sel.appendChild(opt);
+    sel.innerHTML =
+      `<option value="">All teams</option>` +
+      teams.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+  }
+
+  function applyFilters(data) {
+    const q = view.q.trim().toLowerCase();
+    let d = data;
+
+    if (view.team) d = d.filter(r => (r.Team || "") === view.team);
+
+    if (q) {
+      d = d.filter(r =>
+        (r.Player || "").toLowerCase().includes(q) ||
+        (r.Team || "").toLowerCase().includes(q)
+      );
+    }
+
+    if (view.top === "top") d = d.slice(0, 10);
+    return d;
+  }
+
+  function sortData(data) {
+    const key = view.key;
+    const dir = view.dir === "asc" ? 1 : -1;
+
+    const isNumeric = ["GP","Score","Goals","Assists","Saves","Shots","Ping"].includes(key);
+
+    return [...data].sort((a, b) => {
+      if (isNumeric) return (num(a[key]) - num(b[key])) * dir;
+      return String(a[key] || "").localeCompare(String(b[key] || "")) * dir;
     });
-
-    sel.value = "all";
-    sel.disabled = values.length === 0;
   }
 
-  // URL detection + safe image html
-  function isImageUrl(v) {
-    const s = norm(v);
-    return /^https?:\/\/.+\.(png|jpg|jpeg|webp|gif)(\?.*)?$/i.test(s);
+  function paintSortIndicators() {
+    if (!table) return;
+    table.querySelectorAll("thead th").forEach(th => {
+      th.classList.remove("sort-asc", "sort-desc");
+      const key = th.getAttribute("data-key");
+      if (key && key === view.key) th.classList.add(view.dir === "asc" ? "sort-asc" : "sort-desc");
+    });
   }
 
-  function imgHTML(url, alt) {
-    const u = norm(url);
-    if (!isImageUrl(u)) return "";
-    return `<img class="logo" src="${u}" alt="${alt || ""}" loading="lazy" />`;
+  function updateLeaderCard(data) {
+    const top = data[0];
+    if (!top) return;
+
+    if (chip)  chip.textContent  = `#1 ${view.key}`;
+    if (title) title.textContent = top.Player || "Top Performer";
+    if (meta)  meta.textContent  = `${top.Team || "—"} • ${view.key}: ${top[view.key] ?? "—"}`;
   }
 
-  // Read a value by trying multiple possible headers (case sensitive + insensitive)
-  function getAny(row, keys) {
-    for (const k of keys) {
-      if (row[k] != null && String(row[k]).trim() !== "") return row[k];
-
-      const want = String(k).trim().toLowerCase();
-      for (const realKey of Object.keys(row)) {
-        if (String(realKey).trim().toLowerCase() === want) {
-          const v = row[realKey];
-          if (v != null && String(v).trim() !== "") return v;
-        }
-      }
-    }
-    return "";
-  }
-
-  function firstNonUrl(row, keys) {
-    for (const k of keys) {
-      const v = norm(getAny(row, [k]));
-      if (v && !isImageUrl(v)) return v;
-    }
-    return "";
-  }
-
-  // ---- URLs from config (supports BOTH key styles) ----
-  function getUrls() {
-    const cfg = window.OV_CONFIG && window.OV_CONFIG.rlol;
-    if (!cfg) throw new Error("OV_CONFIG.rlol missing (config.js not loaded?)");
-
-    const seasonUrl = String(
-      cfg.playerSeasonStatsCsv ||
-      cfg.statsSeasonCsv ||
-      cfg.playerStatsSeasonCsv ||
-      cfg.statsCsv ||
-      cfg.playerStatsCsv ||
-      ""
-    ).trim();
-
-    const perGameUrl = String(
-      cfg.playerGameStatsCsv ||
-      cfg.statsGameCsv ||
-      ""
-    ).trim();
-
-    if (!seasonUrl) throw new Error("Stats CSV URL missing in OV_CONFIG.rlol (need playerSeasonStatsCsv or statsSeasonCsv)");
-    return { seasonUrl, perGameUrl: perGameUrl || seasonUrl };
-  }
-
-  // ---- state ----
-  const state = {
-    rows: [],
-    filtered: [],
-    sortKey: "score",
-    sortDir: "desc",
-    leaderKey: "score",
-    query: "",
-    season: "all",
-    week: "all",
-    team: "all",
-    viewMode: (viewModeEl && viewModeEl.value) ? viewModeEl.value : "season_totals"
-  };
-
-  // ---- Leaders metrics (REQUIRED) ----
-  const LEADER_METRICS = [
-    { key: "score",   label: "TOP PTS",   badge: "#1 SCORE", valueLabel: "Score" },
-    { key: "goals",   label: "TOP GOALS", badge: "#1 GOALS", valueLabel: "Goals" },
-    { key: "assists", label: "TOP AST",   badge: "#1 AST",   valueLabel: "Assists" },
-    { key: "saves",   label: "TOP SAVES", badge: "#1 SAVES", valueLabel: "Saves" },
-    { key: "shots",   label: "TOP SHOTS", badge: "#1 SHOTS", valueLabel: "Shots" },
-    { key: "gp",      label: "MOST GP",   badge: "#1 GP",    valueLabel: "GP" }
-  ];
-
-  function metricInfo(key) {
-    return LEADER_METRICS.find(m => m.key === key) || LEADER_METRICS[0];
-  }
-
-  // ---- Leaders (dynamic buttons) ----
   function syncLeaderButtonsActive() {
-    if (!leaderBtnsWrap) return;
-    leaderBtnsWrap.querySelectorAll("button[data-metric]").forEach(btn => {
-      const k = btn.dataset.metric;
-      btn.classList.toggle("active", k === state.leaderKey);
+    if (!leaderBtns) return;
+    leaderBtns.querySelectorAll("button[data-metric]").forEach(b => {
+      b.classList.toggle("active", b.dataset.metric === view.key);
     });
   }
 
-  function setLeaderMetric(key) {
-    state.leaderKey = key;
+  function buildLeaderButtons() {
+    if (!leaderBtns) return;
 
-    // also sort table by that metric (desc); never force ping
-    state.sortKey = key;
-    state.sortDir = (key === "player" || key === "team") ? "asc" : "desc";
+    if (leaderBtns.dataset.built !== "1") {
+      leaderBtns.dataset.built = "1";
+      leaderBtns.innerHTML = "";
 
-    render();
-  }
+      // RESET
+      const reset = document.createElement("button");
+      reset.type = "button";
+      reset.className = "btn ghost";
+      reset.textContent = "RESET";
+      reset.dataset.metric = "Score";
+      reset.addEventListener("click", () => {
+        view = { key: "Score", dir: "desc", q: "", team: "", top: "all" };
+        const q = $("#q"), t = $("#teamFilter"), v = $("#viewFilter");
+        if (q) q.value = "";
+        if (t) t.value = "";
+        if (v) v.value = "all";
+        paintSortIndicators();
+        render();
+      });
+      leaderBtns.appendChild(reset);
 
-  // ✅ SINGLE, SAFE ensureLeaderButtons (build once; no null addEventListener)
-  function ensureLeaderButtons() {
-    if (!leaderBtnsWrap) return;
-
-    // build once (avoid re-binding clicks every render)
-    if (leaderBtnsWrap.dataset.built === "1") {
-      syncLeaderButtonsActive();
-      return;
+      // Metrics
+      LEADER_METRICS.forEach(m => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "btn pill";
+        b.textContent = m.label;
+        b.dataset.metric = m.key;
+        b.addEventListener("click", () => {
+          view.key = m.key;
+          view.dir = ["Player","Team"].includes(m.key) ? "asc" : "desc";
+          paintSortIndicators();
+          render();
+        });
+        leaderBtns.appendChild(b);
+      });
     }
-    leaderBtnsWrap.dataset.built = "1";
-    leaderBtnsWrap.innerHTML = "";
-
-    const mkBtn = (txt, metric, cls) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.textContent = txt;
-      b.className = cls || "btn";
-      b.dataset.metric = metric || "";
-      return b;
-    };
-
-    // Reset
-    const resetBtn = mkBtn("RESET", "score", "btn ghost");
-    resetBtn.addEventListener("click", () => setLeaderMetric("score"));
-    leaderBtnsWrap.appendChild(resetBtn);
-
-    // One per metric (no ping)
-    LEADER_METRICS.forEach((m) => {
-      const b = mkBtn(m.label, m.key, "btn pill");
-      b.addEventListener("click", () => setLeaderMetric(m.key));
-      leaderBtnsWrap.appendChild(b);
-    });
-
-    syncLeaderButtonsActive();
-  }
-
-  // ---- model (strong header mapping for your sheet) ----
-  function toModel(row) {
-    const player =
-      firstNonUrl(row, ["player_name", "player_id", "Player", "player", "name", "Player Name"]) ||
-      "Unknown";
-
-    const team =
-      firstNonUrl(row, ["team_name", "team_id", "Team Name", "team", "Team"]) ||
-      "";
-
-    const playerLogo = norm(getAny(row, [
-      "player_logo", "Player Logo", "PlayerLogo",
-      "player_logo_url", "Player Logo URL",
-      "player_pfp", "PFP", "Avatar", "player_avatar"
-    ]));
-
-    const teamLogo = norm(getAny(row, [
-      "team_logo", "Team Logo", "TeamLogo",
-      "team_logo_url", "Team Logo URL",
-      "logo_url", "Logo", "logo"
-    ]));
-
-    const season = norm(getAny(row, ["season", "Season"]));
-    const week = norm(getAny(row, ["week", "Week", "match_week", "MatchWeek", "Match Week"]));
-
-    const gameId = norm(getAny(row, ["game_id", "Game ID", "GameId"]));
-    const gp = num(getAny(row, ["GP", "gp", "Games", "games", "Games Played", "games_played"]), 0);
-
-    const goals = num(getAny(row, ["goals", "Goals", "G", "g"]), 0);
-    const assists = num(getAny(row, ["assists", "Assists", "A", "a"]), 0);
-    const saves = num(getAny(row, ["saves", "Saves", "SV", "sv"]), 0);
-    const shots = num(getAny(row, ["shots", "Shots", "Sh", "sh"]), 0);
-    const score = num(getAny(row, ["score", "Score", "Points", "points", "PTS", "pts"]), 0);
-    const ping = num(getAny(row, ["ping", "Ping", "Avg Ping", "avg_ping"]), 0);
-
-    return {
-      player: player || "Unknown",
-      team: team || "",
-      playerLogo,
-      teamLogo,
-      season,
-      week,
-      gameId,
-      gp,
-      goals,
-      assists,
-      saves,
-      shots,
-      score,
-      ping,
-      _raw: row
-    };
-  }
-
-  // If GP isn't provided but game_id exists, infer GP per player from unique game_id count
-  function inferGPIfMissing(models) {
-    const needs = models.some(r => (!r.gp || r.gp === 0) && r.gameId);
-    if (!needs) return models;
-
-    const map = new Map(); // key -> Set(gameId)
-    for (const r of models) {
-      const key = `${normLower(r.player)}||${normLower(r.team)}`;
-      if (!map.has(key)) map.set(key, new Set());
-      if (r.gameId) map.get(key).add(r.gameId);
-    }
-
-    return models.map(r => {
-      if ((!r.gp || r.gp === 0) && r.gameId) {
-        const key = `${normLower(r.player)}||${normLower(r.team)}`;
-        const set = map.get(key);
-        const inferred = set ? set.size : 0;
-        return { ...r, gp: inferred };
-      }
-      return r;
-    });
-  }
-
-  function applyFilters() {
-    const q = normLower(state.query);
-
-    state.filtered = state.rows.filter((r) => {
-      if (state.season !== "all" && r.season !== state.season) return false;
-      if (state.week !== "all" && r.week !== state.week) return false;
-      if (state.team !== "all" && r.team !== state.team) return false;
-
-      if (!q) return true;
-      return normLower(`${r.player} ${r.team}`).includes(q);
-    });
-  }
-
-  function compare(a, b, dir) {
-    return dir === "asc"
-      ? (a > b ? 1 : a < b ? -1 : 0)
-      : (a < b ? 1 : a > b ? -1 : 0);
-  }
-
-  function sortRows() {
-    const key = state.sortKey;
-    const dir = state.sortDir;
-
-    const getVal = (r) => {
-      switch (key) {
-        case "player": return normLower(r.player);
-        case "team": return normLower(r.team);
-        case "gp": return r.gp;
-        case "goals": return r.goals;
-        case "assists": return r.assists;
-        case "saves": return r.saves;
-        case "shots": return r.shots;
-        case "ping": return r.ping;
-        case "score":
-        default: return r.score;
-      }
-    };
-
-    state.filtered.sort((a, b) => {
-      let res = compare(getVal(a), getVal(b), dir);
-      if (res === 0 && key !== "score") res = compare(a.score, b.score, "desc");
-      return res;
-    });
-  }
-
-  function th(label, key) {
-    const isActive = state.sortKey === key;
-    const arrow = isActive ? (state.sortDir === "asc" ? " ▲" : " ▼") : "";
-    return `<th data-key="${key}" class="${isActive ? "active-stat" : ""}">${label}${arrow}</th>`;
-  }
-
-  function tdNum(val, key) {
-    const cls = `num${state.sortKey === key ? " active-stat" : ""}`;
-    return `<td class="${cls}">${val}</td>`;
-  }
-
-  function updateLeaderCard() {
-    if (!leaderNameEl && !leaderMetaEl && !leaderBadgeEl) return;
-
-    if (!state.filtered.length) {
-      if (leaderNameEl) leaderNameEl.textContent = "—";
-      if (leaderMetaEl) leaderMetaEl.textContent = "No results";
-      if (leaderBadgeEl) leaderBadgeEl.textContent = "";
-      return;
-    }
-
-    const m = metricInfo(state.leaderKey);
-    const key = state.leaderKey;
-
-    const sorted = [...state.filtered].sort((a, b) => {
-      const va = a[key] ?? 0;
-      const vb = b[key] ?? 0;
-      if (vb !== va) return vb - va;
-      return (b.score ?? 0) - (a.score ?? 0);
-    });
-
-    const top = sorted[0];
-    const val = top[key] ?? 0;
-
-    // if leaderTitle is used as "Top Performer" header, don't uppercase it weirdly
-    if (leaderNameEl) leaderNameEl.textContent = String(top.player || "Unknown").toUpperCase();
-
-    if (leaderMetaEl) {
-      const teamTxt = top.team ? `${top.team} · ` : "";
-      leaderMetaEl.textContent = `${teamTxt}${m.valueLabel}: ${val}`;
-    }
-
-    if (leaderBadgeEl) leaderBadgeEl.textContent = m.badge;
 
     syncLeaderButtonsActive();
   }
 
   function render() {
-    applyFilters();
-    sortRows();
+    if (!tbody) return;
 
-    // leaders UI (if present)
-    ensureLeaderButtons();
+    const filtered = applyFilters(sortData(rows));
+    if (hint) hint.textContent = `${rows.length} loaded • Showing ${filtered.length}`;
 
-    root.innerHTML = `
-      <div class="stats-card ov-card">
-        <table class="stats-table">
-          <thead>
-            <tr>
-              ${th("Player", "player")}
-              ${th("Team", "team")}
-              ${th("GP", "gp")}
-              ${th("Score", "score")}
-              ${th("G", "goals")}
-              ${th("A", "assists")}
-              ${th("Saves", "saves")}
-              ${th("Shots", "shots")}
-              ${th("Ping", "ping")}
-            </tr>
-          </thead>
-          <tbody>
-            ${state.filtered.map((r) => `
-              <tr class="ov-row">
-                <td class="playerCell ${state.sortKey === "player" ? "active-stat" : ""}">
-                  <div class="cellFlex">
-                    ${r.playerLogo ? imgHTML(r.playerLogo, r.player) : `<div class="logo ph"></div>`}
-                    <div class="cellText">
-                      <div class="cellMain">${r.player}</div>
-                    </div>
-                  </div>
-                </td>
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="9" class="loading">No results.</td></tr>`;
+      return;
+    }
 
-                <td class="teamCell ${state.sortKey === "team" ? "active-stat" : ""}">
-                  <div class="cellFlex">
-                    ${r.teamLogo ? imgHTML(r.teamLogo, r.team) : `<div class="logo ph"></div>`}
-                    <div class="cellText">
-                      <div class="cellMain">${r.team || ""}</div>
-                    </div>
-                  </div>
-                </td>
+    tbody.innerHTML = filtered.map(r => `
+      <tr>
+        <td class="player">${escapeHtml(r.Player)}</td>
+        <td class="team">${escapeHtml(r.Team)}</td>
+        <td class="num">${escapeHtml(r.GP)}</td>
+        <td class="num">${escapeHtml(r.Score)}</td>
+        <td class="num">${escapeHtml(r.Goals)}</td>
+        <td class="num">${escapeHtml(r.Assists)}</td>
+        <td class="num">${escapeHtml(r.Saves)}</td>
+        <td class="num">${escapeHtml(r.Shots)}</td>
+        <td class="num">${escapeHtml(r.Ping)}</td>
+      </tr>
+    `).join("");
 
-                ${tdNum(r.gp, "gp")}
-                ${tdNum(r.score, "score")}
-                ${tdNum(r.goals, "goals")}
-                ${tdNum(r.assists, "assists")}
-                ${tdNum(r.saves, "saves")}
-                ${tdNum(r.shots, "shots")}
-                <td class="num ${state.sortKey === "ping" ? "active-stat" : ""}">${r.ping || ""}</td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
-      </div>
-    `;
+    updateLeaderCard(filtered);
+    buildLeaderButtons();
+  }
 
-    root.querySelectorAll("th[data-key]").forEach((el) => {
-      el.addEventListener("click", () => {
-        const k = el.getAttribute("data-key");
+  function attachSorting() {
+    if (!table) return;
 
-        if (state.sortKey === k) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
-        else {
-          state.sortKey = k;
-          state.sortDir = (k === "player" || k === "team") ? "asc" : "desc";
+    table.querySelectorAll("thead th[data-key]").forEach(th => {
+      th.addEventListener("click", () => {
+        const key = th.getAttribute("data-key");
+        if (!key) return;
+
+        if (view.key === key) {
+          view.dir = (view.dir === "asc") ? "desc" : "asc";
+        } else {
+          view.key = key;
+          view.dir = ["Player","Team"].includes(key) ? "asc" : "desc";
         }
 
-        // keep leaders in sync (but do NOT force ping)
-        if (k !== "ping") state.leaderKey = k;
-
+        paintSortIndicators();
         render();
-        if (statusEl) statusEl.textContent = `Loaded ${state.filtered.length} rows`;
       });
     });
-
-    if (statusEl) statusEl.textContent = `Loaded ${state.filtered.length} rows`;
-
-    updateLeaderCard();
   }
 
-  async function loadAndBuild() {
-    const { seasonUrl, perGameUrl } = getUrls();
-    const url = (state.viewMode === "per_game") ? perGameUrl : seasonUrl;
-
-    if (statusEl) statusEl.textContent = "Loading stats…";
-    root.innerHTML = `<div class="stats-loading">Loading stats…</div>`;
-
-    const csv = await fetchCsv(url);
-
-    // Map + (optional) infer GP from game_id
-    state.rows = inferGPIfMissing(csv.map(toModel));
-
-    fillSelect(seasonEl, uniqSorted(state.rows.map((r) => r.season)), "All");
-    fillSelect(weekEl, uniqSorted(state.rows.map((r) => r.week)), "All");
-    fillSelect(teamEl, uniqSorted(state.rows.map((r) => r.team)), "All Teams");
-
-    state.season = "all";
-    state.week = "all";
-    state.team = "all";
-
-    // Set default leader metric and render
-    state.leaderKey = state.leaderKey || "score";
-    render();
-  }
-
-  async function init() {
+  async function load() {
     try {
-      if (viewModeEl) {
-        viewModeEl.addEventListener("change", async () => {
-          state.viewMode = viewModeEl.value || "season_totals";
-          await loadAndBuild();
-        });
+      setLoading("Loading stats…");
+      if (hint) hint.textContent = "Loading…";
+
+      const url = CSV_URL || FALLBACK_CSV_URL;
+      if (!url) {
+        setLoading("Missing CSV link");
+        if (hint) hint.textContent = "Missing CSV link";
+        return;
       }
 
-      if (seasonEl) seasonEl.addEventListener("change", () => { state.season = seasonEl.value || "all"; render(); });
-      if (weekEl) weekEl.addEventListener("change", () => { state.week = weekEl.value || "all"; render(); });
-      if (teamEl) teamEl.addEventListener("change", () => { state.team = teamEl.value || "all"; render(); });
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("CSV fetch failed: " + res.status);
+      const text = await res.text();
 
-      if (searchEl) {
-        searchEl.addEventListener("input", () => {
-          state.query = searchEl.value || "";
-          render();
-        });
-      }
+      const grid = parseCSV(text);
+      const headers = (grid.shift() || []).map(h => (h || "").toString().trim());
 
-      // Build leader buttons early (safe even if container missing)
-      ensureLeaderButtons();
+      // raw rows from CSV
+      const raw = grid.map(cols => {
+        const o = {};
+        headers.forEach((h, i) => o[h] = (cols[i] ?? "").trim());
+        return o;
+      });
 
-      await loadAndBuild();
+      // aggregate per player_id
+      const map = {};
+      raw.forEach(r => {
+        const p = r.player_id;
+        if (!p) return;
+
+        if (!map[p]) {
+          map[p] = { Player: p, Team: r.team_id, GP: 0, Score: 0, Goals: 0, Assists: 0, Saves: 0, Shots: 0, PingTotal: 0 };
+        }
+
+        map[p].GP++;
+        map[p].Score     += Number(r.score   || 0);
+        map[p].Goals     += Number(r.goals   || 0);
+        map[p].Assists   += Number(r.assists || 0);
+        map[p].Saves     += Number(r.saves   || 0);
+        map[p].Shots     += Number(r.shots   || 0);
+        map[p].PingTotal += Number(r.ping    || 0);
+      });
+
+      rows = Object.values(map).map(r => ({
+        Player: r.Player,
+        Team: r.Team,
+        GP: r.GP,
+        Score: r.Score,
+        Goals: r.Goals,
+        Assists: r.Assists,
+        Saves: r.Saves,
+        Shots: r.Shots,
+        Ping: r.GP ? Math.round(r.PingTotal / r.GP) : 0
+      }));
+
+      // default sort
+      view.key = "Score";
+      view.dir = "desc";
+
+      hydrateTeamFilter();
+      paintSortIndicators();
+      buildLeaderButtons();
+      render();
     } catch (err) {
       console.error(err);
-      if (statusEl) statusEl.textContent = "Failed to load stats";
-      root.innerHTML = `<div class="error">Error: ${String(err.message || err)}</div>`;
+      setLoading("Could not load stats. Check CSV link + console.");
+      if (hint) hint.textContent = "Load error";
     }
   }
 
-  init();
+  function wireUI() {
+    on($("#q"), "input", (e) => { view.q = e.target.value; render(); });
+    on($("#teamFilter"), "change", (e) => { view.team = e.target.value; render(); });
+    on($("#viewFilter"), "change", (e) => { view.top = e.target.value; render(); });
+    on($("#btnCSV"), "click", load);
+  }
+
+  // Boot
+  attachSorting();
+  wireUI();
+  buildLeaderButtons();
+  load();
 })();
