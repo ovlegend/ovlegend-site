@@ -201,19 +201,39 @@
     viewMode: (viewModeEl && viewModeEl.value) ? viewModeEl.value : "season_totals"
   };
 
-  // Leaders: one button per stat (no ping)
-  const LEADER_METRICS = [
-    { key: "score",   label: "TOP PTS",    badge: "#1 SCORE", valueLabel: "Score" },
-    { key: "goals",   label: "TOP GOALS",  badge: "#1 GOALS", valueLabel: "Goals" },
-    { key: "assists", label: "TOP AST",    badge: "#1 AST",   valueLabel: "Assists" },
-    { key: "saves",   label: "TOP SAVES",  badge: "#1 SAVES", valueLabel: "Saves" },
-    { key: "shots",   label: "TOP SHOTS",  badge: "#1 SHOTS", valueLabel: "Shots" },
-    { key: "gp",      label: "MOST GP",    badge: "#1 GP",    valueLabel: "GP" }
-  ];
+ // ===== Leaders Buttons (V2-safe) =====
+function ensureLeaderButtons() {
+  const wrap = document.querySelector("#leaderBtns");
+  if (!wrap) return; // V2 page missing container? Don't crash.
 
-  function metricInfo(key) {
-    return LEADER_METRICS.find(m => m.key === key) || LEADER_METRICS[0];
-  }
+  // build once
+  if (wrap.dataset.built === "1") return;
+  wrap.dataset.built = "1";
+  wrap.innerHTML = "";
+
+  const mk = (label, metric, extraClass = "btn ghost") => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = extraClass;
+    b.textContent = label;
+    b.dataset.metric = metric || "";
+    return b;
+  };
+
+  // Reset
+  const reset = mk("RESET", "score", "btn ghost");
+  reset.addEventListener("click", () => setLeaderMetric("score"));
+  wrap.appendChild(reset);
+
+  // One per metric (no ping)
+  LEADER_METRICS.forEach((m) => {
+    const b = mk(m.label, m.key, "btn pill");
+    b.addEventListener("click", () => setLeaderMetric(m.key));
+    wrap.appendChild(b);
+  });
+
+  syncLeaderButtonsActive();
+}
 
   // ---- model (strong header mapping for your sheet) ----
   function toModel(row) {
