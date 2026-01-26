@@ -216,6 +216,113 @@ a{ color:inherit; text-decoration:none; }
   background: linear-gradient(180deg, rgba(18,18,22,.82), rgba(12,12,16,.62));
   border: 1px solid rgba(255,255,255,.10);
 
+  /* ===== Stats V2 toolbar + table ===== */
+.toolbar{
+  padding: 0 18px 14px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr 0.7fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.field{
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(255,255,255,.10);
+  color: var(--text);
+  outline: none;
+}
+.field::placeholder{ color: rgba(255,255,255,.45); font-weight: 700; }
+.field:focus{
+  border-color: rgba(255,138,0,.35);
+  box-shadow: var(--glow-soft);
+}
+
+.select{ appearance: none; }
+
+.toolbar-right{ justify-self: end; }
+
+.table-wrap{
+  padding: 0 18px 18px;
+  overflow: auto;
+}
+
+.stats-table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px; /* row gaps like your cards */
+  min-width: 820px; /* keeps columns readable */
+}
+
+.stats-table thead th{
+  position: sticky;
+  top: 0;
+  background: rgba(11,11,13,.92);
+  backdrop-filter: blur(10px);
+  padding: 10px 10px;
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.72);
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.stats-table thead th.num{ text-align: right; }
+
+.stats-table thead th.sort-asc{ color: rgba(255,138,0,.92); }
+.stats-table thead th.sort-desc{ color: rgba(255,138,0,.92); }
+
+.stats-table tbody tr{
+  background: rgba(0,0,0,.26);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.stats-table tbody td{
+  padding: 12px 10px;
+  border-top: 1px solid rgba(255,255,255,.10);
+  border-bottom: 1px solid rgba(255,255,255,.10);
+}
+.stats-table tbody tr td:first-child{
+  border-left: 1px solid rgba(255,255,255,.10);
+  border-radius: 14px 0 0 14px;
+}
+.stats-table tbody tr td:last-child{
+  border-right: 1px solid rgba(255,255,255,.10);
+  border-radius: 0 14px 14px 0;
+}
+
+.stats-table tbody tr:hover td{
+  border-color: rgba(255,138,0,.28);
+  box-shadow: var(--glow-soft);
+}
+
+.stats-table td.num{
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.stats-table td.player{ font-weight: 900; }
+.stats-table td.team{ color: rgba(255,255,255,.85); font-weight: 800; }
+
+.loading{
+  padding: 22px 12px !important;
+  text-align: center;
+  color: rgba(255,255,255,.65);
+  font-weight: 800;
+}
+
+@media (max-width: 980px){
+  .toolbar{
+    grid-template-columns: 1fr;
+  }
+  .toolbar-right{ justify-self: stretch; }
+}
+
   /* NEW shadow system */
   box-shadow:
     0 10px 30px rgba(0,0,0,.35),
