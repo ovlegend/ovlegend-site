@@ -371,25 +371,20 @@
       return b;
     };
 
-   // reset
-if (leaderBtnsWrap) {
+// --- safe bind helper ---
+const bindClick = (el, fn) => {
+  if (!el) return;
+  el.addEventListener("click", fn);
+};
 
-  const resetBtn = mkBtn("RESET", "reset", "btn pill");
-  resetBtn.addEventListener("click", () => {
-    setLeaderMetric("score");
-  });
-  leaderBtnsWrap.appendChild(resetBtn);
-
-  // one per metric (no ping)
-  LEADER_METRICS.forEach(m => {
-    const b = mkBtn(m.label, m.key, "btn pill");
-    b.addEventListener("click", () => setLeaderMetric(m.key));
-    leaderBtnsWrap.appendChild(b);
-  });
-
-  syncLeaderButtonsActive();
-
-}
+// Leaders button wiring (safe even if some buttons don't exist)
+bindClick(btnReset,      () => setLeaderMetric("score"));
+bindClick(btnTopPts,     () => setLeaderMetric("score"));
+bindClick(btnTopGoals,   () => setLeaderMetric("goals"));
+bindClick(btnTopAssists, () => setLeaderMetric("assists"));
+bindClick(btnTopSaves,   () => setLeaderMetric("saves"));
+bindClick(btnTopShots,   () => setLeaderMetric("shots"));
+bindClick(btnTopGp,      () => setLeaderMetric("gp"));
 
   function syncLeaderButtonsActive() {
     if (!leaderBtnsWrap) return;
