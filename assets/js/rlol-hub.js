@@ -109,17 +109,16 @@
     nextMatchesEl.innerHTML = "";
 
     // Try to map schedule columns (flexible)
-    const mapped = scheduleRows.map(r => {
-      const week = pick(r, ["week", "wk"]);
-      const status = pick(r, ["status", "matchstatus", "state"], "scheduled");
-      const day = pick(r, ["day", "dow"]);
-      const time = pick(r, ["time", "start", "starttime"]);
-      const team1 = pick(r, ["team1", "home", "team", "blue", "team_a", "teama"]);
-      const team2 = pick(r, ["team2", "away", "opponent", "orange", "team_b", "teamb"]);
-      const note = pick(r, ["note", "notes", "comment", "meta"]);
-
-      return { week, status, day, time, team1, team2, note };
-    });
+const mapped = scheduleRows.map(r => {
+  const week   = pick(r, ["week", "wk"]);
+  const status = pick(r, ["status", "matchstatus", "state"], "");
+  const day = pick(r, ["scheduled_date", "date", "match_date", "day", "dow"]);
+  const time = pick(r, ["scheduled_time", "time", "start", "starttime"]);
+  const team1 = pick(r, ["home_team_id", "home", "team1", "team", "blue", "team_a", "teama"]);
+  const team2 = pick(r, ["away_team_id", "away", "team2", "opponent", "orange", "team_b", "teamb"]);
+  const note   = pick(r, ["note", "notes", "comment", "meta"]);
+  return { week, status, day, time, team1, team2, note };
+});
 
     // Pick upcoming: scheduled/live first; ignore blank rows
 const upcoming = mapped
