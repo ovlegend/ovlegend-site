@@ -371,22 +371,25 @@
       return b;
     };
 
-    // reset
-    const resetBtn = mkBtn("RESET", "reset", "btn pill");
-    resetBtn.addEventListener("click", () => {
-      setLeaderMetric("score");
-    });
-    leaderBtnsWrap.appendChild(resetBtn);
+   // reset
+if (leaderBtnsWrap) {
 
-    // one per metric (no ping)
-    LEADER_METRICS.forEach(m => {
-      const b = mkBtn(m.label, m.key, "btn pill");
-      b.addEventListener("click", () => setLeaderMetric(m.key));
-      leaderBtnsWrap.appendChild(b);
-    });
+  const resetBtn = mkBtn("RESET", "reset", "btn pill");
+  resetBtn.addEventListener("click", () => {
+    setLeaderMetric("score");
+  });
+  leaderBtnsWrap.appendChild(resetBtn);
 
-    syncLeaderButtonsActive();
-  }
+  // one per metric (no ping)
+  LEADER_METRICS.forEach(m => {
+    const b = mkBtn(m.label, m.key, "btn pill");
+    b.addEventListener("click", () => setLeaderMetric(m.key));
+    leaderBtnsWrap.appendChild(b);
+  });
+
+  syncLeaderButtonsActive();
+
+}
 
   function syncLeaderButtonsActive() {
     if (!leaderBtnsWrap) return;
