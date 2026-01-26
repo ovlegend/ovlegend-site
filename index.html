@@ -1,221 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OV Legend</title>
-
-  <!-- Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet" />
-
-  <!-- Main CSS -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
-
-  <!-- Page-only layout: Hero left + HQ right (desktop), stacked (mobile) -->
-  <style>
-    .home-top-wrap{
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 28px 16px 12px;
-      position: relative;
-      z-index: 1; /* keeps content above lightning */
-    }
-
-    .home-top{
-      display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      gap: 26px;
-      align-items: start;
-    }
-
-    .home-top .hero{
-      padding: 0 !important;
-      margin: 0 !important;
-    }
-    .home-top .hero-v2-inner{
-      padding: 0 !important;
-    }
-
-    .hq-side{
-      justify-self: end;
-      width: min(560px, 100%);
-    }
-
-    .hq-side .section-head{
-      margin-bottom: 14px;
-    }
-
-    .hq-side .feature-grid{
-      gap: 14px;
-    }
-
-    .hq-mark-wrap{
-      margin-top: 22px;
-      display: flex;
-      justify-content: center;
-      pointer-events: none;
-    }
-    .hq-mark{
-      width: 96px;
-      opacity: 0.65;
-      filter: drop-shadow(0 0 14px rgba(255,86,0,.35));
-    }
-
-    @media (max-width: 980px){
-      .home-top{
-        grid-template-columns: 1fr;
-        gap: 18px;
-      }
-      .hq-side{
-        justify-self: stretch;
-        width: 100%;
-      }
-      .home-top-wrap{
-        padding-top: 18px;
-      }
-      .hq-mark-wrap{
-        margin-top: 18px;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>OV Legend v2</title>
+  <link rel="stylesheet" href="/v2/assets/css/v2.css">
 </head>
 
-<body>
-  <!-- Lightning overlay goes RIGHT after body -->
-  <div class="fx-lightning" aria-hidden="true"></div>
+<body class="ov">
+  <main class="v2-wrap">
 
-  <!-- NAV -->
-  <header class="nav">
-    <div class="nav-inner">
-      <a class="logo" href="/" aria-label="OV Legend Home">
-        <img class="nav-logo" src="/assets/img/brand/ov-mark.png" alt="OV Legend" />
-      </a>
+    <!-- HERO: left = logo/identity, right = HQ cards -->
+    <section class="v2-grid hero">
 
-      <nav class="nav-links">
-        <a class="active" href="/">Home</a>
-        <a href="/rlol/">RLOL</a>
-        <a href="/stats/">Rank</a>
-        <a href="/lvb/">Legends v Bozos</a>
-        <a href="/builds/">Builds</a>
-      </nav>
-    </div>
-  </header>
+      <!-- LEFT: placeholder for circular logo -->
+      <!-- LEFT COLUMN: logo + hero panel -->
+<div class="left-stack">
 
-  <!-- TOP: 2-column layout (Hero left / HQ right) -->
-  <div class="home-top-wrap">
-    <div class="home-top">
+  <!-- Logo / Seal -->
+  <div class="seal-wrap">
+    <!-- Replace src with your circular logo path -->
+    <img class="seal" src="/assets/img/brand/ov-mark.png" alt="OV Legend Mark">
+  </div>
 
-      <!-- HERO (Left) -->
-      <section class="hero hero-v2 hero-center">
-        <div class="hero-v2-inner">
-          <div class="hero-left">
+  <!-- HERO PANEL -->
+  <div class="panel edge hero-panel">
+    <div class="in">
+      <div class="kicker">Rocket League • Content • Community</div>
+      <h1 class="h1 glow-title">OV LEGEND</h1>
+      <p class="sub">
+        Built around high-energy streams, legendary queue nights, custom builds,
+        and a community league that turns matches into events.
+      </p>
 
-            <!-- FIXED wordmark image (single valid tag) -->
-            <img
-              src="/assets/img/brand/ov-wordmark.png"
-              alt="What's Up Twitches"
-              class="hero-wordmark"
-            />
-
-            <div class="hero-kicker">Rocket League • Content • Community</div>
-
-            <p class="hero-lede">
-              Built around high-energy streams, legendary queue nights, custom builds,
-              and a community league that turns matches into events.
-            </p>
-
-            <div class="hero-actions">
-              <a href="/builds/">Browse Builds</a>
-              <a href="/lvb/">Legends V Bozos</a>
-              <a href="/rlol/">RLOL Hub</a>
-            </div>
-
-            <div class="hero-socials">
-              <a class="btn ghost" href="https://discord.gg/sGXgUNAtDp" target="_blank" rel="noopener noreferrer">Discord</a>
-              <a class="btn ghost" href="https://twitch.tv/the_ov_legend" target="_blank" rel="noopener noreferrer">Twitch</a>
-              <a class="btn ghost" href="https://www.youtube.com/@OVLegend" target="_blank" rel="noopener noreferrer">YouTube</a>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      <!-- HQ (Right) -->
-      <section class="section hq-side" id="hq">
-        <div class="section-head">
-          <h2 class="section-title">OV Headquarters</h2>
-          <p class="section-sub">Legendary Command Center.</p>
-        </div>
-
-        <div class="feature-grid">
-          <a class="feature-card" href="/builds/">
-            <div class="feature-top">
-              <div class="card-title">Alpha</div>
-              <span class="chip">Builds</span>
-            </div>
-            <p class="muted">AlphaConsole presets, car styles, and branded configs.</p>
-            <div class="feature-link">Open Builds →</div>
-          </a>
-
-          <a class="feature-card" href="/lvb/">
-            <div class="feature-top">
-              <div class="card-title">Legends V Bozos</div>
-              <span class="chip">Tracker</span>
-            </div>
-            <p class="muted">Wins, losses, streaks, and the ongoing BOZO war!</p>
-            <div class="feature-link">See Tracker →</div>
-          </a>
-
-          <a class="feature-card" href="/rlol/">
-            <div class="feature-top">
-              <div class="card-title">RLOL</div>
-              <span class="chip">League Hub</span>
-            </div>
-            <p class="muted">Standings, schedule, teams — built like a mini-RLCS.</p>
-            <div class="feature-link">Enter RLOL →</div>
-          </a>
-
-          <a class="feature-card" href="/stats/">
-            <div class="feature-top">
-              <div class="card-title">Rank</div>
-              <span class="chip">Stats</span>
-            </div>
-            <p class="muted">See how OV is playing</p>
-            <div class="feature-link">View RL Tracker →</div>
-          </a>
-        </div>
-
-        <a class="feature-card cotw" href="/cotw/">
-          <div class="hq-panel">
-            <div class="panel-tag">COTW</div>
-            <h3>CLIP OF<br />THE WEEK</h3>
-            <p>Weekly community highlight. Cast your vote and crown the Legend.</p>
-            <span class="panel-link">View Clips →</span>
-          </div>
-        </a>
-
-        <div class="hq-mark-wrap">
-          <img
-            src="/assets/img/brand/ov-mark.png"
-            alt="OV Legend"
-            class="hq-mark"
-          />
-        </div>
-      </section>
-
+      <div class="hero-actions">
+        <a class="btn" href="/v2/builds/">Browse Builds</a>
+        <a class="btn" href="/v2/lvb/">Legends v Bozos</a>
+        <a class="btn" href="/v2/rlol/">RLOL Hub</a>
+      </div>
     </div>
   </div>
 
-  <main class="container home-v2"></main>
+</div> <!-- 👈 THIS closes .left-stack -->
 
-  <footer class="footer">
-    © <span id="year"></span> OV Legend
-  </footer>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+      <!-- RIGHT: OV Headquarters -->
+      <div>
+        <h2 class="h2 glow-title" style="margin-bottom:10px;">OV HEADQUARTERS</h2>
+        <div class="sub" style="margin-bottom:14px;">Legendary Command Center.</div>
+
+        <div class="hq-grid">
+          <div class="card edge">
+            <div class="in">
+              <div class="card-top">
+                <h3 class="card-title glow-title">ALPHA</h3>
+                <span class="pill">BUILDS</span>
+              </div>
+              <div class="sub">AlphaConsole presets, car styles, and branded configs.</div>
+              <a class="cta" href="/v2/builds/">Open Builds →</a>
+            </div>
+          </div>
+
+          <div class="card edge">
+            <div class="in">
+              <div class="card-top">
+                <h3 class="card-title glow-title">LEGENDS VS. BOZOS</h3>
+                <span class="pill">TRACKER</span>
+              </div>
+              <div class="sub">Wins, losses, streaks, and the ongoing BOZO war.</div>
+              <a class="cta" href="/v2/lvb/">See Tracker →</a>
+            </div>
+          </div>
+
+          <div class="card edge">
+            <div class="in">
+              <div class="card-top">
+                <h3 class="card-title glow-title">RLOL</h3>
+                <span class="pill">LEAGUE HUB</span>
+              </div>
+              <div class="sub">Standings, schedule, teams — built like a mini-RLCS.</div>
+              <a class="cta" href="/v2/rlol/">Enter RLOL →</a>
+            </div>
+          </div>
+
+          <div class="card edge">
+            <div class="in">
+              <div class="card-top">
+                <h3 class="card-title glow-title">RANK</h3>
+                <span class="pill">STATS</span>
+              </div>
+              <div class="sub">See how OV is playing (tracker + trends).</div>
+              <a class="cta" href="/v2/stats/">View RL Tracker →</a>
+            </div>
+          </div>
+
+          <div class="card edge feature" style="grid-column: 1 / -1;">
+            <div class="in">
+              <div class="card-top">
+                <h3 class="card-title glow-title">CLIP OF THE WEEK</h3>
+                <span class="pill">COTW</span>
+              </div>
+              <div class="sub">Weekly community highlight. Cast your vote and crown the Legend.</div>
+              <a class="cta" href="/v2/cotw/">View Clips →</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
 </body>
 </html>
