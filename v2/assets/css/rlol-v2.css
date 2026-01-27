@@ -1215,3 +1215,5 @@ body.rlol-standings #standingsRoot{
   width: 100% !important;
   max-width: none !important;
 }
+
+@import url("/assets/css/mobile-fix.css");
