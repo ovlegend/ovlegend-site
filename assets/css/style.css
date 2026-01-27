@@ -2241,3 +2241,7 @@ body.lvb .stat-value{
   font-family: "FeastOfFlesh","Impact","Arial Black",system-ui;
   letter-spacing: .04em;
 }
+
+body.lvb h1.lvb-title{
+  font-family: "FeastOfFlesh","Impact","Arial Black",system-ui !important;
+}
