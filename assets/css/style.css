@@ -2245,3 +2245,5 @@ body.lvb .stat-value{
 body.lvb h1.lvb-title{
   font-family: "FeastOfFlesh","Impact","Arial Black",system-ui !important;
 }
+
+@import url("/assets/css/mobile-fix.css");
