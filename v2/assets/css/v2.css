@@ -410,3 +410,180 @@ body.rlol .card.edge:hover{
       drop-shadow(0 0 40px rgba(255,86,0,.22));
   }
 }
+
+/* =========================================================
+   OV BUILDS (Alpha Console) — v2 styling patch
+   Scope: body.ac-builds
+   ========================================================= */
+
+body.ac-builds{
+  /* keep v2 background system; this just makes builds match */
+}
+
+body.ac-builds .ac-hero,
+body.ac-builds .ac-section{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+body.ac-builds .ac-hero{
+  padding-top: 96px;
+  padding-bottom: 22px;
+}
+
+/* Hero panel look */
+body.ac-builds .ac-hero-inner{
+  position: relative;
+  border-radius: 26px;
+  padding: 34px 28px 26px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 28px 90px rgba(0,0,0,.55);
+  overflow: hidden;
+}
+
+body.ac-builds .ac-hero-inner::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 420px at 18% 20%, rgba(255,86,0,.18), transparent 60%),
+    radial-gradient(680px 340px at 85% 10%, rgba(255,138,0,.10), transparent 60%),
+    radial-gradient(820px 520px at 55% 120%, rgba(255,86,0,.10), transparent 60%);
+  opacity: .95;
+}
+
+body.ac-builds .ac-hero-inner > *{
+  position: relative;
+  z-index: 1;
+}
+
+body.ac-builds .ac-hero-inner h1{
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-family: "FeastOfFlesh","Impact","Arial Black",system-ui;
+  font-size: clamp(44px, 5.2vw, 78px);
+  line-height: 1.02;
+  text-shadow:
+    0 0 22px rgba(255,86,0,.55),
+    0 0 52px rgba(255,86,0,.30);
+}
+
+body.ac-builds .ac-hero-inner p{
+  margin: 0 0 18px 0;
+  max-width: 70ch;
+  opacity: .88;
+  line-height: 1.55;
+}
+
+/* CTA buttons (works with your existing .btn styles if present in v2) */
+body.ac-builds .ac-hero-cta{
+  display:flex;
+  flex-wrap:wrap;
+  gap: 12px;
+}
+
+/* Sections */
+body.ac-builds .ac-section{
+  padding-top: 26px;
+  padding-bottom: 40px;
+}
+
+body.ac-builds .ac-title{
+  margin: 0 0 8px 0;
+  font-family: "FeastOfFlesh","Impact","Arial Black",system-ui;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  font-size: clamp(30px, 3.1vw, 46px);
+}
+
+body.ac-builds .ac-sub{
+  margin: 0 0 18px 0;
+  opacity: .82;
+}
+
+body.ac-builds .ac-subtitle{
+  margin: 18px 0 12px 0;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-size: 12px;
+  opacity: .85;
+}
+
+/* Gallery grid */
+body.ac-builds .ac-grid{
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 14px;
+}
+
+body.ac-builds .ac-card{
+  grid-column: span 4;
+  margin: 0;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 18px 44px rgba(0,0,0,.45);
+  overflow: hidden;
+  transform: translateY(0);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+body.ac-builds .ac-card:hover{
+  transform: translateY(-3px);
+  border-color: rgba(255,86,0,.22);
+  box-shadow:
+    0 28px 70px rgba(0,0,0,.55),
+    0 0 0 1px rgba(255,86,0,.08) inset;
+}
+
+body.ac-builds .ac-card img{
+  display:block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+body.ac-builds .ac-card figcaption{
+  padding: 12px 12px 14px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  opacity: .92;
+}
+
+/* Pricing card */
+body.ac-builds .ac-ratecard{
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 18px 44px rgba(0,0,0,.45);
+  overflow: hidden;
+  padding: 14px;
+}
+
+body.ac-builds .ac-ratecard img{
+  width: 100%;
+  height: auto;
+  display:block;
+  border-radius: 16px;
+}
+
+body.ac-builds .ac-contact{
+  margin-top: 16px;
+}
+
+/* Responsive */
+@media (max-width: 980px){
+  body.ac-builds .ac-card{ grid-column: span 6; }
+}
+
+@media (max-width: 640px){
+  body.ac-builds .ac-hero{ padding-top: 78px; }
+  body.ac-builds .ac-hero-inner{ padding: 26px 18px 20px; }
+  body.ac-builds .ac-section{ padding-top: 18px; padding-bottom: 30px; }
+  body.ac-builds .ac-card{ grid-column: span 12; }
+  body.ac-builds .ac-hero, body.ac-builds .ac-section{ padding-left: 16px; padding-right: 16px; }
+}
