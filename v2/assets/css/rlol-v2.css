@@ -840,3 +840,25 @@ body.rlol-standings .footer{
   margin-top: 10px;
   opacity: .82;
 }
+
+/* ===== Standings: hard-cap team logos ===== */
+.standings-table .teamCell{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.standings-table img.logo{
+  width: 28px !important;
+  height: 28px !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  object-fit: contain !important;
+  display: inline-block !important;
+  border-radius: 6px;
+  box-shadow:
+    0 0 6px rgba(255,138,0,.35),
+    0 0 1px rgba(255,255,255,.12);
+}
