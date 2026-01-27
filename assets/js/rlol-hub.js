@@ -4,14 +4,14 @@
   const standingsEl = document.getElementById("standingsPreview");
   const leadersEl = document.getElementById("statsLeaders");
 
-  if (!window.OV_CONFIG || !OV_CONFIG.rlol) {
+  if (!window.OV_CONFIG || !window.OV_CONFIG.rlol) {
     console.error("Missing OV_CONFIG.rlol in /assets/js/config.js");
     return;
   }
 
-  const scheduleURL = OV_CONFIG.rlol.scheduleCsv;
-  const standingsURL = OV_CONFIG.rlol.standingsCsv || OV_CONFIG.rlol.standingsViewCsv;
-  const statsURL = OV_CONFIG.rlol.playerSeasonStatsCsv;
+  const scheduleURL = window.OV_CONFIG.rlol.scheduleCsv;
+  const standingsURL = window.OV_CONFIG.rlol.standingsCsv || window.OV_CONFIG.rlol.standingsViewCsv;
+  const statsURL = window.OV_CONFIG.rlol.playerSeasonStatsCsv;
 
   // ---------- CSV parsing (quoted commas safe) ----------
   function parseCSV(text) {
@@ -46,6 +46,7 @@
   }
 
   function normKey(s) {
+    // NOTE: strips underscores, so "home_team_id" -> "hometeamid"
     return String(s || "")
       .trim()
       .toLowerCase()
@@ -87,149 +88,75 @@
       .replace(/>/g, "&gt;");
   }
 
-  function statusClass(raw) {
-    const s = String(raw || "").toLowerCase();
-    if (s.includes("live")) return "live";
-    if (s.includes("played") || s.includes("final") || s.includes("done")) return "played";
-    return "scheduled";
-  }
-
-  function dayFromText(t) {
-    const s = String(t || "").toUpperCase();
-    // if you store "FRI" etc in a column, this will just pass it through
-    if (["MON","TUE","WED","THU","FRI","SAT","SUN"].includes(s)) return s;
-    return ""; // unknown
-  }
-
   // ---------- Render: Next Matches ----------
-function renderNextMatches(scheduleRows) {
-  if (!nextMatchesEl) return;
+  function renderNextMatches(scheduleRows) {
+    if (!nextMatchesEl) return;
+    nextMatchesEl.innerHTML = "";
 
-  // wipe placeholders
-  nextMatchesEl.innerHTML = "";
+    // Map to YOUR schedule sheet columns (after normKey)
+    const mapped = scheduleRows.map(r => {
+      const week   = pick(r, ["week"]);
+      const status = pick(r, ["status"], "scheduled");
+      const date   = pick(r, ["scheduleddate", "matchdate", "date"]);
+      const time   = pick(r, ["scheduledtime", "time", "starttime", "start"]);
+      const team1  = pick(r, ["hometeamid", "home", "team1"]);
+      const team2  = pick(r, ["awayteamid", "away", "team2"]);
+      const note   = pick(r, ["notes", "note"], "");
+      return { week, status, date, time, team1, team2, note };
+    });
 
-  // Map your EXACT schedule columns
-  const mapped = scheduleRows.map(r => {
-    const week   = pick(r, ["week", "wk"]);
-    const status = pick(r, ["status"], "");
-    const date   = pick(r, ["scheduled_date", "date"]);
-    const time   = pick(r, ["scheduled_time", "time"]);
-    const team1  = pick(r, ["home_team_id", "home"]);
-    const team2  = pick(r, ["away_team_id", "away"]);
-    const note   = pick(r, ["notes", "note", "meta"], "");
-    return { week, status, date, time, team1, team2, note };
-  });
+    // Parse for sorting (YYYY-MM-DD + HH:MM)
+    function toStamp(m) {
+      const d = String(m.date || "").trim();
+      const t = String(m.time || "").trim();
+      if (!d) return Number.MAX_SAFE_INTEGER;
+      const iso = t ? `${d}T${t}:00` : `${d}T23:59:59`;
+      const ms = Date.parse(iso);
+      return Number.isFinite(ms) ? ms : Number.MAX_SAFE_INTEGER;
+    }
 
-  // Parse YYYY-MM-DD + HH:MM for sorting
-  function toStamp(m) {
-    const d = String(m.date || "").trim();
-    const t = String(m.time || "").trim();
-    if (!d) return Number.MAX_SAFE_INTEGER;
-    // If time missing, sort to end of that date
-    const iso = t ? `${d}T${t}:00` : `${d}T23:59:59`;
-    const ms = Date.parse(iso);
-    return Number.isFinite(ms) ? ms : Number.MAX_SAFE_INTEGER;
-  }
+    // Upcoming = not played/final/done + has both teams
+    const upcoming = mapped
+      .filter(m => m.team1 && m.team2)
+      .filter(m => {
+        const s = String(m.status || "").toLowerCase();
+        return !(s.includes("played") || s.includes("final") || s.includes("done"));
+      })
+      .sort((a, b) => toStamp(a) - toStamp(b))
+      .slice(0, 6);
 
-  // Upcoming = NOT played/final/done + must have both teams
-  const upcoming = mapped
-    .filter(m => m.team1 && m.team2)
-    .filter(m => {
-      const s = String(m.status || "").toLowerCase();
-      return !(s.includes("played") || s.includes("final") || s.includes("done"));
-    })
-    .sort((a, b) => toStamp(a) - toStamp(b))
-    .slice(0, 6);
-
-  if (!upcoming.length) {
-    nextMatchesEl.innerHTML = `<div class="empty">No upcoming matches</div>`;
-    return;
-  }
-
-  // Render
-  upcoming.forEach((m, idx) => {
-    const clock = m.time || "—";
-    const meta  = m.week ? `Week ${m.week}${m.note ? " • " + m.note : ""}` : (m.note || "");
-    const dayLabel = m.date || "TBD";
-
-    const row = document.createElement("div");
-    row.className = `match-row ${idx === 0 ? "playoff-glow" : ""}`;
-
-    row.innerHTML = `
-      <div class="match-left">
-        <div class="match-time">
-          <div class="day">${esc(dayLabel)}</div>
-          <div class="clock">${esc(clock)}</div>
-        </div>
-        <div class="match-info">
-          <div class="match-teams">
-            <span class="team">${esc(m.team1)}</span>
-            <span class="vs">vs</span>
-            <span class="team">${esc(m.team2)}</span>
-          </div>
-          <div class="match-meta">${esc(meta)}</div>
-        </div>
-      </div>
-      <a class="mini-link" href="/rlol/schedule/">Details</a>
-    `;
-
-    nextMatchesEl.appendChild(row);
-  });
-}
-
-    // Pick upcoming: scheduled/live first; ignore blank rows
-const upcoming = mapped
-  .filter(m => (m.team1 || m.team2))
-  .filter(m => {
-    const s = String(m.status || "").toLowerCase();
-
-    // count these as upcoming
-    const ok =
-      s === "" ||
-      s.includes("sched") ||
-      s.includes("upcoming") ||
-      s.includes("pending") ||
-      s.includes("confirm") ||
-      s.includes("tbd") ||
-      s.includes("live");
-
-    // exclude finished matches
-    const finished =
-      s.includes("played") ||
-      s.includes("final") ||
-      s.includes("done");
-
-    return ok && !finished;
-  })
-  .slice(0, 6);
+    if (!upcoming.length) {
+      nextMatchesEl.innerHTML = `<div class="empty">No upcoming matches</div>`;
+      return;
+    }
 
     upcoming.forEach((m, idx) => {
-      const day = dayFromText(m.day) || (m.time ? "" : "TBD");
+      const dayLabel = m.date ? m.date : "TBD";
       const clock = m.time || "—";
-      const meta = m.week ? `${m.week}${m.note ? " • " + m.note : ""}` : (m.note || "");
-      const t1 = m.team1 || "TBD";
-      const t2 = m.team2 || "TBD";
+      const meta = m.week
+        ? `Week ${m.week}${m.note ? " • " + m.note : ""}`
+        : (m.note || "");
 
       const row = document.createElement("div");
-      row.className = `match-row ${idx === 0 ? "playoff-glow" : ""} ${(!m.time || !m.team1 || !m.team2) ? "dim" : ""}`;
+      row.className = `match-row ${idx === 0 ? "playoff-glow" : ""}`;
 
-row.innerHTML = `
-  <div class="match-left">
-    <div class="match-time">
-      <div class="day">${esc(day || "TBD")}</div>
-      <div class="clock">${esc(clock)}</div>
-    </div>
-    <div class="match-info">
-      <div class="match-teams">
-        <span class="team">${esc(t1)}</span>
-        <span class="vs">vs</span>
-        <span class="team">${esc(t2)}</span>
-      </div>
-      <div class="match-meta">${esc(meta)}</div>
-    </div>
-  </div>
-  <a class="mini-link" href="/rlol/schedule/">Details</a>
-`;
+      row.innerHTML = `
+        <div class="match-left">
+          <div class="match-time">
+            <div class="day">${esc(dayLabel)}</div>
+            <div class="clock">${esc(clock)}</div>
+          </div>
+          <div class="match-info">
+            <div class="match-teams">
+              <span class="team">${esc(m.team1)}</span>
+              <span class="vs">vs</span>
+              <span class="team">${esc(m.team2)}</span>
+            </div>
+            <div class="match-meta">${esc(meta)}</div>
+          </div>
+        </div>
+        <a class="mini-link" href="/rlol/schedule/">Details</a>
+      `;
 
       nextMatchesEl.appendChild(row);
     });
@@ -239,7 +166,6 @@ row.innerHTML = `
   function renderStandings(standingRows) {
     if (!standingsEl) return;
 
-    // Keep the header row if your CSS expects it; easiest is to rebuild the whole block.
     standingsEl.innerHTML = `
       <div class="trow thead">
         <div>#</div><div>Team</div><div class="num">W</div><div class="num">L</div><div class="num">PTS</div>
@@ -247,7 +173,7 @@ row.innerHTML = `
     `;
 
     const mapped = standingRows.map(r => {
-      const rank = pick(r, ["rank", "#", "pos", "position", "place"]);
+      const rank = pick(r, ["rank", "pos", "position", "place", "#"]);
       const team = pick(r, ["team", "name", "teamname"]);
       const w = pick(r, ["w", "wins"]);
       const l = pick(r, ["l", "losses"]);
@@ -255,11 +181,10 @@ row.innerHTML = `
       return { rank, team, w, l, pts };
     }).filter(x => x.team);
 
-    // Sort by pts desc then w desc (if your sheet isn’t already sorted)
     mapped.sort((a, b) => (toNum(b.pts) - toNum(a.pts)) || (toNum(b.w) - toNum(a.w)));
 
     const top = mapped.slice(0, 8);
-    const playoffCut = 4; // change if your league uses a different cut
+    const playoffCut = 4;
 
     top.forEach((t, i) => {
       if (i === playoffCut) {
@@ -287,7 +212,6 @@ row.innerHTML = `
   // ---------- Render: Stats Leaders ----------
   function renderLeaders(statRows) {
     if (!leadersEl) return;
-
     leadersEl.innerHTML = "";
 
     const mapped = statRows.map(r => {
@@ -300,7 +224,6 @@ row.innerHTML = `
       return { player, team, goals, assists, saves, score };
     }).filter(x => x.player);
 
-    // Build 4 leader tiles (top 1 each)
     const cats = [
       { key: "goals", label: "Goals" },
       { key: "assists", label: "Assists" },
@@ -363,11 +286,9 @@ row.innerHTML = `
 
     } catch (e) {
       console.error(e);
-      // If something fails, at least wipe placeholders so it doesn't look "fake"
       if (nextMatchesEl) nextMatchesEl.innerHTML = `<div class="empty">Unable to load schedule</div>`;
       if (standingsEl) standingsEl.innerHTML = `<div class="empty">Unable to load standings</div>`;
       if (leadersEl) leadersEl.innerHTML = `<div class="empty">Unable to load stats</div>`;
     }
   })();
-
 })();
