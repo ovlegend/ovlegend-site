@@ -529,17 +529,18 @@ td.active-stat {
   gap: 10px;
 }
 
-/* Force schedule logos to behave */
+/* Force schedule logos to behave (bulletproof) */
 .match-row .team-logo{
-  width: 32px;
-  height: 32px;
-  max-width: 32px;
-  max-height: 32px;
-  object-fit: contain;
+  width: 32px !important;
+  height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  display: block;
+  flex: 0 0 32px;
+  object-fit: contain !important;
 
+  border-radius: 6px;
   box-shadow:
     0 0 6px rgba(255,138,0,.35),
     0 0 0 1px rgba(255,255,255,.12);
-
-  border-radius: 6px;
 }
