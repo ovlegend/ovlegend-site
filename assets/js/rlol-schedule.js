@@ -127,8 +127,12 @@
 
     return `
       <span class="team with-logo">
-        <img class="team-logo" src="${esc(logo)}" alt="${esc(id)} logo" loading="lazy"
-             onerror="this.style.display='none'">
+        <img class="team-logo"
+     src="${esc(logo)}"
+     alt="${esc(id)} logo"
+     loading="lazy"
+     style="width:28px!important;height:28px!important;max-width:28px!important;max-height:28px!important;min-width:28px!important;min-height:28px!important;object-fit:contain!important;display:inline-block!important;"
+     onerror="this.style.display='none'">
         <span class="team-name">${esc(teamId)}</span>
       </span>
     `;
