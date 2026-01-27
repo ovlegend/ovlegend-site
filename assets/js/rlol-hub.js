@@ -209,55 +209,56 @@
     });
   }
 
-  // ---------- Render: Stats Leaders ----------
-  function renderLeaders(statRows) {
-    if (!leadersEl) return;
-    leadersEl.innerHTML = "";
+// ---------- Render: Stats Leaders ----------
+function renderLeaders(statRows) {
+  if (!leadersEl) return;
 
-    const mapped = statRows.map(r => {
-      const player = pick(r, ["player", "name", "playername", "username"]);
-      const team = pick(r, ["team", "teamname"]);
-      const goals = toNum(pick(r, ["g", "goals"]));
-      const assists = toNum(pick(r, ["a", "assists"]));
-      const saves = toNum(pick(r, ["saves", "sv"]));
-      const score = toNum(pick(r, ["score", "pts", "points"]));
-      return { player, team, goals, assists, saves, score };
-    }).filter(x => x.player);
+  leadersEl.innerHTML = "";
 
-    const cats = [
-      { key: "goals", label: "Goals" },
-      { key: "assists", label: "Assists" },
-      { key: "saves", label: "Saves" },
-      { key: "score", label: "Score" }
-    ];
+  const mapped = statRows.map(r => {
+    const player  = pick(r, ["player", "name", "playername", "username"]);
+    const goals   = toNum(pick(r, ["goals", "g"]));
+    const assists = toNum(pick(r, ["assists", "a"]));
+    const saves   = toNum(pick(r, ["saves", "sv"]));
+    const score   = toNum(pick(r, ["score", "pts", "points"]));
+    return { player, goals, assists, saves, score };
+  }).filter(x => x.player);
 
-    cats.forEach((c, idx) => {
-      const best = mapped.slice().sort((a, b) => b[c.key] - a[c.key])[0];
+  const cats = [
+    { key: "goals",   label: "Goals" },
+    { key: "assists", label: "Assists" },
+    { key: "saves",   label: "Saves" },
+    { key: "score",   label: "Score" }
+  ];
 
-      const row = document.createElement("div");
-      row.className = `leader-row ${idx === 0 ? "playoff-glow" : ""}`;
+  cats.forEach((c, idx) => {
+    const best = mapped.slice().sort((a, b) => b[c.key] - a[c.key])[0];
 
-      if (!best || best[c.key] <= 0) {
-        row.classList.add("dim");
-        row.innerHTML = `
-          <div class="leader-main">
-            <div class="leader-name">—</div>
-            <div class="leader-sub">No data • ${esc(c.label)}</div>
-          </div>
-          <div class="leader-val">—</div>
-        `;
-      } else {
-        row.innerHTML = `
-         <div class="leader-main">
-           <div class="leader-name">${esc(best.player)}</div>
-           <div class="leader-sub">${esc(c.label)}</div>
-         </div>
-         <div class="leader-val">${esc(best[c.key])}</div>
-`;
+    const row = document.createElement("div");
+    row.className = `leader-row ${idx === 0 ? "playoff-glow" : ""}`;
 
-      leadersEl.appendChild(row);
-    });
-  }
+    if (!best || best[c.key] <= 0) {
+      row.classList.add("dim");
+      row.innerHTML = `
+        <div class="leader-main">
+          <div class="leader-name">—</div>
+          <div class="leader-sub">${esc(c.label)}</div>
+        </div>
+        <div class="leader-val">—</div>
+      `;
+    } else {
+      row.innerHTML = `
+        <div class="leader-main">
+          <div class="leader-name">${esc(best.player)}</div>
+          <div class="leader-sub">${esc(c.label)}</div>
+        </div>
+        <div class="leader-val">${esc(best[c.key])}</div>
+      `;
+    }
+
+    leadersEl.appendChild(row);
+  });
+}
 
   // ---------- Fetch & hydrate ----------
   async function fetchCSV(url) {
