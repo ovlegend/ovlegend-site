@@ -521,3 +521,18 @@ td.active-stat {
 .about{ padding: 0 16px 18px; color: rgba(255,255,255,.84); }
 .about p{ margin: 0 0 14px; line-height: 1.6; }
 .cta-row{ display:flex; gap
+
+         /* Schedule: team logos */
+.match-row .teams .team.with-logo{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.match-row .team-logo{
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.10);
+}
