@@ -913,40 +913,135 @@ body.rlol-standings .standings-table .teamName{
   text-overflow: ellipsis;
 }
 
-/* ---- PLAYOFF TEAMS (top 4) glow + orange outline ---- */
+/* ===== Playoff teams (top 4) glow + outline ===== */
 body.rlol-standings .standings-table tr.playoffRow{
   border-radius: 14px;
-  background: linear-gradient(90deg, rgba(255,138,0,.14), rgba(0,0,0,.22));
+  background: linear-gradient(
+    90deg,
+    rgba(255,138,0,.16),
+    rgba(0,0,0,.22)
+  );
+
   box-shadow: var(--glow-strong);
   outline: 1px solid rgba(255,138,0,.34);
 }
 
-/* Make the glow read even inside table layouts */
+/* reinforce glow in table layout */
 body.rlol-standings .standings-table tr.playoffRow td{
   border-top: 1px solid rgba(255,138,0,.18);
   border-bottom: 1px solid rgba(255,138,0,.12);
 }
 
-/* Optional: slightly brighter team name for playoff rows */
+/* optional pop on team name */
 body.rlol-standings .standings-table tr.playoffRow .teamName{
   text-shadow: 0 0 14px rgba(255,138,0,.18);
 }
 
-/* Playoff line row: full width bar */
-body.rlol-standings .standings-table tr.playoffLineRow td{
-  padding: 14px 16px;
+/* ===== Make standings fill card width ===== */
+body.rlol-standings .standings-card{
+  width: 100%;
 }
 
-body.rlol-standings .standings-table tr.playoffLineRow span{
-  display: block;
+body.rlol-standings .standings-table{
   width: 100%;
-  text-align: center;
-  letter-spacing: .22em;
-  font-weight: 900;
-  padding: 12px 14px;
-  border-radius: 14px;
+  table-layout: fixed;
+}
 
-  border: 1px solid rgba(255,138,0,.34);
-  box-shadow: var(--glow-soft);
-  background: linear-gradient(90deg, rgba(255,138,0,.10), rgba(0,0,0,.22));
+body.rlol-standings .standings-table th,
+body.rlol-standings .standings-table td{
+  padding: 14px 12px;
+}
+
+/* =========================================================
+   RLOL STANDINGS — Mobile clamp / responsive table
+   ========================================================= */
+@media (max-width: 900px){
+
+  /* Page header sizing */
+  body.rlol-standings .topbar h1{
+    font-size: clamp(34px, 7vw, 56px);
+    line-height: 1.05;
+  }
+
+  body.rlol-standings .topbar .sub{
+    font-size: clamp(12px, 2.8vw, 14px);
+  }
+
+  /* Card breathing room */
+  body.rlol-standings .card{
+    padding: 14px 12px 16px;
+  }
+
+  /* Controls stack cleanly */
+  body.rlol-standings .metaRow{
+    gap: 10px;
+  }
+  body.rlol-standings .controls{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  body.rlol-standings .controls input,
+  body.rlol-standings .controls select{
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Make table scrollable horizontally on mobile */
+  body.rlol-standings #standingsRoot{
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px; /* room for scrollbar */
+  }
+
+  /* Prevent columns from crushing into mush */
+  body.rlol-standings .standings-table{
+    width: 100%;
+    min-width: 720px;           /* key: forces swipe instead of squish */
+    table-layout: fixed;
+  }
+
+  /* Clamp cell sizing */
+  body.rlol-standings .standings-table th,
+  body.rlol-standings .standings-table td{
+    padding: 10px 10px;
+    font-size: clamp(12px, 2.9vw, 14px);
+    white-space: nowrap;
+  }
+
+  /* Team cell: keep readable */
+  body.rlol-standings .standings-table .teamCell{
+    gap: 10px;
+  }
+  body.rlol-standings .standings-table .teamName{
+    font-size: clamp(13px, 3.2vw, 15px);
+  }
+  body.rlol-standings .standings-table .teamAbbr{
+    font-size: clamp(11px, 2.7vw, 12px);
+    opacity: .85;
+  }
+
+  /* Slightly smaller logo on phones */
+  body.rlol-standings .standings-table img.logo{
+    width: 24px !important;
+    height: 24px !important;
+    max-width: 24px !important;
+    max-height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+  }
+}
+
+/* Extra-small phones */
+@media (max-width: 520px){
+  body.rlol-standings .card{
+    padding: 12px 10px 14px;
+    border-radius: 16px;
+  }
+
+  /* Make the swipe feel intentional */
+  body.rlol-standings #standingsRoot{
+    mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+  }
 }
