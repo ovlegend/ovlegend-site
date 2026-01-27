@@ -248,13 +248,12 @@
         `;
       } else {
         row.innerHTML = `
-          <div class="leader-main">
-            <div class="leader-name">${esc(best.player)}</div>
-            <div class="leader-sub">${esc(best.team || "Team")} • ${esc(c.label)}</div>
-          </div>
-          <div class="leader-val">${esc(best[c.key])}</div>
-        `;
-      }
+         <div class="leader-main">
+           <div class="leader-name">${esc(best.player)}</div>
+           <div class="leader-sub">${esc(c.label)}</div>
+         </div>
+         <div class="leader-val">${esc(best[c.key])}</div>
+`;
 
       leadersEl.appendChild(row);
     });
