@@ -915,6 +915,38 @@ body.stats-v2 .hero-v2 img{
   }
 }
 
+/* =========================
+   STATS: big seal control + pulse (robust)
+   ========================= */
+
+/* If the big seal is in the hero area, target it directly */
+body.stats-v2 .stats-hero-logo,
+body.stats-v2 .hero-v2 .stats-hero-logo{
+  max-width: 220px;
+  width: 100%;
+  height: auto;
+  margin: 0 0 16px;
+  animation: ovPulse 4.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 14px rgba(255,86,0,.35));
+}
+
+/* If you didn't add a class to the image yet, this catches the first big image in the hero */
+body.stats-v2 .hero-v2 img:first-of-type{
+  max-width: 220px;
+  width: 100%;
+  height: auto;
+  margin: 0 0 16px;
+  animation: ovPulse 4.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 14px rgba(255,86,0,.35));
+}
+
+/* Pulse keyframes (safe even if it already exists) */
+@keyframes ovPulse{
+  0%   { filter: drop-shadow(0 0 14px rgba(255,86,0,.35)); opacity:.92; }
+  50%  { filter: drop-shadow(0 0 34px rgba(255,86,0,.75)); opacity:1; }
+  100% { filter: drop-shadow(0 0 14px rgba(255,86,0,.35)); opacity:.92; }
+}
+
 /* SHOP v2 */
 body.shop-v2 .shop-hero .lede{ max-width: 70ch; }
 
