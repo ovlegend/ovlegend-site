@@ -1198,3 +1198,20 @@ body.rlol-standings .standings-table tbody tr.playoffRow .teamName{
   }
 }
 
+/* === Standings: FORCE table to fill the card (kills right-side empty space) === */
+body.rlol-standings .standings-card{
+  width: 100% !important;
+  max-width: none !important;
+}
+
+body.rlol-standings .standings-table{
+  width: 100% !important;
+  max-width: none !important;
+  display: table !important; /* prevents shrink-to-fit behaviors */
+}
+
+/* If anything wrapped it and is doing fit-content, this breaks it */
+body.rlol-standings #standingsRoot{
+  width: 100% !important;
+  max-width: none !important;
+}
