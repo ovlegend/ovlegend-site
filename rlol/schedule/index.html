@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -7,59 +7,82 @@
 
   <meta name="theme-color" content="#ff8a00" />
 
+  <!-- Fonts (v2) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <!-- RLOL v2 theme -->
+  <link rel="stylesheet" href="/v2/assets/css/rlol-v2.css" />
 </head>
 
-<body class="rlol rlol-schedule">
+<body class="rlol rlol-schedule-v2">
   <main class="rlol-wrap">
-    <div class="topbar">
-      <div>
-        <h1>RLOL Schedule</h1>
-        <div class="sub">Auto-updates from Google Sheets • Filter by week, status, or team</div>
-      </div>
 
-      <div class="nav-btns" aria-label="RLOL navigation">
-        <a class="btn" href="/">Home</a>
-        <a class="btn" href="/rlol/">Hub</a>
-        <a class="btn" href="/rlol/standings/">Standings</a>
-        <a class="btn" href="/rlol/teams/">Teams</a>
-        <a class="btn" href="/rlol/stats/">Stats</a>
-      </div>
-    </div>
+    <!-- Hero (v2 style) -->
+    <header class="rlol-hero">
+      <div class="rlol-hero-inner">
 
-    <div class="card">
-      <div class="metaRow">
-        <div class="pill">
-          <span class="dot"></span>
-          <span id="schedStatusText">Loading schedule…</span>
+        <div class="rlol-hero-left">
+          <div class="kicker">Rocket League of Legends</div>
+          <h1 class="title">Schedule</h1>
+          <p class="sub">Auto-updates from Google Sheets • Filter by week, status, or team</p>
+
+          <nav class="nav-pills" aria-label="RLOL navigation">
+            <a class="pill" href="/">Home</a>
+            <a class="pill" href="/rlol/">Hub</a>
+            <a class="pill is-active" href="/rlol/schedule/">Schedule</a>
+            <a class="pill" href="/rlol/standings/">Standings</a>
+            <a class="pill" href="/rlol/stats/">Stats</a>
+          </nav>
         </div>
 
-        <div class="controls">
-          <select id="weekFilter" aria-label="Filter by week">
-            <option value="all">All weeks</option>
-          </select>
+        <div class="rlol-hero-right">
+          <!-- Reuse the v2 badge-card look for status -->
+          <div class="badge-card">
+            <div class="badge-top">
+              <span class="badge-label">Status</span>
+              <span class="badge-chip" id="schedStatusText">Loading…</span>
+            </div>
 
-          <select id="statusFilter" aria-label="Filter by status">
-            <option value="all">All statuses</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="live">Live</option>
-            <option value="played">Played</option>
-          </select>
+            <div class="badge-title">Filters</div>
+            <div class="badge-meta">Use week + status + search to find your match</div>
 
-          <input id="searchInput" type="text" placeholder="Search team (e.g., WLW)" />
+            <div class="badge-actions" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <select id="weekFilter" class="field select" aria-label="Filter by week">
+                <option value="all">All weeks</option>
+              </select>
+
+              <select id="statusFilter" class="field select" aria-label="Filter by status">
+                <option value="all">All statuses</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="live">Live</option>
+                <option value="played">Played</option>
+              </select>
+
+              <input id="searchInput" class="field" type="text" placeholder="Search team (e.g., WLW)" style="grid-column: 1 / -1;" />
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div id="scheduleRoot"></div>
-
-      <div class="footer">
-        Tip: Search matches team names, abbreviations, and opponent names.
       </div>
-    </div>
+    </header>
+
+    <!-- Schedule card -->
+    <section class="grid">
+      <article class="card wide">
+        <div class="card-head">
+          <h2 class="card-title">Matches</h2>
+          <div class="card-tools">
+            <span class="hint">Tip: Search matches team names, abbreviations, and opponent names.</span>
+          </div>
+        </div>
+
+        <!-- JS renders here -->
+        <div id="scheduleRoot"></div>
+      </article>
+    </section>
+
   </main>
 
   <!-- Config + page logic (ABSOLUTE PATHS) -->
