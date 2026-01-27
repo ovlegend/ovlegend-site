@@ -123,7 +123,7 @@
         return !(s.includes("played") || s.includes("final") || s.includes("done"));
       })
       .sort((a, b) => toStamp(a) - toStamp(b))
-      .slice(0, 6);
+      .slice(0, 4);
 
     if (!upcoming.length) {
       nextMatchesEl.innerHTML = `<div class="empty">No upcoming matches</div>`;
