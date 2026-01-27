@@ -778,3 +778,104 @@ body.cotw .chip{
     padding-top: 78px;
   }
 }
+
+/* =========================================================
+   STATS (RL Tracker embed) — v2 styling
+   Scope: body.stats-v2
+   ========================================================= */
+
+body.stats-v2 .container.stats-page{
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 24px 70px;
+}
+
+/* Header block */
+body.stats-v2 .stats-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+body.stats-v2 .stats-title{
+  font-family: "FeastOfFlesh","Impact","Arial Black",system-ui;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  font-size: clamp(38px, 4.5vw, 64px);
+  margin: 0 0 6px 0;
+  text-shadow:
+    0 0 18px rgba(255,86,0,.45),
+    0 0 42px rgba(255,86,0,.25);
+}
+
+body.stats-v2 .stats-sub{
+  margin: 0;
+  opacity: .82;
+  max-width: 60ch;
+}
+
+/* Buttons */
+body.stats-v2 .stats-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap: 10px;
+}
+
+/* Embed card */
+body.stats-v2 .embed-wrap{
+  position: relative;
+  border-radius: 26px;
+  padding: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 26px 80px rgba(0,0,0,.55);
+  overflow: hidden;
+}
+
+/* subtle OV glow */
+body.stats-v2 .embed-wrap::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 420px at 18% 20%, rgba(255,86,0,.18), transparent 60%),
+    radial-gradient(680px 340px at 85% 10%, rgba(255,138,0,.10), transparent 60%);
+  opacity:.95;
+}
+
+body.stats-v2 .embed-wrap > *{
+  position: relative;
+  z-index:1;
+}
+
+/* Big cinematic iframe */
+body.stats-v2 .embed-frame{
+  width: 100%;
+  height: 78vh;       /* THIS is what makes it big */
+  min-height: 780px;
+  border: 0;
+  border-radius: 18px;
+  background:#000;
+}
+
+/* Mobile */
+@media (max-width: 900px){
+  body.stats-v2 .embed-frame{
+    height: 70vh;
+    min-height: 520px;
+  }
+}
+@media (max-width: 600px){
+  body.stats-v2 .container.stats-page{
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  body.stats-v2 .embed-frame{
+    height: 62vh;
+    min-height: 420px;
+  }
+}
