@@ -1157,3 +1157,5 @@ body.rlol-standings .standings-table tbody tr.playoffLineRow span{
     border-spacing: 0 8px;
   }
 }
+
+body.rlol-standings .topbar { outline: 4px solid hotpink !important; }
