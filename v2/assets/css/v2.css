@@ -879,3 +879,38 @@ body.stats-v2 .embed-frame{
     min-height: 420px;
   }
 }
+
+/* Stats page hero logo sizing */
+
+body.stats-v2 .hero-v2 .nav-logo,
+body.stats-v2 .hero-v2 img{
+  max-width: 220px;   /* try 180–240 range to taste */
+  width: 100%;
+  height: auto;
+  margin-bottom: 16px;
+}
+
+/* =========================================================
+   Stats Hero Logo — glow pulse (OV style)
+   ========================================================= */
+
+body.stats-v2 .hero-v2 img{
+  animation: ovPulse 3.8s ease-in-out infinite;
+  filter: drop-shadow(0 0 18px rgba(255,86,0,.45));
+}
+
+/* Reuse OV pulse animation (if not already in v2.css) */
+@keyframes ovPulse{
+  0%{
+    filter: drop-shadow(0 0 14px rgba(255,86,0,.35));
+    opacity: .92;
+  }
+  50%{
+    filter: drop-shadow(0 0 34px rgba(255,86,0,.70));
+    opacity: 1;
+  }
+  100%{
+    filter: drop-shadow(0 0 14px rgba(255,86,0,.35));
+    opacity: .92;
+  }
+}
