@@ -587,3 +587,67 @@ td.active-stat {
 
   transform: translateY(-1px);
 }
+
+/* === Standings page base === */
+body.rlol-standings{
+  font-family: var(--font-body, 'Montserrat', system-ui, sans-serif);
+}
+
+/* Title like other v2 pages */
+body.rlol-standings h1{
+  font-family: var(--font-head, 'Anton', system-ui, sans-serif);
+  letter-spacing: .04em;
+}
+
+/* Main standings card */
+body.rlol-standings .card{
+  background: linear-gradient(
+    180deg,
+    rgba(18,18,22,.9),
+    rgba(10,10,12,.9)
+  );
+
+  border-radius: 18px;
+  padding: 22px 22px 18px;
+
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,.25),
+    0 0 22px rgba(0,0,0,.6),
+    inset 0 0 18px rgba(255,138,0,.06);
+}
+
+/* Meta row spacing */
+body.rlol-standings .metaRow{
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+/* Controls nicer */
+body.rlol-standings input,
+body.rlol-standings select{
+  background: rgba(0,0,0,.55);
+  border: 1px solid rgba(255,255,255,.15);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  outline: none;
+}
+
+/* Hover glow on standings rows (if JS renders rows as divs) */
+body.rlol-standings .standings-row,
+body.rlol-standings .row{
+  transition: background .2s ease, box-shadow .2s ease;
+}
+
+body.rlol-standings .standings-row:hover,
+body.rlol-standings .row:hover{
+  background: rgba(255,138,0,.06);
+  box-shadow:
+    inset 0 0 12px rgba(255,138,0,.12);
+}
+
+/* Footer spacing */
+body.rlol-standings .footer{
+  margin-top: 14px;
+  opacity: .8;
+}
