@@ -2230,3 +2230,14 @@ body.lvb .lvb-foot{
     font-size: clamp(40px, 10vw, 56px);
   }
 }
+
+/* LVB — use OV headline font */
+
+body.lvb .lvb-title{
+  font-family: "FeastOfFlesh","Impact","Arial Black",system-ui;
+}
+
+body.lvb .stat-value{
+  font-family: "FeastOfFlesh","Impact","Arial Black",system-ui;
+  letter-spacing: .04em;
+}
