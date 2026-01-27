@@ -544,3 +544,23 @@ td.active-stat {
     0 0 6px rgba(255,138,0,.35),
     0 0 0 1px rgba(255,255,255,.12);
 }
+
+/* === Schedule: hard-cap ALL team logos (override any global img rules) === */
+#scheduleRoot img.team-logo,
+.match-row img.team-logo,
+.match-row .team.with-logo > img.team-logo{
+  width: 28px !important;
+  height: 28px !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  display: inline-block !important;
+  object-fit: contain !important;
+}
+
+.match-row .team.with-logo{
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
