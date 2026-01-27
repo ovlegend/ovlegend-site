@@ -651,3 +651,192 @@ body.rlol-standings .footer{
   margin-top: 14px;
   opacity: .8;
 }
+
+/* =========================================================
+   RLOL STANDINGS (v2 look) — card spacing + playoff glow
+   Targets: body.rlol-standings
+   ========================================================= */
+
+body.rlol-standings{
+  font-family: var(--font-body);
+}
+
+/* Big centered heading like your screenshot */
+body.rlol-standings .topbar{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+body.rlol-standings .topbar h1{
+  font-family: var(--font-head);
+  font-size: clamp(44px, 6vw, 72px);
+  letter-spacing: .04em;
+  margin: 0;
+}
+
+body.rlol-standings .topbar .sub{
+  opacity: .85;
+}
+
+/* Pills nav to match v2 style */
+body.rlol-standings .nav-btns{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+body.rlol-standings .nav-btns .btn{
+  background: rgba(0,0,0,.55);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 800;
+  letter-spacing: .03em;
+  transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+body.rlol-standings .nav-btns .btn:hover{
+  border-color: rgba(255,138,0,.45);
+  box-shadow: var(--glow-soft);
+  transform: translateY(-1px);
+}
+
+/* Main card */
+body.rlol-standings .card{
+  background: linear-gradient(180deg, rgba(18,18,22,.86), rgba(10,10,12,.86));
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 20px;
+  padding: 18px 18px 14px;
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,.18),
+    0 18px 48px rgba(0,0,0,.55),
+    inset 0 0 22px rgba(255,138,0,.06);
+}
+
+/* Meta row / controls */
+body.rlol-standings .metaRow{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+body.rlol-standings .controls{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+body.rlol-standings input,
+body.rlol-standings select{
+  background: rgba(0,0,0,.55);
+  border: 1px solid rgba(255,255,255,.14);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+body.rlol-standings input:focus,
+body.rlol-standings select:focus{
+  border-color: rgba(255,138,0,.55);
+  box-shadow: 0 0 0 3px rgba(255,138,0,.12);
+}
+
+/* ---------- Table / rows (works for both table or div rows) ---------- */
+body.rlol-standings table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px; /* “card rows” feel */
+}
+
+body.rlol-standings thead th{
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .85;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+body.rlol-standings tbody tr{
+  background: rgba(0,0,0,.42);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+}
+
+body.rlol-standings tbody td{
+  padding: 14px 12px;
+  vertical-align: middle;
+}
+
+/* Rounded “row cards” */
+body.rlol-standings tbody tr td:first-child{
+  border-top-left-radius: 14px;
+  border-bottom-left-radius: 14px;
+}
+body.rlol-standings tbody tr td:last-child{
+  border-top-right-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+/* Hover glow */
+@media (hover:hover){
+  body.rlol-standings tbody tr:hover{
+    box-shadow:
+      0 0 0 1px rgba(255,138,0,.35),
+      0 0 18px rgba(255,138,0,.18),
+      inset 0 0 18px rgba(255,138,0,.10);
+    background: rgba(255,138,0,.06);
+  }
+}
+
+/* ---------- PLAYOFF GLOW (top 4 teams) ---------- */
+/* If your JS already assigns classes like .playoff or .above-cut, this will still help.
+   But if it doesn't, this nth-child approach matches your screenshot perfectly. */
+body.rlol-standings tbody tr:nth-child(-n+4){
+  background: linear-gradient(90deg, rgba(255,138,0,.16), rgba(0,0,0,.42));
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,.30),
+    0 0 14px rgba(255,138,0,.22),
+    inset 0 0 18px rgba(255,138,0,.10);
+}
+
+/* Slightly stronger divider line under the 4th row */
+body.rlol-standings tbody tr:nth-child(4){
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,.42),
+    0 0 18px rgba(255,138,0,.24),
+    inset 0 0 18px rgba(255,138,0,.12);
+}
+
+/* If you have a playoff-line element already */
+body.rlol-standings .playoff-line{
+  margin: 8px 0 12px;
+  padding: 14px 12px;
+  text-align: center;
+  font-family: var(--font-head);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  border-radius: 16px;
+  border: 1px solid rgba(255,138,0,.35);
+  background: linear-gradient(90deg, rgba(255,138,0,.10), rgba(0,0,0,.18), rgba(255,138,0,.10));
+  box-shadow: var(--glow-soft);
+}
+
+/* Footer */
+body.rlol-standings .footer{
+  margin-top: 10px;
+  opacity: .82;
+}
