@@ -947,6 +947,69 @@ body.stats-v2 .hero-v2 img:first-of-type{
   100% { filter: drop-shadow(0 0 14px rgba(255,86,0,.35)); opacity:.92; }
 }
 
+/* =========================
+   NAV: make links look like v2 tabs
+   ========================= */
+
+.nav{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(10px);
+  background: rgba(0,0,0,.35);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.nav .nav-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.nav .logo img.nav-logo{
+  height: 44px;
+  width: auto;
+  display:block;
+  filter: drop-shadow(0 0 18px rgba(255,86,0,.35));
+}
+
+.nav nav{
+  display:flex;
+  flex-wrap:wrap;
+  gap: 10px;
+  align-items:center;
+}
+
+.nav nav a{
+  text-decoration: none;
+  color: rgba(255,255,255,.86);
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.22);
+  transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+.nav nav a:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255,86,0,.22);
+  box-shadow: 0 0 0 1px rgba(255,86,0,.08) inset;
+}
+
+.nav nav a.active{
+  border-color: rgba(255,86,0,.35);
+  background: linear-gradient(180deg, rgba(255,86,0,.20), rgba(0,0,0,.22));
+  box-shadow: 0 12px 30px rgba(255,86,0,.10);
+}
+
 /* SHOP v2 */
 body.shop-v2 .shop-hero .lede{ max-width: 70ch; }
 
