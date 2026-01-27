@@ -1069,3 +1069,5 @@ body.shop-v2 .shop-sub{
 @media (max-width: 640px){
   body.shop-v2 .shop-grid{ grid-template-columns: 1fr; }
 }
+
+@import url("/assets/css/mobile-fix.css");
