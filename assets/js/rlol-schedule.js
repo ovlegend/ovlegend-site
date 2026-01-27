@@ -10,6 +10,7 @@
 
   // ---- Guard: config must exist ----
   const CSV_URL = window.OV_CONFIG?.rlol?.scheduleCsv;
+  const TEAMS_CSV_URL = window.OV_CONFIG?.rlol?.teamsCsv;
 
   if (!CSV_URL) {
     console.error("Missing OV_CONFIG.rlol.scheduleCsv. Check /assets/js/config.js");
@@ -18,6 +19,7 @@
   }
 
   let matches = [];
+  let teamLogoById = {}; // { wlw: "https://...", bread: "https://..." }
 
   /* ---------------- CSV PARSER (quoted commas safe) ---------------- */
   function parseCSV(text) {
@@ -82,34 +84,88 @@
       .replaceAll("'", "&#039;");
   }
 
+  /* ---------------- TEAM LOGOS ---------------- */
+  function loadTeamLogos() {
+    // Non-fatal: if not provided, just return empty map
+    if (!TEAMS_CSV_URL) return Promise.resolve({});
+
+    return fetch(TEAMS_CSV_URL)
+      .then(r => r.text())
+      .then(text => {
+        const rows = parseCSV(text);
+        const rawHeaders = rows.shift() || [];
+        const headers = rawHeaders.map(keyify);
+
+        const out = {};
+        rows
+          .filter(r => r.some(cell => String(cell || "").trim() !== ""))
+          .forEach(r => {
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = (r[i] || "").trim());
+
+            // Your sheet: team_id + logo_url
+            const id = get(obj, ["teamid", "team_id", "id"], "").toLowerCase();
+            const logo = get(obj, ["logourl", "logo_url", "logo"], "");
+
+            if (id && logo) out[id] = logo;
+          });
+
+        return out;
+      })
+      .catch(err => {
+        console.warn("Teams logos load failed (non-fatal):", err);
+        return {};
+      });
+  }
+
+  function teamCell(teamId) {
+    const id = String(teamId || "").trim().toLowerCase();
+    const logo = teamLogoById[id];
+
+    // If no logo, just render plain text (safe fallback)
+    if (!logo) return `<span class="team">${esc(teamId)}</span>`;
+
+    return `
+      <span class="team with-logo">
+        <img class="team-logo" src="${esc(logo)}" alt="${esc(id)} logo" loading="lazy"
+             onerror="this.style.display='none'">
+        <span class="team-name">${esc(teamId)}</span>
+      </span>
+    `;
+  }
+
   /* ---------------- LOAD ---------------- */
-  fetch(CSV_URL)
-    .then(r => r.text())
-    .then(text => {
-      const rows = parseCSV(text);
-      const rawHeaders = rows.shift() || [];
-      const headers = rawHeaders.map(keyify);
+  loadTeamLogos().then(map => {
+    teamLogoById = map || {};
 
-      matches = rows
-        .filter(r => r.some(cell => String(cell || "").trim() !== "")) // drop empty lines
-        .map(r => {
-          const obj = {};
-          headers.forEach((h, i) => obj[h] = (r[i] || "").trim());
-          return obj;
-        });
+    fetch(CSV_URL)
+      .then(r => r.text())
+      .then(text => {
+        const rows = parseCSV(text);
+        const rawHeaders = rows.shift() || [];
+        const headers = rawHeaders.map(keyify);
 
-      buildWeekFilter();
-      updateStatusPill();
-      render();
+        matches = rows
+          .filter(r => r.some(cell => String(cell || "").trim() !== "")) // drop empty lines
+          .map(r => {
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = (r[i] || "").trim());
+            return obj;
+          });
 
-      if (weekFilter) weekFilter.addEventListener("change", render);
-      if (statusFilter) statusFilter.addEventListener("change", render);
-      if (searchInput) searchInput.addEventListener("input", render);
-    })
-    .catch(err => {
-      console.error("Schedule load failed", err);
-      if (statusText) statusText.textContent = "Failed to load schedule";
-    });
+        buildWeekFilter();
+        updateStatusPill();
+        render();
+
+        if (weekFilter) weekFilter.addEventListener("change", render);
+        if (statusFilter) statusFilter.addEventListener("change", render);
+        if (searchInput) searchInput.addEventListener("input", render);
+      })
+      .catch(err => {
+        console.error("Schedule load failed", err);
+        if (statusText) statusText.textContent = "Failed to load schedule";
+      });
+  });
 
   /* ---------------- UI BUILD ---------------- */
   function buildWeekFilter() {
@@ -199,9 +255,9 @@
 
         <div class="match-center">
           <div class="teams">
-            <span class="team">${esc(t1)}</span>
+            ${teamCell(t1)}
             <span class="vs">vs</span>
-            <span class="team">${esc(t2)}</span>
+            ${teamCell(t2)}
           </div>
         </div>
 
