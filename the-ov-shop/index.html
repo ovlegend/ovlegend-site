@@ -3,153 +3,90 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The OV Shop | OV Legend</title>
+  <title>OV Shop | OV Legend</title>
+  <meta name="theme-color" content="#ff5600" />
 
-  <!-- Site CSS -->
-  <link rel="stylesheet" href="../assets/css/style.css" />
-
-  <!-- Small page-specific styles -->
-  <style>
-    .shop-wrap{
-      max-width:1100px;
-      margin:0 auto;
-      padding:36px 16px 60px;
-      color:#fff;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    }
-    .shop-hero{
-      background: linear-gradient(180deg, rgba(255,86,0,.95), rgba(255,86,0,.78));
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 20px;
-      padding: 28px 18px;
-      text-align:center;
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-      margin-bottom: 22px;
-    }
-    .shop-hero h1{
-      margin:0 0 8px 0;
-      font-family:"Impact","Arial Black",system-ui;
-      font-size: clamp(34px, 4vw, 56px);
-      letter-spacing: 1px;
-      text-shadow: 0 0 14px rgba(0,0,0,.25);
-    }
-    .shop-hero p{
-      margin:0 auto;
-      max-width: 820px;
-      opacity:.95;
-      line-height:1.5;
-    }
-
-    .shop-actions{
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      flex-wrap:wrap;
-      margin-top:14px;
-    }
-
-    .btn{
-      display:inline-block;
-      padding:10px 14px;
-      border-radius:999px;
-      background:#111;
-      color:#fff;
-      text-decoration:none;
-      border:1px solid rgba(255,86,0,.55);
-      box-shadow: 0 0 18px rgba(255,86,0,.18);
-      font-weight:700;
-      letter-spacing:.2px;
-    }
-    .btn:hover{
-      border-color: rgba(255,86,0,.9);
-      box-shadow: 0 0 26px rgba(255,86,0,.28);
-    }
-    .btn-outline{
-      background: transparent;
-      border: 1px solid rgba(255,255,255,.22);
-    }
-    .btn-outline:hover{
-      border-color: rgba(255,255,255,.40);
-    }
-
-    .shop-panel{
-      background: rgba(18,18,20,.85);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 20px;
-      overflow:hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-    }
-
-    .shop-embed{
-      width:100%;
-      height: 82vh;
-      min-height: 720px;
-      border: 0;
-      display:block;
-      background: #0b0b0d;
-    }
-
-    .shop-fallback{
-      display:none;
-      padding: 22px 18px;
-      text-align:center;
-    }
-    .shop-fallback p{
-      margin: 0 0 12px 0;
-      opacity: .9;
-      line-height: 1.5;
-    }
-
-    /* Nice on mobile */
-    @media (max-width: 640px){
-      .shop-embed{ min-height: 620px; height: 76vh; }
-    }
-  </style>
+  <link rel="stylesheet" href="/v2/assets/css/v2.css" />
 </head>
 
-<body>
-  <main class="shop-wrap">
+<body class="ov shop-v2">
 
-    <section class="shop-hero">
-      <h1>The OV Shop</h1>
-      <p>Official OV Legend merch — built for the Legends. New drops, limited runs, and the classics.</p>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="/">
+        <img class="nav-logo" src="/assets/img/brand/ov-mark.png" alt="OV Legend" />
+      </a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/rlol/">RLOL</a>
+        <a href="/stats/">Stats</a>
+        <a href="/lvb/">Legends vs. Bozos</a>
+        <a href="/builds/">Builds</a>
+        <a class="active" href="/shop/">Shop</a>
+      </nav>
+    </div>
+  </header>
 
-      <div class="shop-actions">
-        <a class="btn" href="#store">Shop Now</a>
-        <a class="btn btn-outline" href="/live/">Watch Live</a>
+  <main class="v2-wrap">
+    <section class="panel edge shop-hero">
+      <div class="in">
+        <div class="kicker">Merch • Support • Legendary</div>
+        <h1 class="h1 glow-title">OV SHOP</h1>
+        <p class="lede">
+          Official OV Legend merch. Drops rotate — grab what’s live, support the stream, stay legendary.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="PASTE_STREAMLABS_SHOP_URL_HERE" target="_blank" rel="noopener noreferrer">
+            Open Shop
+          </a>
+          <a class="btn ghost" href="mailto:ov@ovlegend.com">Questions / Support</a>
+        </div>
+
+        <div class="muted tiny" style="margin-top:10px;">
+          Shop opens in a new tab (Streamlabs). Payments + shipping handled by Streamlabs.
+        </div>
       </div>
     </section>
 
-    <section id="store" class="shop-panel">
-      <!-- EMBED -->
-      <iframe
-        class="shop-embed"
-        src="YOUR_STREAMLABS_STORE_URL"
-        title="OV Legend Streamlabs Store"
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"
-      ></iframe>
+    <section class="panel edge shop-featured" style="margin-top:18px;">
+      <div class="in">
+        <h2 class="h2">Featured Drops</h2>
+        <p class="muted">Hand-picked. Tap to view in the shop.</p>
 
-      <!-- FALLBACK (if embed is blocked) -->
-      <div class="shop-fallback" id="shopFallback">
-        <p>Your browser (or Streamlabs) is blocking the embedded shop.</p>
-        <a class="btn" href="https://streamlabs.com/ovlegend/merch" target="_blank" rel="noopener">Open The OV Shop</a>
+        <div class="shop-grid">
+          <a class="shop-card" href="PASTE_PRODUCT_URL" target="_blank" rel="noopener noreferrer">
+            <img src="/assets/img/shop/placeholder-1.jpg" alt="Featured item 1">
+            <div class="shop-meta">
+              <div class="shop-name">Legendary Tee</div>
+              <div class="shop-sub muted">Limited run</div>
+            </div>
+          </a>
+
+          <a class="shop-card" href="PASTE_PRODUCT_URL" target="_blank" rel="noopener noreferrer">
+            <img src="/assets/img/shop/placeholder-2.jpg" alt="Featured item 2">
+            <div class="shop-meta">
+              <div class="shop-name">OV Hoodie</div>
+              <div class="shop-sub muted">Premium</div>
+            </div>
+          </a>
+
+          <a class="shop-card" href="PASTE_PRODUCT_URL" target="_blank" rel="noopener noreferrer">
+            <img src="/assets/img/shop/placeholder-3.jpg" alt="Featured item 3">
+            <div class="shop-meta">
+              <div class="shop-name">Happy Hour Mug</div>
+              <div class="shop-sub muted">Best seller</div>
+            </div>
+          </a>
+        </div>
       </div>
     </section>
 
+    <footer class="footer">© <span id="year"></span> OV Legend</footer>
   </main>
 
   <script>
-    // If the iframe is blocked by X-Frame-Options / CSP, users often see a blank panel.
-    // This adds a simple fallback message after a short delay.
-    (function(){
-      const fallback = document.getElementById('shopFallback');
-      setTimeout(() => {
-        // Show fallback for safety; if embed loads, users will still see it above.
-        // (We can't reliably detect cross-origin iframe success.)
-        fallback.style.display = 'block';
-      }, 2500);
-    })();
+    document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
