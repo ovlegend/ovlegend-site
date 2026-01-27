@@ -862,3 +862,91 @@ body.rlol-standings .footer{
     0 0 6px rgba(255,138,0,.35),
     0 0 1px rgba(255,255,255,.12);
 }
+
+/* =========================
+   STANDINGS — fill card + playoff glow
+   ========================= */
+
+/* Make the standings card/container use full width */
+body.rlol-standings .standings-card{
+  width: 100%;
+}
+
+/* Make the table actually span the full card */
+body.rlol-standings .standings-table{
+  width: 100%;
+  table-layout: fixed;         /* keeps columns consistent */
+  border-collapse: collapse;
+}
+
+/* Header + cells spacing */
+body.rlol-standings .standings-table th,
+body.rlol-standings .standings-table td{
+  padding: 12px 14px;
+  vertical-align: middle;
+}
+
+/* Give Team column room, keep stats tight */
+body.rlol-standings .standings-table th:nth-child(2),
+body.rlol-standings .standings-table td:nth-child(2){
+  width: 44%;
+}
+
+body.rlol-standings .standings-table th:not(:nth-child(2)),
+body.rlol-standings .standings-table td:not(:nth-child(2)){
+  width: auto;
+  text-align: right;
+}
+
+/* Team cell layout */
+body.rlol-standings .standings-table .teamCell{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0; /* allow text ellipsis */
+}
+
+body.rlol-standings .standings-table .teamName{
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- PLAYOFF TEAMS (top 4) glow + orange outline ---- */
+body.rlol-standings .standings-table tr.playoffRow{
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(255,138,0,.14), rgba(0,0,0,.22));
+  box-shadow: var(--glow-strong);
+  outline: 1px solid rgba(255,138,0,.34);
+}
+
+/* Make the glow read even inside table layouts */
+body.rlol-standings .standings-table tr.playoffRow td{
+  border-top: 1px solid rgba(255,138,0,.18);
+  border-bottom: 1px solid rgba(255,138,0,.12);
+}
+
+/* Optional: slightly brighter team name for playoff rows */
+body.rlol-standings .standings-table tr.playoffRow .teamName{
+  text-shadow: 0 0 14px rgba(255,138,0,.18);
+}
+
+/* Playoff line row: full width bar */
+body.rlol-standings .standings-table tr.playoffLineRow td{
+  padding: 14px 16px;
+}
+
+body.rlol-standings .standings-table tr.playoffLineRow span{
+  display: block;
+  width: 100%;
+  text-align: center;
+  letter-spacing: .22em;
+  font-weight: 900;
+  padding: 12px 14px;
+  border-radius: 14px;
+
+  border: 1px solid rgba(255,138,0,.34);
+  box-shadow: var(--glow-soft);
+  background: linear-gradient(90deg, rgba(255,138,0,.10), rgba(0,0,0,.22));
+}
