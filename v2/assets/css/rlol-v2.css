@@ -564,3 +564,26 @@ td.active-stat {
   align-items: center !important;
   gap: 10px !important;
 }
+
+/* === Schedule row hover glow === */
+.match-row{
+  transition: 
+    box-shadow .25s ease,
+    transform .18s ease,
+    background .25s ease;
+}
+
+.match-row:hover{
+  background: linear-gradient(
+    90deg,
+    rgba(255,138,0,.08),
+    rgba(0,0,0,0)
+  );
+
+  box-shadow:
+    0 0 0 1px rgba(255,138,0,.35),
+    0 0 12px rgba(255,138,0,.35),
+    inset 0 0 18px rgba(255,138,0,.12);
+
+  transform: translateY(-1px);
+}
