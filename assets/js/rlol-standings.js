@@ -248,7 +248,7 @@
                 <tr class="${isPlayoff ? "playoffRow" : ""}">
                   <td class="num">${r.rank === 999 ? "" : r.rank}</td>
                   <td class="teamCell">
-                    ${r.logo ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" />` : `<div class="logo ph"></div>`}
+                      ${r.logo ? `<img class="logo" src="${r.logo}" alt="${r.team} logo" loading="lazy" style="width:28px!important;height:28px!important;max-width:28px!important;max-height:28px!important;min-width:28px!important;min-height:28px!important;object-fit:contain!important;display:inline-block!important;" />` : `<div class="logo ph"></div>`}
                     <div class="teamText">
                       <div class="teamName">${r.team || r.abbr || r.teamId || "TBD"}</div>
                       ${r.abbr ? `<div class="teamAbbr">${r.abbr}</div>` : ``}
