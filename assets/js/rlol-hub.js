@@ -211,25 +211,25 @@ const upcoming = mapped
       const t2 = m.team2 || "TBD";
 
       const row = document.createElement("div");
-      row.className = `match-row ${idx === 0 ? "playoff-glow" : ""} ${(!m.time && (!m.team1 || !m.team2)) ? "dim" : ""}`;
+      row.className = `match-row ${idx === 0 ? "playoff-glow" : ""} ${(!m.time || !m.team1 || !m.team2) ? "dim" : ""}`;
 
-      row.innerHTML = `
-        <div class="match-left">
-          <div class="match-time">
-            <div class="day">${esc(day || "TBD")}</div>
-            <div class="clock">${esc(clock)}</div>
-          </div>
-          <div class="match-info">
-            <div class="match-teams">
-              <span class="team">${esc(t1)}</span>
-              <span class="vs">vs</span>
-              <span class="team">${esc(t2)}</span>
-            </div>
-            <div class="match-meta">${esc(meta)}</div>
-          </div>
-        </div>
-        <a class="mini-link" href="/rlol/schedule/">Details</a>
-      `;
+row.innerHTML = `
+  <div class="match-left">
+    <div class="match-time">
+      <div class="day">${esc(day || "TBD")}</div>
+      <div class="clock">${esc(clock)}</div>
+    </div>
+    <div class="match-info">
+      <div class="match-teams">
+        <span class="team">${esc(t1)}</span>
+        <span class="vs">vs</span>
+        <span class="team">${esc(t2)}</span>
+      </div>
+      <div class="match-meta">${esc(meta)}</div>
+    </div>
+  </div>
+  <a class="mini-link" href="/rlol/schedule/">Details</a>
+`;
 
       nextMatchesEl.appendChild(row);
     });
