@@ -1106,3 +1106,36 @@ body.ov.cotw .hero,
 body.ov.cotw .hero-v2{
   background-image: none !important;
 }
+
+/* =========================
+   COTW – hide global OV seal layer (ALL possible sources)
+   ========================= */
+
+/* If it's a real element */
+body.ov.cotw .seal-wrap,
+body.ov.cotw .seal,
+body.ov.cotw .hero-wordmark,
+body.ov.cotw .left-stack{
+  display: none !important;
+}
+
+/* If it's on html/body pseudo-elements */
+html.ov.cotw::before,
+html.ov.cotw::after,
+body.ov.cotw::before,
+body.ov.cotw::after{
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  opacity: 0 !important;
+}
+
+/* If it's a background-image on wrappers */
+html.ov.cotw,
+body.ov.cotw,
+body.ov.cotw main,
+body.ov.cotw .container,
+body.ov.cotw .hero,
+body.ov.cotw .hero-v2{
+  background-image: none !important;
+}
