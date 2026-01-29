@@ -1150,8 +1150,8 @@ body.ov.cotw .left-stack{
 }
 
 /* If it's on html/body pseudo-elements */
-html.ov.cotw::before,
-html.ov.cotw::after,
+body.ov.cotw::before,
+body.ov.cotw::after,
 body.ov.cotw::before,
 body.ov.cotw::after{
   content: none !important;
@@ -1161,7 +1161,7 @@ body.ov.cotw::after{
 }
 
 /* If it's a background-image on wrappers */
-html.ov.cotw,
+body.ov.cotw,
 body.ov.cotw,
 body.ov.cotw main,
 body.ov.cotw .container,
