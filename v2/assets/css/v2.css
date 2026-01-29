@@ -1114,3 +1114,13 @@ body.cotw main,
 body.cotw .container{
   background-image: none !important;
 }
+
+/* =========================
+   COTW – disable global page overlays (body ::before/::after)
+   ========================= */
+body.ov.cotw::before,
+body.ov.cotw::after{
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
