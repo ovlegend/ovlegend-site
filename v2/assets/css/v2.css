@@ -1169,3 +1169,7 @@ body.ov.cotw .hero,
 body.ov.cotw .hero-v2{
   background-image: none !important;
 }
+
+body.ov.cotw img{
+  display: none !important;
+}
