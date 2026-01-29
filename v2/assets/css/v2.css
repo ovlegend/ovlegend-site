@@ -1090,3 +1090,19 @@ body.ov.cotw::after{
 body.ov.cotw{
   background: linear-gradient(180deg, #050505, #0b0b0b) !important;
 }
+
+/* =========================
+   COTW – force remove any global background images
+   ========================= */
+
+html body.ov.cotw{
+  background-image: none !important;
+  background-color: #050505 !important;
+}
+
+body.ov.cotw .container,
+body.ov.cotw main,
+body.ov.cotw .hero,
+body.ov.cotw .hero-v2{
+  background-image: none !important;
+}
