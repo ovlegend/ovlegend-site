@@ -1089,3 +1089,28 @@ body.cotw .hero,
 body.cotw .hero-v2 {
   background: linear-gradient(180deg, #050505, #0b0b0b) !important;
 }
+
+/* =========================
+   COTW – KILL ANY GLOBAL PAGE BACKGROUND/SEAL OVERLAY
+   ========================= */
+
+body.cotw::before,
+body.cotw::after,
+body.cotw .v2-wrap::before,
+body.cotw .v2-wrap::after,
+body.cotw .container::before,
+body.cotw .container::after,
+body.cotw main::before,
+body.cotw main::after{
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+
+/* Also clear any forced background images on high-level wrappers */
+body.cotw,
+body.cotw .v2-wrap,
+body.cotw main,
+body.cotw .container{
+  background-image: none !important;
+}
