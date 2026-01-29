@@ -1071,3 +1071,21 @@ body.shop-v2 .shop-sub{
 }
 
 @import url("/assets/css/mobile-fix.css");
+
+/* =========================
+   COTW PAGE – REMOVE GLOBAL HERO BACKGROUND
+   ========================= */
+
+body.cotw .hero::before,
+body.cotw .hero::after,
+body.cotw .hero-bg,
+body.cotw .seal-wrap,
+body.cotw .hero-v2::before,
+body.cotw .hero-v2::after {
+  display: none !important;
+}
+
+body.cotw .hero,
+body.cotw .hero-v2 {
+  background: linear-gradient(180deg, #050505, #0b0b0b) !important;
+}
