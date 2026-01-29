@@ -173,7 +173,7 @@ body::after{
   max-width: 62ch;
 }
 
-/* ===== Feast of Flesh — Gradient Titles (FINAL, clean + no fighting) ===== */
+/* ===== Feast of Flesh — Gradient Titles ===== */
 .h1,
 .h2,
 .card-title{
@@ -181,10 +181,40 @@ body::after{
   text-transform: uppercase;
   letter-spacing: .02em;
 
-  /* fixes the “O” clipping/cutoff */
   line-height: 1.15;
   padding-top: .10em;
   padding-bottom: .10em;
+
+  background-image: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #ffffff 45%,
+    #ffd6b0 65%,
+    #ff8a3a 82%,
+    #ff5600 100%
+  );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  -webkit-text-stroke: 0;
+
+  text-shadow:
+    0 1px 0 rgba(0,0,0,.12),
+    0 0 8px rgba(255,255,255,.45),
+    0 0 18px rgba(255,86,0,.55),
+    0 0 36px rgba(255,86,0,.35);
+}
+
+/* ==== FIX: FeastOfFlesh “O” clipping ==== */
+.h1, .h2, .card-title{
+  display: inline-block;
+  overflow: visible;
+  padding-left: .14em;
+  padding-right: .08em;
+}
+
 
   /* ==== FIX: FeastOfFlesh “O” clipping (give glyph room to breathe) ==== */
 .h1, .h2, .card-title{
