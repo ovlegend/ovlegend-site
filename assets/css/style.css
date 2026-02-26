@@ -2247,40 +2247,60 @@ body.lvb h1.lvb-title{
 }
 
 
-/* MVP LEADERBOARD STYLING */
+/* =========================
+   MVP LEADERBOARD (LVB)
+   Targets: <ul id="mvpList"><li>...</li></ul>
+   ========================= */
 
-.leaderboard {
+#mvpList{
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 12px;
 }
 
-.leaderboard span {
+/* Each row becomes a “card” */
+#mvpList li{
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 14px 18px;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 14px 16px;
   border-radius: 14px;
+
   background: linear-gradient(145deg, #121212, #0a0a0a);
-  border: 1px solid rgba(255,138,0,0.25);
-  box-shadow: 0 0 18px rgba(255,138,0,0.15);
+  border: 1px solid rgba(255,86,0,.22);
+  box-shadow: 0 0 18px rgba(255,86,0,.14);
+
   font-weight: 700;
-  transition: .25s ease;
+  color: rgba(255,255,255,.92);
+
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 
-.leaderboard span:hover {
+#mvpList li:hover{
   transform: translateY(-2px);
-  box-shadow: 0 0 28px rgba(255,138,0,0.4);
+  border-color: rgba(255,86,0,.35);
+  box-shadow:
+    0 0 28px rgba(255,86,0,.28),
+    0 18px 55px rgba(0,0,0,.55);
 }
 
-/* Rank number */
-.leaderboard span strong {
-  color: #ff8a00;
+/* Name styling */
+#mvpList li strong{
+  font-weight: 900;
+  letter-spacing: .02em;
+  color: #fff;
 }
 
-/* #1 MVP special glow */
-.leaderboard span:first-child {
-  border: 1px solid rgba(255,138,0,0.7);
-  box-shadow: 0 0 30px rgba(255,138,0,0.6);
+/* “— 1 MVP” part: push to right + muted */
+#mvpList li{
+  /* we’ll split using a pseudo-wrap approach:
+     strong stays left; everything after becomes right-aligned */
+}
+#mvpList li strong{
+  margin-right: auto;
 }
