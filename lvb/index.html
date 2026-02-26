@@ -10,129 +10,102 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
-  <!-- V2 CSS -->
-  <link rel="stylesheet" href="/v2/assets/css/v2.css?v=lvb3">
+  <!-- ORIGINAL LVB CSS (keeps the old look) -->
+  <link rel="stylesheet" href="/assets/css/style.css?v=lvb2">
 </head>
 
-<body class="ov">
+<body class="ov lvb">
 
   <!-- NAV -->
   <header class="nav">
     <div class="nav-inner">
       <a class="logo" href="/">
-        <img class="nav-logo" src="/assets/img/brand/ov-mark.png" alt="OV Legend" />
+        <img src="/assets/img/brand/ov-mark.png" alt="OV Legend" />
       </a>
 
       <nav>
         <a href="/">Home</a>
         <a href="/rlol/">RLOL</a>
         <a href="/stats/">Stats</a>
-        <a class="active" href="/lvb/">Legends vs. Bozos</a>
+        <a href="/lvb/">Legends vs. Bozos</a>
         <a href="/builds/">Builds</a>
       </nav>
     </div>
   </header>
 
   <!-- PAGE -->
-  <main class="v2-wrap">
+  <main class="container">
 
-    <!-- HERO / WAR RECORD -->
-    <section class="panel edge">
-      <div class="in">
-        <div class="kicker">OV Legend ⚡ War Record</div>
-        <h1 class="h1">Legends vs. Bozos</h1>
-        <p class="sub">
+    <!-- WAR RECORD HERO -->
+    <section class="panel panel-wide lvb-hero">
+      <div class="lvb-head">
+        <div class="lvb-kicker">OV Legend ⚡ War Record</div>
+        <h1 class="lvb-title">Legends vs. Bozos</h1>
+
+        <p class="lvb-sub">
           This page tracks the ongoing community war record — updated automatically after streams.
         </p>
 
-        <div class="hero-actions">
-          <a class="btn" href="https://twitch.tv/the_ov_legend" target="_blank" rel="noopener noreferrer">Watch on Twitch</a>
-          <a class="btn" href="/">Back Home</a>
+        <div class="lvb-actions">
+          <a class="btn ghost" href="https://twitch.tv/the_ov_legend" target="_blank" rel="noopener noreferrer">Watch on Twitch</a>
+          <a class="btn ghost" href="/">Back Home</a>
+        </div>
+      </div>
+
+      <div class="lvb-grid">
+        <div class="stat-card">
+          <div class="stat-label">Legends Wins</div>
+          <div class="stat-value" id="lw">—</div>
         </div>
 
-        <div class="hq-grid" style="margin-top:16px;">
-          <div class="card edge">
-            <div class="in">
-              <div class="card-top">
-                <h2 class="card-title">Legends Wins</h2>
-                <span class="pill">All-time</span>
-              </div>
-              <div id="lw" style="font-size:42px; font-weight:900; letter-spacing:.02em;">—</div>
-            </div>
-          </div>
-
-          <div class="card edge">
-            <div class="in">
-              <div class="card-top">
-                <h2 class="card-title">Bozos Wins</h2>
-                <span class="pill">All-time</span>
-              </div>
-              <div id="bw" style="font-size:42px; font-weight:900; letter-spacing:.02em;">—</div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="in">
-              <div class="card-top">
-                <h2 class="card-title">Total Games</h2>
-                <span class="pill">All-time</span>
-              </div>
-              <div id="tg" style="font-size:42px; font-weight:900; letter-spacing:.02em;">—</div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="in">
-              <div class="card-top">
-                <h2 class="card-title">Win %</h2>
-                <span class="pill">All-time</span>
-              </div>
-              <div id="wp" style="font-size:42px; font-weight:900; letter-spacing:.02em;">—</div>
-            </div>
-          </div>
+        <div class="stat-card">
+          <div class="stat-label">Bozos Wins</div>
+          <div class="stat-value" id="bw">—</div>
         </div>
 
-        <div class="card edge" id="streakWrap" style="margin-top:14px;">
-          <div class="in">
-            <div class="card-top">
-              <h2 class="card-title">Current Streak</h2>
-              <span class="pill">Live</span>
-            </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Games</div>
+          <div class="stat-value" id="tg">—</div>
+        </div>
 
-            <div style="display:flex; align-items:center; gap:10px; margin-top:6px;">
-              <span aria-hidden="true">🔥</span>
-              <div id="streak" style="font-size:22px; font-weight:900; letter-spacing:.06em;">—</div>
-            </div>
+        <div class="stat-card">
+          <div class="stat-label">Win %</div>
+          <div class="stat-value" id="wp">—</div>
+        </div>
 
-            <div class="sub" id="streakHint" style="max-width:none; margin-top:8px;">
-              Updates automatically.
-            </div>
+        <div class="streak-card" id="streakWrap" aria-live="polite">
+          <div class="streak-label">Current Streak</div>
+          <div class="streak-value">
+            <span class="streak-flame">🔥</span>
+            <span id="streak">—</span>
           </div>
+          <div class="streak-hint" id="streakHint">Updates automatically.</div>
         </div>
+      </div>
 
-        <div class="sub" style="margin-top:12px; opacity:.72;">
-          Data source: Google Sheets (published CSV)
-        </div>
+      <div class="lvb-foot muted">
+        Data source: Google Sheets (published CSV)
       </div>
     </section>
 
-    <!-- MVP LEADERBOARD -->
-    <section class="panel edge" style="margin-top:18px;">
-      <div class="in">
-        <div class="kicker">Community ⚡ Leaderboard</div>
-        <h2 class="h2">Legends Hall of Fame</h2>
-        <p class="sub">Legends voted Stream MVP during Legendary Queue nights.</p>
+    <!-- MVP LEADERBOARD (matches original look) -->
+    <section class="panel panel-wide" style="margin-top:18px;">
+      <div class="lvb-head">
+        <div class="lvb-kicker">Community ⚡ Leaderboard</div>
+        <h2 class="lvb-title" style="font-size: clamp(34px, 4vw, 56px);">Legends Hall of Fame</h2>
 
-        <div class="card edge" style="margin-top:14px;">
-          <div class="in">
-            <div class="card-top">
-              <h3 class="card-title">Top Stream MVPs</h3>
-              <span class="pill">Top 10</span>
-            </div>
+        <p class="lvb-sub">
+          Legends voted Stream MVP during Legendary Queue nights. Top 10 shown.
+        </p>
+      </div>
 
-            <ol id="mvpList" class="mvp-list"></ol>
-            <div class="sub" id="mvpHint" style="max-width:none; margin-top:10px;">Loading MVP leaderboard…</div>
-          </div>
+      <div class="lvb-grid">
+        <!-- Use the same stat-card style, but let it span full width -->
+        <div class="stat-card" style="grid-column: 1 / -1;">
+          <div class="stat-label">Top Stream MVPs</div>
+
+          <ol id="mvpList" style="margin: 12px 0 0; padding-left: 20px;"></ol>
+          <div class="muted" id="mvpHint" style="margin-top:10px;">Loading MVP leaderboard…</div>
         </div>
       </div>
     </section>
@@ -140,57 +113,25 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="footer" style="text-align:center; padding: 28px 0 40px; opacity:.8;">
+  <footer class="footer">
     © <span id="year"></span> OV Legend
   </footer>
-
-  <!-- Small, scoped styles for the MVP list only -->
-  <style>
-    .mvp-list{
-      margin: 12px 0 0;
-      padding-left: 18px;
-      display: grid;
-      gap: 10px;
-    }
-    .mvp-list li{
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 14px;
-    }
-    .mvp-list .mvp-name{
-      font-weight: 900;
-      letter-spacing: .02em;
-    }
-    .mvp-list .mvp-count{
-      font-weight: 900;
-      letter-spacing: .08em;
-      opacity: .92;
-      white-space: nowrap;
-    }
-  </style>
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // WAR RECORD (Public_API tab)
-    const CSV_URL =
-      "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcEA64SCB5PySpPVfagT2DUHyJSqq27IIiWzuR2vXI4xiuQ_QBQx_HhdHi_v8gUZxzS28CL1JypVoA/pub?gid=108397746&single=true&output=csv";
+    // Existing Public_API (key/value) CSV
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcEA64SCB5PySpPVfagT2DUHyJSqq27IIiWzuR2vXI4xiuQ_QBQx_HhdHi_v8gUZxzS28CL1JypVoA/pub?gid=108397746&single=true&output=csv";
 
-    // MVP LEADERBOARD (MVP_LEADERBOARD tab)
-    const MVP_CSV_URL =
-      "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcEA64SCB5PySpPVfagT2DUHyJSqq27IIiWzuR2vXI4xiuQ_QBQx_HhdHi_v8gUZxzS28CL1JypVoA/pub?gid=1379460896&single=true&output=csv";
+    // MVP_LEADERBOARD tab CSV
+    const MVP_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcEA64SCB5PySpPVfagT2DUHyJSqq27IIiWzuR2vXI4xiuQ_QBQx_HhdHi_v8gUZxzS28CL1JypVoA/pub?gid=1379460896&single=true&output=csv";
 
     function safeText(id, value){
       const el = document.getElementById(id);
       if(el) el.textContent = (value ?? "—");
     }
 
-    // Basic CSV parser (good for your simple sheet outputs)
+    // Basic CSV parser (handles quoted cells enough for simple sheets)
     function parseCSVBasic(text) {
       const rows = text.trim().split("\n").map(r => r.split(","));
       return rows.map(r => r.map(c => (c ?? "").trim().replace(/^"|"$/g, "")));
@@ -239,12 +180,19 @@
         const streakText = (lastRes && streakCount) ? `${lastRes} ${streakCount}` : "—";
         safeText("streak", streakText);
 
-        // Hint text
+        const wrap = document.getElementById("streakWrap");
         const hint = document.getElementById("streakHint");
-        if(hint){
-          if(lastRes === "W") hint.textContent = "Legends are rolling. Keep it going.";
-          else if(lastRes === "L") hint.textContent = "Bozos got one. Run it back.";
-          else hint.textContent = "Updates automatically.";
+        if(wrap){
+          wrap.classList.remove("is-win", "is-loss");
+          if(lastRes === "W") {
+            wrap.classList.add("is-win");
+            if(hint) hint.textContent = "Legends are rolling. Keep it going.";
+          } else if(lastRes === "L") {
+            wrap.classList.add("is-loss");
+            if(hint) hint.textContent = "Bozos got one. Run it back.";
+          } else {
+            if(hint) hint.textContent = "Updates automatically.";
+          }
         }
       })
       .catch(err => {
@@ -257,13 +205,17 @@
     // 2) MVP LEADERBOARD FETCH
     // =========================
     fetch(MVP_CSV_URL, { cache: "no-store" })
-      .then(r => r.text())
+      .then(r => {
+        if(!r.ok) throw new Error("MVP CSV fetch failed: " + r.status);
+        return r.text();
+      })
       .then(t => {
         const rows = parseCSVBasic(t);
         const list = document.getElementById("mvpList");
         const hint = document.getElementById("mvpHint");
         if(!list || !hint) return;
 
+        // Need headers + at least one row
         if(rows.length < 2){
           list.innerHTML = "";
           hint.textContent = "No MVPs yet — first winner will appear here ⚡";
@@ -297,17 +249,7 @@
 
         data.slice(0, 10).forEach(p => {
           const li = document.createElement("li");
-
-          const left = document.createElement("span");
-          left.className = "mvp-name";
-          left.textContent = p.name;
-
-          const right = document.createElement("span");
-          right.className = "mvp-count";
-          right.textContent = `${p.mvps} MVP${p.mvps === 1 ? "" : "s"}`;
-
-          li.appendChild(left);
-          li.appendChild(right);
+          li.innerHTML = `<strong>${p.name}</strong> — ${p.mvps} MVP${p.mvps === 1 ? "" : "s"}`;
           list.appendChild(li);
         });
 
