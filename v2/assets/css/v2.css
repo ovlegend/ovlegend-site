@@ -1173,3 +1173,41 @@ body.ov.cotw .hero-v2{
 body.ov.cotw img{
   display: none !important;
 }
+
+/* MVP LEADERBOARD STYLING */
+
+.leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.leaderboard span {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #121212, #0a0a0a);
+  border: 1px solid rgba(255,138,0,0.25);
+  box-shadow: 0 0 18px rgba(255,138,0,0.15);
+  font-weight: 700;
+  transition: .25s ease;
+}
+
+.leaderboard span:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(255,138,0,0.4);
+}
+
+/* Rank number */
+.leaderboard span strong {
+  color: #ff8a00;
+}
+
+/* #1 MVP special glow */
+.leaderboard span:first-child {
+  border: 1px solid rgba(255,138,0,0.7);
+  box-shadow: 0 0 30px rgba(255,138,0,0.6);
+}
